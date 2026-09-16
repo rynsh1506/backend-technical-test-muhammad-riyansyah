@@ -29,7 +29,7 @@ Proyek ini secara ketat mengadopsi struktur berbasis fitur (_Vertical Slice / Do
 - `src/modules/`: Berisi berbagai domain bisnis (seperti `auth`, `products`, dll). Setiap modul wajib memisahkan HTTP Controller (`index.ts`), Logika Bisnis (`service.ts`), dan Skema Database/Validasi (`model.ts`).
 - `src/config/`: Konfigurasi global (Database, Env).
 - `src/utils/`: Fungsi utilitas _reusable_ (seperti setup JWT, _Route Guard/Middleware_, dll).
-- `test/`: _End-to-End Type-Safe Unit Testing_ menggunakan Eden Treaty.
+- `*.test.ts`: _End-to-End Type-Safe Unit Testing_ menggunakan Eden Treaty diletakkan berdampingan langsung di dalam folder modul masing-masing.
 
 ## 🗄️ Desain Database (Database Design)
 
