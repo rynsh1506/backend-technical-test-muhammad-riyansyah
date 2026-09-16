@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
-import { db } from "../../utils/db";
+import { db } from "@/utils/db";
 import { users } from "./model";
 import type { AuthModelTypes } from "./model";
 
