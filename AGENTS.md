@@ -11,6 +11,8 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
 
 ## 2. Git & Branching Strategy
 
+- **Merge Strategy (Classic Merge Commit):** You MUST ALWAYS use standard merge commits (`gh pr merge --merge`) to preserve the branching history graph (the 'railroad' look). DO NOT use 'Squash and Merge' or 'Rebase and Merge' unless explicitly asked, as the user prefers the branched visualization.
+
 - **Branch Hierarchy:**
   - `main`: Production-ready code ONLY.
   - `dev`: Staging and integration branch.
