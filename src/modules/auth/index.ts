@@ -1,10 +1,8 @@
 import { Elysia, t } from "elysia";
 import { jwt } from "@elysiajs/jwt";
-import { eq } from "drizzle-orm";
-import { db } from "../../utils/db";
-import { users } from "./model";
+import { validateUserCredentials } from "./service";
 
-// Define the JWT payload type
+// Define the JWT payload type & Authentication Middleware
 export const authSetup = new Elysia()
   .use(
     jwt({
@@ -12,8 +10,7 @@ export const authSetup = new Elysia()
       secret: process.env.JWT_SECRET || "default_secret",
     })
   )
-  .derive(async ({ jwt, cookie: { auth_token }, set }) => {
-    // Middleware to extract and verify the JWT from HttpOnly Cookie
+  .derive(async ({ jwt, cookie: { auth_token } }) => {
     return {
       getCurrentUser: async () => {
         if (!auth_token.value) {
@@ -37,18 +34,10 @@ export const authController = new Elysia({ prefix: "/auth" })
     async ({ body, jwt, cookie: { auth_token }, set }) => {
       const { username, password } = body;
 
-      // Find user
-      const userList = await db.select().from(users).where(eq(users.username, username)).limit(1);
-      const user = userList[0];
+      // Delegate business logic to the service layer
+      const user = await validateUserCredentials(username, password);
 
       if (!user) {
-        set.status = 401;
-        return { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } };
-      }
-
-      // Verify password
-      const isMatch = await Bun.password.verify(password, user.password);
-      if (!isMatch) {
         set.status = 401;
         return { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } };
       }
@@ -71,11 +60,7 @@ export const authController = new Elysia({ prefix: "/auth" })
 
       return {
         message: "Login successful",
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role,
-        },
+        user,
       };
     },
     {
