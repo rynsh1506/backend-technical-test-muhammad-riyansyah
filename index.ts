@@ -1,19 +1,24 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import { authController } from "./src/modules/auth";
+import { cors } from "@elysiajs/cors";
 import { APP_CONFIG } from "./src/config";
+import { authController } from "./src/modules/auth";
 
 export const app = new Elysia()
-  .use(swagger({
-    documentation: {
-      info: {
-        title: "Inventory Procurement API",
-        version: "1.0.0"
-      }
-    }
-  }))
-  .use(authController)
-  .get("/", () => "Inventory Procurement API is running!")
-  .listen(APP_CONFIG.PORT);
+  .use(cors()) // Enable CORS for frontend integration
+  .use(
+    swagger({
+      documentation: {
+        info: {
+          title: "Backend Technical Test API",
+          version: "1.0.0",
+          description: "API Documentation for Master Data and Purchase Request System",
+        },
+      },
+    })
+  )
+  .use(authController);
 
-console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+app.listen(APP_CONFIG.PORT, () => {
+  console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+});
