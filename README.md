@@ -8,9 +8,11 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ## 📖 Ringkasan Proyek (Project Overview)
-Proyek ini adalah sistem *Backend* untuk manajemen **Inventory dan Purchase Request**. Sistem ini dirancang untuk menangani pencatatan Master Data (Produk, Supplier, Gudang), pergerakan stok barang, hingga alur persetujuan (Approval) untuk pengadaan barang secara *End-to-End*.
+
+Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Request**. Sistem ini dirancang untuk menangani pencatatan Master Data (Produk, Supplier, Gudang), pergerakan stok barang, hingga alur persetujuan (Approval) untuk pengadaan barang secara _End-to-End_.
 
 ## 🛠️ Tech Stack
+
 - **Runtime & Package Manager**: Bun
 - **Web Framework**: ElysiaJS
 - **Language**: TypeScript (Strict Mode)
@@ -21,61 +23,71 @@ Proyek ini adalah sistem *Backend* untuk manajemen **Inventory dan Purchase Requ
 - **Infrastructure**: Docker & Docker Compose
 
 ## 📂 Struktur Proyek (Project Structure)
-Proyek ini secara ketat mengadopsi struktur berbasis fitur (*Vertical Slice / Domain-Driven*).
+
+Proyek ini secara ketat mengadopsi struktur berbasis fitur (_Vertical Slice / Domain-Driven_).
+
 - `src/modules/`: Berisi berbagai domain bisnis (seperti `auth`, `products`, dll). Setiap modul wajib memisahkan HTTP Controller (`index.ts`), Logika Bisnis (`service.ts`), dan Skema Database/Validasi (`model.ts`).
 - `src/config/`: Konfigurasi global (Database, Env).
-- `src/utils/`: Fungsi utilitas *reusable* (seperti setup JWT, *Route Guard/Middleware*, dll).
-- `test/`: *End-to-End Type-Safe Unit Testing* menggunakan Eden Treaty.
+- `src/utils/`: Fungsi utilitas _reusable_ (seperti setup JWT, _Route Guard/Middleware_, dll).
+- `test/`: _End-to-End Type-Safe Unit Testing_ menggunakan Eden Treaty.
 
 ## 🗄️ Desain Database (Database Design)
-*(Akan diperbarui saat modul Master Data & Transaksi dikerjakan)*
+
+_(Akan diperbarui saat modul Master Data & Transaksi dikerjakan)_
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
-- **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur resmi dari ElysiaJS. *Controller* (`index.ts`) secara khusus hanya mengurus urusan HTTP (seperti *Cookie*, kode status, rute), sedangkan *Service* (`service.ts`) murni menangani logika bisnis dan operasi *database*.
-  - **Kenapa?** Untuk memastikan pemisahan tanggung jawab (*separation of concerns*) yang murni dan mencapai 100% *Type Safety* tanpa menggunakan *casting* tipe data secara paksa (`any` / `as unknown`).
+- **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur resmi dari ElysiaJS. _Controller_ (`index.ts`) secara khusus hanya mengurus urusan HTTP (seperti _Cookie_, kode status, rute), sedangkan _Service_ (`service.ts`) murni menangani logika bisnis dan operasi _database_.
+  - **Kenapa?** Untuk memastikan pemisahan tanggung jawab (_separation of concerns_) yang murni dan mencapai 100% _Type Safety_ tanpa menggunakan _casting_ tipe data secara paksa (`any` / `as unknown`).
 - **Dokumentasi API Modern (Scalar UI)**: Beralih dari antarmuka Swagger UI klasik ke Scalar UI (`@elysia/openapi`) yang jauh lebih modern.
-  - **Kenapa?** Untuk memberikan *playground* API yang sangat interaktif, responsif, dan estetis, lengkap dengan cuplikan kode (*code snippet*) multibahasa bagi para penguji (*Reviewer*).
-- **Penjaga Rute yang Kuat (Middleware)**: Memanfaatkan fungsi siklus hidup (*lifecycle hook*) `.resolve` dari Elysia untuk menciptakan *middleware* `isAuthenticated`.
-  - **Kenapa?** Berfungsi sebagai "Penjaga" (*Guard*) ber-tipe kuat yang otomatis memblokir *request* tanpa izin sebelum mencapai *Controller*. Ini menjaga *Controller* tetap bersih dan menjamin bahwa ia selalu menerima objek *User* yang tidak mungkin bernilai `null`.
+  - **Kenapa?** Untuk memberikan _playground_ API yang sangat interaktif, responsif, dan estetis, lengkap dengan cuplikan kode (_code snippet_) multibahasa bagi para penguji (_Reviewer_).
+- **Penjaga Rute yang Kuat (Middleware)**: Memanfaatkan fungsi siklus hidup (_lifecycle hook_) `.resolve` dari Elysia untuk menciptakan _middleware_ `isAuthenticated`.
+  - **Kenapa?** Berfungsi sebagai "Penjaga" (_Guard_) ber-tipe kuat yang otomatis memblokir _request_ tanpa izin sebelum mencapai _Controller_. Ini menjaga _Controller_ tetap bersih dan menjamin bahwa ia selalu menerima objek _User_ yang tidak mungkin bernilai `null`.
 - **Validasi DRY (Drizzle-Typebox)**: Mengadopsi `drizzle-typebox` untuk secara otomatis menghasilkan skema validasi Elysia (TypeBox) langsung dari skema PostgreSQL Drizzle (menggunakan fungsi `t.Pick`).
-  - **Kenapa?** Untuk membangun *Single Source of Truth* (Satu Sumber Kebenaran). Hal ini memastikan lapisan validasi API selalu 100% sinkron dengan struktur *database* tanpa perlu mengetik ulang kodenya (menerapkan prinsip DRY - *Don't Repeat Yourself*).
-- **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk *unit testing* alih-alih menyusun objek `Request` secara manual.
-  - **Kenapa?** Untuk menegakkan *End-to-End Type Safety* mutlak. Klien ini secara otomatis membaca tipe data dari *backend* langsung di dalam file *test*, mencegah *typo*, dan memastikan setiap perubahan pada skema API akan langsung memunculkan *error* TypeScript pada sesi pengujian.
+  - **Kenapa?** Untuk membangun _Single Source of Truth_ (Satu Sumber Kebenaran). Hal ini memastikan lapisan validasi API selalu 100% sinkron dengan struktur _database_ tanpa perlu mengetik ulang kodenya (menerapkan prinsip DRY - _Don't Repeat Yourself_).
+- **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _unit testing_ alih-alih menyusun objek `Request` secara manual.
+  - **Kenapa?** Untuk menegakkan _End-to-End Type Safety_ mutlak. Klien ini secara otomatis membaca tipe data dari _backend_ langsung di dalam file _test_, mencegah _typo_, dan memastikan setiap perubahan pada skema API akan langsung memunculkan _error_ TypeScript pada sesi pengujian.
 - **Arsitektur Database**: Menggunakan **PostgreSQL** bersama **Drizzle ORM**.
-  - **Kenapa?** Untuk menjaga *query* yang aman dari tipe data (*type-safe*) dan secara ketat menerapkan standar penamaan `snake_case` di tabel *database*, sambil dengan elegan memetakannya ke `camelCase` di dalam *codebase* TypeScript.
-- **Keamanan (JWT via HttpOnly Cookies)**: Dipilih sebagai pengganti token *Bearer/LocalStorage* tradisional.
-  - **Kenapa?** Untuk melindungi aplikasi dari serangan *XSS (Cross-Site Scripting)* dan menyederhanakan manajemen *state* di *frontend*, sekaligus memenuhi mandat keamanan dari *technical test* ini.
+  - **Kenapa?** Untuk menjaga _query_ yang aman dari tipe data (_type-safe_) dan secara ketat menerapkan standar penamaan `snake_case` di tabel _database_, sambil dengan elegan memetakannya ke `camelCase` di dalam _codebase_ TypeScript.
+- **Keamanan (JWT via HttpOnly Cookies)**: Dipilih sebagai pengganti token _Bearer/LocalStorage_ tradisional.
+  - **Kenapa?** Untuk melindungi aplikasi dari serangan _XSS (Cross-Site Scripting)_ dan menyederhanakan manajemen _state_ di _frontend_, sekaligus memenuhi mandat keamanan dari _technical test_ ini.
 - **Manajemen Peran (Role)**: Diimplementasikan sebagai kolom `VARCHAR` sederhana di dalam tabel `users` daripada membuat tabel relasional `roles` terpisah.
-  - **Kenapa?** Aturan bisnis di soal secara tegas hanya meminta dua peran statis (USER dan APPROVER). Pendekatan ini mencegah *over-engineering* dan memenuhi instruksi untuk menjaga solusi tetap sederhana (*Keep it simple*).
+  - **Kenapa?** Aturan bisnis di soal secara tegas hanya meminta dua peran statis (USER dan APPROVER). Pendekatan ini mencegah _over-engineering_ dan memenuhi instruksi untuk menjaga solusi tetap sederhana (_Keep it simple_).
 
 ## 💡 Asumsi (Assumptions)
 
-*(Akan diisi ketika ada kondisi bisnis yang tidak disebutkan dalam spesifikasi soal dan membutuhkan pengambilan keputusan mandiri)*
+_(Akan diisi ketika ada kondisi bisnis yang tidak disebutkan dalam spesifikasi soal dan membutuhkan pengambilan keputusan mandiri)_
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
 ### 1. Environment Variables
-Salin contoh file *env*:
+
+Salin contoh file _env_:
+
 ```bash
 cp .env.example .env
 ```
 
 ### 2. Menggunakan Docker (Direkomendasikan)
-Cara paling mudah untuk menjalankan aplikasi dan *database* sekaligus:
+
+Cara paling mudah untuk menjalankan aplikasi dan _database_ sekaligus:
+
 ```bash
 docker compose up -d --build
 ```
+
 Aplikasi akan menyala di `http://localhost:3000`.
 
 ### 3. Cara Menjalankan Tanpa Docker (Lokal)
+
 Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
+
 1. Pastikan PostgreSQL sudah menyala dan sesuaikan `DATABASE_URL` di `.env`.
 2. Install dependensi:
    ```bash
    bun install
    ```
-3. Jalankan migrasi *database*:
+3. Jalankan migrasi _database_:
    ```bash
    bun run db:migrate
    ```
@@ -85,11 +97,14 @@ Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
    ```
 
 ## 🧪 Pengujian (Testing)
-Untuk menjalankan *End-to-End Type-Safe Unit Test* (menggunakan Bun Test + Eden Treaty):
+
+Untuk menjalankan _End-to-End Type-Safe Unit Test_ (menggunakan Bun Test + Eden Treaty):
+
 ```bash
 bun test
 ```
 
 ## 📚 Dokumentasi API
-Buka tautan berikut di *browser* Anda untuk mengakses Dokumentasi API (Scalar UI) secara interaktif:
+
+Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API (Scalar UI) secara interaktif:
 👉 **[http://localhost:3000/openapi](http://localhost:3000/openapi)**
