@@ -72,16 +72,22 @@ _(Instructions will be added as the project is built)_
 
 ## 🧠 Engineering Decisions
 
-- **Strict Architecture (Controller vs Service)**: Following the official ElysiaJS feature-based structure, the *Controller* (`index.ts`) strictly handles HTTP specifics (Routing, Cookie assignment, JWT signing, Status Codes), while the *Service* (`service.ts`) is completely decoupled from the HTTP Context and focuses purely on Business Logic and Database operations. This ensures 100% Type Safety without resorting to `any` or manual type assertions.
-- **Modern API Documentation**: Transitioned from classic Swagger UI (`@elysiajs/swagger`) to the modern Scalar UI (`@elysia/openapi`) to provide a highly interactive, fast, and aesthetically pleasing API playground for reviewers.
-- **Robust Route Guards (Middleware)**: Leveraged Elysia's `.resolve` lifecycle hook to create an `isAuthenticated` middleware. This acts as a highly typed "Guard" that automatically rejects unauthorized requests before they reach the controller, ensuring the controller receives a strictly non-null User object.
-- **DRY Validation with Drizzle-Typebox**: Adopted `drizzle-typebox` to automatically generate Elysia (TypeBox) validation schemas directly from Drizzle PostgreSQL schemas. By using `t.Pick` and `t.Omit`, we ensure the API validation layer is always 100% in sync with the database structure without repeating code.
-- **Comprehensive Edge-Case Testing**: Automated test coverage goes beyond happy paths. The test suite aggressively validates malformed payloads, forged JWT signatures, absence of cookies, and idempotency of logout operations to guarantee a bulletproof Auth module.
-
-- **Framework Choice**: Chosen **ElysiaJS** running on **Bun** for maximum performance and excellent end-to-end TypeScript support.
-- **Database Architecture**: **PostgreSQL** is used as the relational engine. **Drizzle ORM** was chosen to maintain type-safe queries and strict `snake_case` database schema while elegantly keeping `camelCase` in the TypeScript codebase.
-- **Authentication & Security**: Utilized Bun's native `Bun.password.hash` for password hashing to minimize dependencies. For Session Management, **JWT via HttpOnly Cookies** was chosen over traditional LocalStorage/Bearer tokens. This protects the application against XSS (Cross-Site Scripting) attacks and simplifies the frontend implementation, fulfilling the test's security and simplicity mandates.
-- **Role Management**: Implemented `role` as a simple `VARCHAR` column in the `users` table rather than creating a separate relational `roles` table. Since the business requirements strictly mandate only two static roles (USER and APPROVER) without complex hierarchical permissions, this approach satisfies the "keep the solution simple" requirement and prevents over-engineering.
+- **Strict Architecture (Controller vs Service)**: Following the official ElysiaJS feature-based structure, the *Controller* strictly handles HTTP specifics (Cookie assignment, JWT, Status Codes), while the *Service* is completely decoupled from the HTTP Context. 
+  - **Why?** To ensure pure separation of concerns and 100% Type Safety without resorting to `any` or brute-force type assertions.
+- **Modern API Documentation (Scalar UI)**: Transitioned from classic Swagger UI to the modern Scalar UI (`@elysia/openapi`). 
+  - **Why?** To provide a highly interactive, fast, and aesthetically pleasing API playground with auto-generated multi-language request snippets for the reviewers.
+- **Robust Route Guards (Middleware)**: Leveraged Elysia's `.resolve` lifecycle hook to create an `isAuthenticated` middleware. 
+  - **Why?** To act as a highly typed "Guard" that automatically rejects unauthorized requests before they reach the controller. This keeps the controller clean and guarantees it receives a strictly non-null User object.
+- **DRY Validation (Drizzle-Typebox)**: Adopted `drizzle-typebox` to automatically generate Elysia (TypeBox) validation schemas directly from Drizzle PostgreSQL schemas using `t.Pick`. 
+  - **Why?** To establish a Single Source of Truth. It ensures the API validation layer is always 100% in sync with the database structure without repeating code (DRY principle).
+- **E2E Type-Safe Testing (Eden Treaty)**: Adopted Elysia's `@elysiajs/eden` Treaty client for unit testing instead of manual `Request` crafting. 
+  - **Why?** To enforce absolute End-to-End Type Safety. It infers backend types directly in the test file, eliminating typos and ensuring that any API schema changes immediately flag as TypeScript errors in the tests.
+- **Database Architecture**: **PostgreSQL** with **Drizzle ORM**.
+  - **Why?** To maintain type-safe queries and strictly enforce standard `snake_case` database schemas while elegantly mapping them to `camelCase` in the TypeScript codebase.
+- **Security (JWT via HttpOnly Cookies)**: Chosen over traditional LocalStorage/Bearer tokens. 
+  - **Why?** To protect the application against XSS (Cross-Site Scripting) attacks and simplify the frontend state management, fulfilling the technical test's security mandates.
+- **Role Management**: Implemented `role` as a simple `VARCHAR` column rather than a separate relational table. 
+  - **Why?** The business requirements mandate only two static roles (USER and APPROVER). This approach prevents over-engineering and satisfies the "keep the solution simple" requirement.
 
 ## 💡 Assumptions
 
