@@ -2,15 +2,15 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   test:
     name: Run Unit Tests
     runs-on: ubuntu-latest
-    
+
     env:
       DB_HOST: localhost
       DB_PORT: 5432
