@@ -1,18 +1,27 @@
 import { Elysia } from "elysia";
-import { swagger } from "@elysiajs/swagger";
+import { openapi } from "@elysia/openapi";
+import { cors } from "@elysiajs/cors";
+import { APP_CONFIG } from "./src/config";
 import { authController } from "./src/modules/auth";
 
 export const app = new Elysia()
-  .use(swagger({
-    documentation: {
-      info: {
-        title: "Inventory Procurement API",
-        version: "1.0.0"
-      }
-    }
-  }))
-  .use(authController)
-  .get("/", () => "Inventory Procurement API is running!")
-  .listen(process.env.PORT || 3000);
+  .use(cors())
+  .use(
+    openapi({
+      documentation: {
+        info: {
+          title: "Backend Technical Test API",
+          version: "1.0.0",
+          description: "API Documentation for Master Data and Purchase Request System",
+        },
+      },
+    })
+  )
+  .use(authController);
 
-console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+// Only listen if this file is run directly (not imported by tests)
+if (import.meta.main) {
+  app.listen(APP_CONFIG.PORT, () => {
+    console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+  });
+}
