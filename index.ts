@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { swagger } from "@elysiajs/swagger";
+import { openapi } from "@elysia/openapi";
 import { cors } from "@elysiajs/cors";
 import { APP_CONFIG } from "./src/config";
 import { authController } from "./src/modules/auth";
@@ -7,7 +7,7 @@ import { authController } from "./src/modules/auth";
 export const app = new Elysia()
   .use(cors()) // Enable CORS for frontend integration
   .use(
-    swagger({
+    openapi({
       documentation: {
         info: {
           title: "Backend Technical Test API",
