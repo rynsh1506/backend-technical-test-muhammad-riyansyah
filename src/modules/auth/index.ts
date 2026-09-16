@@ -21,7 +21,11 @@ export const authController = new Elysia({ prefix: "/auth" })
         200: AuthModel.loginResponse,
         401: AuthModel.loginInvalid,
       },
-      detail: { tags: ["Authentication"] },
+      detail: { 
+        tags: ["Authentication"],
+        summary: "User Login",
+        description: "Authenticates a user using their username and password. Upon successful authentication, an HttpOnly cookie containing a JWT is set in the client's browser to maintain the session securely."
+      },
     }
   )
   .post(
@@ -31,7 +35,11 @@ export const authController = new Elysia({ prefix: "/auth" })
       return { message: "Logout successful" };
     },
     {
-      detail: { tags: ["Authentication"] },
+      detail: { 
+        tags: ["Authentication"],
+        summary: "User Logout",
+        description: "Clears the authentication HttpOnly cookie, effectively ending the user's session. This operation is idempotent."
+      },
     }
   )
   // === PRIVATE ROUTES START HERE ===
@@ -42,6 +50,10 @@ export const authController = new Elysia({ prefix: "/auth" })
       return { user };
     },
     {
-      detail: { tags: ["Authentication"] },
+      detail: { 
+        tags: ["Authentication"],
+        summary: "Get Current User",
+        description: "Retrieves the profile information of the currently authenticated user based on the active JWT session cookie."
+      },
     }
   );
