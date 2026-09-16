@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { AuthService } from "./service";
 import { AuthModel } from "./model";
-import { authSetup } from "../../utils/auth";
+import { authSetup, isAuthenticated } from "../../utils/auth";
 import { APP_CONFIG } from "../../config";
 
 export const authController = new Elysia({ prefix: "/auth" })
@@ -9,10 +9,8 @@ export const authController = new Elysia({ prefix: "/auth" })
   .post(
     "/login",
     async ({ body, jwt, cookie }) => {
-      // 1. Service handles business logic
       const user = await AuthService.login(body);
 
-      // 2. Controller handles HTTP logic (JWT & Cookie)
       const token = await jwt.sign({
         id: user.id,
         role: user.role,
@@ -52,14 +50,14 @@ export const authController = new Elysia({ prefix: "/auth" })
       detail: { tags: ["Authentication"] },
     }
   )
+  // === PRIVATE ROUTES START HERE ===
+  // Any route defined below .use(isAuthenticated) will be protected automatically!
+  .use(isAuthenticated)
   .get(
     "/me",
-    async ({ getCurrentUser }) => {
-      // 1. Controller gets HTTP context dependencies
-      const currentUser = await getCurrentUser();
-      
-      // 2. Service validates and returns pure domain data
-      return await AuthService.getMe(currentUser);
+    ({ user }) => {
+      // The `user` is injected by the middleware. It is guaranteed to be valid and non-null!
+      return { user };
     },
     {
       detail: { tags: ["Authentication"] },
