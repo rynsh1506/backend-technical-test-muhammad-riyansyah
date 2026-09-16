@@ -1,8 +1,7 @@
 import { Elysia } from "elysia";
 import { AuthService } from "./service";
 import { AuthModel } from "./model";
-import { authSetup, isAuthenticated } from "../../utils/auth";
-import { APP_CONFIG } from "../../config";
+import { authSetup, isAuthenticated, setAuthCookie, clearAuthCookie } from "../../utils/auth";
 
 export const authController = new Elysia({ prefix: "/auth" })
   .use(authSetup)
@@ -10,21 +9,9 @@ export const authController = new Elysia({ prefix: "/auth" })
     "/login",
     async ({ body, jwt, cookie }) => {
       const user = await AuthService.login(body);
-
-      const token = await jwt.sign({
-        id: user.id,
-        role: user.role,
-        username: user.username,
-      });
-
-      const authToken = cookie[APP_CONFIG.COOKIE.NAME];
-      authToken!.set({
-        value: token,
-        httpOnly: APP_CONFIG.COOKIE.HTTP_ONLY,
-        maxAge: APP_CONFIG.COOKIE.MAX_AGE,
-        path: APP_CONFIG.COOKIE.PATH,
-        sameSite: APP_CONFIG.COOKIE.SAME_SITE,
-      });
+      const token = await jwt.sign(user);
+      
+      setAuthCookie(cookie, token);
 
       return { message: "Login successful", user };
     },
@@ -40,10 +27,7 @@ export const authController = new Elysia({ prefix: "/auth" })
   .post(
     "/logout",
     ({ cookie }) => {
-      const authToken = cookie[APP_CONFIG.COOKIE.NAME];
-      if (authToken) {
-        authToken.remove();
-      }
+      clearAuthCookie(cookie);
       return { message: "Logout successful" };
     },
     {
@@ -51,12 +35,10 @@ export const authController = new Elysia({ prefix: "/auth" })
     }
   )
   // === PRIVATE ROUTES START HERE ===
-  // Any route defined below .use(isAuthenticated) will be protected automatically!
   .use(isAuthenticated)
   .get(
     "/me",
     ({ user }) => {
-      // The `user` is injected by the middleware. It is guaranteed to be valid and non-null!
       return { user };
     },
     {
