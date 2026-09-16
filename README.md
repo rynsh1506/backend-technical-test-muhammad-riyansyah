@@ -74,7 +74,7 @@ _(Instructions will be added as the project is built)_
 
 - **Framework Choice**: Chosen **ElysiaJS** running on **Bun** for maximum performance and excellent end-to-end TypeScript support.
 - **Database Architecture**: **PostgreSQL** is used as the relational engine. **Drizzle ORM** was chosen to maintain type-safe queries and strict `snake_case` database schema while elegantly keeping `camelCase` in the TypeScript codebase.
-- **Authentication & Security**: Utilized Bun's native `Bun.password.hash` for password hashing instead of installing external libraries (like bcrypt or argon2) to minimize dependencies and leverage Bun's highly optimized native C bindings.
+- **Authentication & Security**: Utilized Bun's native `Bun.password.hash` for password hashing to minimize dependencies. For Session Management, **JWT via HttpOnly Cookies** was chosen over traditional LocalStorage/Bearer tokens. This protects the application against XSS (Cross-Site Scripting) attacks and simplifies the frontend implementation, fulfilling the test's security and simplicity mandates.
 - **Role Management**: Implemented `role` as a simple `VARCHAR` column in the `users` table rather than creating a separate relational `roles` table. Since the business requirements strictly mandate only two static roles (USER and APPROVER) without complex hierarchical permissions, this approach satisfies the "keep the solution simple" requirement and prevents over-engineering.
 
 ## 💡 Assumptions
