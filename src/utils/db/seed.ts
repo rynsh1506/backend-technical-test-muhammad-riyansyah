@@ -1,8 +1,8 @@
 import { db, queryClient } from "./index";
-import { users } from "../../modules/auth/model";
-import { products } from "../../modules/product/model";
-import { suppliers } from "../../modules/supplier/model";
-import { warehouses } from "../../modules/warehouse/model";
+import { users } from "@/modules/auth/model";
+import { products } from "@/modules/product/model";
+import { suppliers } from "@/modules/supplier/model";
+import { warehouses } from "@/modules/warehouse/model";
 
 async function main() {
   console.log("🌱 Starting database seeding...");
