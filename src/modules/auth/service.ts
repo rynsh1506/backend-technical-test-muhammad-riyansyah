@@ -1,9 +1,37 @@
 import { eq } from "drizzle-orm";
+import type { Cookie } from "elysia";
 import { db } from "../../utils/db";
 import { users } from "./model";
 import { APP_CONFIG } from "../../config";
 
-export async function loginHandler(context: any) {
+// --- Strict Types Definition ---
+export interface LoginContext {
+  body: {
+    username: string;
+    password: string;
+  };
+  jwt: {
+    sign: (payload: Record<string, unknown>) => Promise<string>;
+  };
+  cookie: Record<string, Cookie<string | undefined>>;
+  set: {
+    status?: number;
+  };
+}
+
+export interface LogoutContext {
+  cookie: Record<string, Cookie<string | undefined>>;
+}
+
+export interface GetMeContext {
+  getCurrentUser: () => Promise<{ id: number; role: string; username: string } | null>;
+  set: {
+    status?: number;
+  };
+}
+// -------------------------------
+
+export async function loginHandler(context: LoginContext) {
   const { body, jwt, cookie, set } = context;
   const authToken = cookie[APP_CONFIG.COOKIE.NAME];
 
@@ -49,12 +77,12 @@ export async function loginHandler(context: any) {
   };
 }
 
-export async function logoutHandler(context: any) {
+export async function logoutHandler(context: LogoutContext) {
   context.cookie[APP_CONFIG.COOKIE.NAME].remove();
   return { message: "Logout successful" };
 }
 
-export async function getMeHandler(context: any) {
+export async function getMeHandler(context: GetMeContext) {
   const user = await context.getCurrentUser();
   if (!user) {
     context.set.status = 401;
