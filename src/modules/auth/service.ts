@@ -16,8 +16,8 @@ type LoginBody = Static<typeof LoginSchema>;
 type AllowClaimValue = string | number | boolean | null;
 
 export interface JwtPlugin {
+  // Only define what the service actually uses from the JWT plugin!
   sign: (payload: Record<string, AllowClaimValue>) => Promise<string>;
-  verify: (token: string) => Promise<Record<string, AllowClaimValue> | false>;
 }
 
 export async function loginService(
