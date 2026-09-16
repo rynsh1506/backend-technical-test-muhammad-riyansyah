@@ -2,7 +2,7 @@ import Elysia from "elysia";
 import type { Cookie } from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { status } from "elysia";
-import { APP_CONFIG } from "../../config";
+import { APP_CONFIG } from "@/config";
 
 // --- Middleware Providers ---
 export const authSetup = (app: Elysia) =>

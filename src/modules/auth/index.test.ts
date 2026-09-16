@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { app } from "../../../index";
 import { treaty } from "@elysiajs/eden";
-import { APP_CONFIG } from "../../config";
+import { APP_CONFIG } from "@/config";
 
 const api = treaty(app);
 
