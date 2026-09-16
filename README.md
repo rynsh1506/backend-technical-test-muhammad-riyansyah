@@ -39,11 +39,24 @@ Ensure you have a `.env` file based on the provided `.env.example`.
 
 ## 🗄️ Migration
 
-_(Instructions will be added as the project is built)_
+To apply the database schema to your local PostgreSQL instance:
+
+```bash
+bunx drizzle-kit migrate
+```
 
 ## 🌱 Seed (Crucial for Reviewers)
 
-_(Instructions will be added as the project is built)_
+To populate the database with default test data (1 User, 1 Approver, Products, Suppliers, and Warehouses), run:
+
+```bash
+bun run src/utils/db/seed.ts
+```
+
+**Default Credentials:**
+
+- USER: `staff_user` / `password123`
+- APPROVER: `manager_approver` / `password123`
 
 ## 🏃 Run Application
 
@@ -61,6 +74,8 @@ _(Instructions will be added as the project is built)_
 
 - **Framework Choice**: Chosen **ElysiaJS** running on **Bun** for maximum performance and excellent end-to-end TypeScript support.
 - **Database Architecture**: **PostgreSQL** is used as the relational engine. **Drizzle ORM** was chosen to maintain type-safe queries and strict `snake_case` database schema while elegantly keeping `camelCase` in the TypeScript codebase.
+- **Authentication & Security**: Utilized Bun's native `Bun.password.hash` for password hashing instead of installing external libraries (like bcrypt or argon2) to minimize dependencies and leverage Bun's highly optimized native C bindings.
+- **Role Management**: Implemented `role` as a simple `VARCHAR` column in the `users` table rather than creating a separate relational `roles` table. Since the business requirements strictly mandate only two static roles (USER and APPROVER) without complex hierarchical permissions, this approach satisfies the "keep the solution simple" requirement and prevents over-engineering.
 
 ## 💡 Assumptions
 
