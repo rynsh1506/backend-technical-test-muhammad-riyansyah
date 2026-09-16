@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import { authController } from "./src/modules/auth";
+import { APP_CONFIG } from "./src/config";
 
 export const app = new Elysia()
   .use(swagger({
@@ -13,6 +14,6 @@ export const app = new Elysia()
   }))
   .use(authController)
   .get("/", () => "Inventory Procurement API is running!")
-  .listen(process.env.PORT || 3000);
+  .listen(APP_CONFIG.PORT);
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
