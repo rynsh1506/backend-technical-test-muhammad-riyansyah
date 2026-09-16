@@ -1,7 +1,12 @@
 import { Elysia } from "elysia";
 import { AuthService } from "@/modules/auth/service";
 import { AuthModel } from "@/modules/auth/model";
-import { authSetup, isAuthenticated, setAuthCookie, clearAuthCookie } from "@/utils/auth";
+import {
+  authSetup,
+  isAuthenticated,
+  setAuthCookie,
+  clearAuthCookie,
+} from "@/utils/auth";
 
 export const authController = new Elysia({ prefix: "/auth" })
   .use(authSetup)
@@ -10,7 +15,7 @@ export const authController = new Elysia({ prefix: "/auth" })
     async ({ body, jwt, cookie }) => {
       const user = await AuthService.login(body);
       const token = await jwt.sign(user);
-      
+
       setAuthCookie(cookie, token);
 
       return { message: "Login successful", user };
@@ -21,12 +26,13 @@ export const authController = new Elysia({ prefix: "/auth" })
         200: AuthModel.loginResponse,
         401: AuthModel.loginInvalid,
       },
-      detail: { 
+      detail: {
         tags: ["Authentication"],
         summary: "User Login",
-        description: "Authenticates a user using their username and password. Upon successful authentication, an HttpOnly cookie containing a JWT is set in the client's browser to maintain the session securely."
+        description:
+          "Authenticates a user using their username and password. Upon successful authentication, an HttpOnly cookie containing a JWT is set in the client's browser to maintain the session securely.",
       },
-    }
+    },
   )
   .post(
     "/logout",
@@ -35,12 +41,13 @@ export const authController = new Elysia({ prefix: "/auth" })
       return { message: "Logout successful" };
     },
     {
-      detail: { 
+      detail: {
         tags: ["Authentication"],
         summary: "User Logout",
-        description: "Clears the authentication HttpOnly cookie, effectively ending the user's session. This operation is idempotent."
+        description:
+          "Clears the authentication HttpOnly cookie, effectively ending the user's session. This operation is idempotent.",
       },
-    }
+    },
   )
   // === PRIVATE ROUTES START HERE ===
   .use(isAuthenticated)
@@ -50,10 +57,11 @@ export const authController = new Elysia({ prefix: "/auth" })
       return { user };
     },
     {
-      detail: { 
+      detail: {
         tags: ["Authentication"],
         summary: "Get Current User",
-        description: "Retrieves the profile information of the currently authenticated user based on the active JWT session cookie."
+        description:
+          "Retrieves the profile information of the currently authenticated user based on the active JWT session cookie.",
       },
-    }
+    },
   );
