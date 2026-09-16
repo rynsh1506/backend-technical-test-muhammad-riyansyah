@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { jwt } from "@elysiajs/jwt";
+import { APP_CONFIG } from "../../config";
 
 export const authSetup = new Elysia()
   .use(
@@ -8,14 +9,15 @@ export const authSetup = new Elysia()
       secret: process.env.JWT_SECRET || "default_secret",
     })
   )
-  .derive(async ({ jwt, cookie: { auth_token } }) => {
+  .derive(async ({ jwt, cookie }) => {
     return {
       getCurrentUser: async () => {
-        if (!auth_token.value) {
+        const authToken = cookie[APP_CONFIG.COOKIE.NAME];
+        if (!authToken || !authToken.value) {
           return null;
         }
 
-        const payload = await jwt.verify(auth_token.value);
+        const payload = await jwt.verify(authToken.value);
         if (!payload || !payload.id) {
           return null;
         }
