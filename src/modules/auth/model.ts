@@ -20,13 +20,13 @@ export const selectUserSchema = createSelectSchema(users);
 export const AuthModel = {
   // Directly extract 'username' and 'password' requirements from the database schema!
   loginBody: t.Pick(insertUserSchema, ["username", "password"]),
-  
+
   loginResponse: t.Object({
     message: t.String(),
     // Directly extract safe fields from the select schema to return to the user
     user: t.Pick(selectUserSchema, ["id", "username", "role"]),
   }),
-  
+
   loginInvalid: t.Object({
     error: t.Object({
       code: t.String(),
