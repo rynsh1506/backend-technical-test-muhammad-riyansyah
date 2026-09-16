@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { AuthService } from "./service";
-import { AuthModel } from "./model";
+import { AuthService } from "@/modules/auth/service";
+import { AuthModel } from "@/modules/auth/model";
 import { authSetup, isAuthenticated, setAuthCookie, clearAuthCookie } from "@/utils/auth";
 
 export const authController = new Elysia({ prefix: "/auth" })

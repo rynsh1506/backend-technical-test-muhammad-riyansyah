@@ -1,4 +1,4 @@
-import { db, queryClient } from "./index";
+import { db, queryClient } from "@/utils/db";
 import { users } from "@/modules/auth/model";
 import { products } from "@/modules/product/model";
 import { suppliers } from "@/modules/supplier/model";
