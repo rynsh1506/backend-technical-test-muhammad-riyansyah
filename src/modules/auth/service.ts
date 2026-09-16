@@ -5,7 +5,7 @@ import { users } from "./model";
 import { APP_CONFIG } from "../../config";
 
 // --- Strict Types Definition ---
-type AllowClaimValue = string | number | boolean | null | object;
+type AllowClaimValue = string | number | boolean | null;
 
 export interface JwtPlugin {
   sign: (payload: Record<string, AllowClaimValue>) => Promise<string>;
