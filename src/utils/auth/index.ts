@@ -2,14 +2,14 @@ import { Elysia } from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { APP_CONFIG } from "../../config";
 
-export const authSetup = new Elysia()
+export const authSetup = new Elysia({ name: "authSetup" })
   .use(
     jwt({
       name: "jwt",
       secret: APP_CONFIG.JWT.SECRET,
     })
   )
-  .derive(async ({ jwt, cookie }) => {
+  .derive(({ jwt, cookie }) => {
     return {
       getCurrentUser: async () => {
         const authToken = cookie[APP_CONFIG.COOKIE.NAME];
