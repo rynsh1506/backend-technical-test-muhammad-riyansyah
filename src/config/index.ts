@@ -18,4 +18,9 @@ export const APP_CONFIG = {
     PATH: "/",
     SAME_SITE: "lax" as const, // Protects against CSRF
   },
+
+  // Database Configuration
+  DB: {
+    URL: `postgres://${process.env.DB_USER || "postgres"}:${process.env.DB_PASSWORD || "postgres"}@${process.env.DB_HOST || "localhost"}:${process.env.DB_PORT || "5432"}/${process.env.DB_NAME || "inventory_db_test"}`
+  }
 };

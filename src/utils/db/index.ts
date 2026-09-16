@@ -1,8 +1,10 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { APP_CONFIG } from "../../config";
 
-const connectionString = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+// Construct connection from centralized config
+const connectionString = APP_CONFIG.DB.URL;
 
 // Disable prefetch as it is not supported for "Transaction" pool mode
-export const queryClient = postgres(connectionString, { prepare: false });
-export const db = drizzle(queryClient);
+export const client = postgres(connectionString, { prepare: false });
+export const db = drizzle(client);

@@ -1,12 +1,11 @@
-import { defineConfig } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
+import { APP_CONFIG } from "./src/config";
 
 export default defineConfig({
-  schema: './src/modules/**/model.ts',
-  out: './drizzle',
-  dialect: 'postgresql',
+  schema: "./src/modules/*/model.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
   dbCredentials: {
-    url: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    url: APP_CONFIG.DB.URL,
   },
-  verbose: true,
-  strict: true,
 });
