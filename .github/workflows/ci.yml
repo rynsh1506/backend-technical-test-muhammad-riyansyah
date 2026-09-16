@@ -48,7 +48,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run Database Migrations
-        run: bunx drizzle-kit push
+        run: bunx drizzle-kit migrate
 
       - name: Run Database Seeder
         run: bun run src/utils/db/seed.ts
