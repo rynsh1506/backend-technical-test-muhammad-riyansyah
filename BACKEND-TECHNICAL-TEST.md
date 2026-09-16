@@ -8,14 +8,14 @@ Kami tidak hanya menilai apakah endpoint berhasil dibuat.
 
 Kami ingin melihat bagaimana Anda:
 
-* memahami business flow;
-* merancang database;
-* menentukan API contract;
-* mengimplementasikan business rules;
-* menjaga data consistency;
-* melakukan testing;
-* mendokumentasikan pekerjaan;
-* dan mendeliver hasil pekerjaan kepada user.
+- memahami business flow;
+- merancang database;
+- menentukan API contract;
+- mengimplementasikan business rules;
+- menjaga data consistency;
+- melakukan testing;
+- mendokumentasikan pekerjaan;
+- dan mendeliver hasil pekerjaan kepada user.
 
 ---
 
@@ -73,12 +73,12 @@ dan technical test tersebut **tidak akan masuk ke proses penilaian**.
 
 Pastikan seluruh:
 
-* source code;
-* documentation;
-* migration;
-* tests;
-* API documentation;
-* dan file pendukung lainnya
+- source code;
+- documentation;
+- migration;
+- tests;
+- API documentation;
+- dan file pendukung lainnya
 
 telah di-push sebelum batas waktu submission.
 
@@ -151,14 +151,14 @@ USER merupakan staff yang membuat kebutuhan pembelian.
 
 USER dapat:
 
-* login;
-* membuat Purchase Request;
-* menambahkan Product ke Purchase Request;
-* mengubah Purchase Request selama masih DRAFT;
-* submit Purchase Request;
-* melihat Purchase Request;
-* melihat Purchase Order;
-* mencatat Goods Receipt.
+- login;
+- membuat Purchase Request;
+- menambahkan Product ke Purchase Request;
+- mengubah Purchase Request selama masih DRAFT;
+- submit Purchase Request;
+- melihat Purchase Request;
+- melihat Purchase Order;
+- mencatat Goods Receipt.
 
 ### APPROVER
 
@@ -166,9 +166,9 @@ APPROVER merupakan user yang memiliki authority untuk melakukan approval.
 
 APPROVER dapat:
 
-* melihat Purchase Request;
-* approve Purchase Request;
-* reject Purchase Request.
+- melihat Purchase Request;
+- approve Purchase Request;
+- reject Purchase Request.
 
 Role dan authorization harus divalidasi pada backend.
 
@@ -194,8 +194,8 @@ updated_at
 
 Rules:
 
-* SKU wajib unik.
-* Product yang tidak aktif tidak dapat digunakan pada transaksi baru.
+- SKU wajib unik.
+- Product yang tidak aktif tidak dapat digunakan pada transaksi baru.
 
 ---
 
@@ -233,8 +233,8 @@ updated_at
 
 Rules:
 
-* Warehouse Code wajib unik.
-* Warehouse yang tidak aktif tidak dapat digunakan untuk transaksi baru.
+- Warehouse Code wajib unik.
+- Warehouse yang tidak aktif tidak dapat digunakan untuk transaksi baru.
 
 ---
 
@@ -364,10 +364,10 @@ DRAFT
 
 USER dapat:
 
-* menambah item;
-* mengubah quantity;
-* menghapus item;
-* mengubah Warehouse.
+- menambah item;
+- mengubah quantity;
+- menghapus item;
+- mengubah Warehouse.
 
 ### SUBMITTED
 
@@ -934,13 +934,13 @@ ORM lain
 
 Pemilihan technology tidak akan menggantikan penilaian terhadap:
 
-* business understanding;
-* correctness;
-* database design;
-* data integrity;
-* code quality;
-* testing;
-* dan kemampuan menjelaskan implementation.
+- business understanding;
+- correctness;
+- database design;
+- data integrity;
+- code quality;
+- testing;
+- dan kemampuan menjelaskan implementation.
 
 Stack yang sophisticated tidak otomatis mendapatkan nilai lebih apabila implementation business logic tidak benar.
 
@@ -950,11 +950,11 @@ Stack yang sophisticated tidak otomatis mendapatkan nilai lebih apabila implemen
 
 Gunakan:
 
-* database migration;
-* foreign key;
-* appropriate constraints;
-* appropriate unique constraint;
-* appropriate index.
+- database migration;
+- foreign key;
+- appropriate constraints;
+- appropriate unique constraint;
+- appropriate index.
 
 Kami ingin schema database dapat dibangun kembali dari repository.
 
@@ -1280,11 +1280,11 @@ Presentasikan system seperti Anda sedang mendeliver hasil pekerjaan kepada user 
 
 Anda dipersilakan menjelaskan:
 
-* business flow;
-* bagaimana solusi digunakan;
-* hal penting dari implementation;
-* assumption yang dibuat;
-* limitation yang masih terdapat pada solusi.
+- business flow;
+- bagaimana solusi digunakan;
+- hal penting dari implementation;
+- assumption yang dibuat;
+- limitation yang masih terdapat pada solusi.
 
 ---
 
