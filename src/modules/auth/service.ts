@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../utils/db";
 import { users } from "./model";
+import { APP_CONFIG } from "../../config";
 
 export async function loginHandler(context: any) {
   const { body, jwt, cookie, set } = context;
-  const { auth_token } = cookie;
+  const authToken = cookie[APP_CONFIG.COOKIE.NAME];
 
   // 1. Find user by username
   const userList = await db.select().from(users).where(eq(users.username, body.username)).limit(1);
@@ -29,13 +30,13 @@ export async function loginHandler(context: any) {
     username: user.username,
   });
 
-  // 4. Set HttpOnly Cookie
-  auth_token.set({
+  // 4. Set Secure Cookie from Config
+  authToken.set({
     value: token,
-    httpOnly: true,
-    maxAge: 7 * 86400, // 7 days
-    path: "/",
-    sameSite: "lax",
+    httpOnly: APP_CONFIG.COOKIE.HTTP_ONLY,
+    maxAge: APP_CONFIG.COOKIE.MAX_AGE,
+    path: APP_CONFIG.COOKIE.PATH,
+    sameSite: APP_CONFIG.COOKIE.SAME_SITE,
   });
 
   return {
@@ -49,7 +50,7 @@ export async function loginHandler(context: any) {
 }
 
 export async function logoutHandler(context: any) {
-  context.cookie.auth_token.remove();
+  context.cookie[APP_CONFIG.COOKIE.NAME].remove();
   return { message: "Logout successful" };
 }
 
