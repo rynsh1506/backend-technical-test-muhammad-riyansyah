@@ -50,7 +50,7 @@ describe("Auth Module (Full Coverage)", () => {
     expect(setCookie).toContain("HttpOnly");
     
     if (setCookie) {
-      validCookie = setCookie.split(";")[0];
+      validCookie = setCookie.split(";")[0] || null;
     }
   });
 
@@ -67,7 +67,7 @@ describe("Auth Module (Full Coverage)", () => {
     const res = await app.handle(req);
     expect(res.status).toBe(200);
     
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.user.username).toBe("staff_user");
   });
 

@@ -5,28 +5,33 @@ import { users } from "./model";
 import { APP_CONFIG } from "../../config";
 
 // --- Strict Types Definition ---
+type AllowClaimValue = string | number | boolean | null | object;
+
+export interface JwtPlugin {
+  sign: (payload: Record<string, AllowClaimValue>) => Promise<string>;
+  verify: (token: string) => Promise<Record<string, AllowClaimValue> | false>;
+}
+
 export interface LoginContext {
   body: {
     username: string;
     password: string;
   };
-  jwt: {
-    sign: (payload: Record<string, unknown>) => Promise<string>;
-  };
-  cookie: Record<string, Cookie<string | undefined>>;
+  jwt: JwtPlugin;
+  cookie: Record<string, Cookie<unknown> | undefined>;
   set: {
-    status?: number;
+    status?: number | string;
   };
 }
 
 export interface LogoutContext {
-  cookie: Record<string, Cookie<string | undefined>>;
+  cookie: Record<string, Cookie<unknown> | undefined>;
 }
 
 export interface GetMeContext {
   getCurrentUser: () => Promise<{ id: number; role: string; username: string } | null>;
   set: {
-    status?: number;
+    status?: number | string;
   };
 }
 // -------------------------------
@@ -34,6 +39,11 @@ export interface GetMeContext {
 export async function loginHandler(context: LoginContext) {
   const { body, jwt, cookie, set } = context;
   const authToken = cookie[APP_CONFIG.COOKIE.NAME];
+
+  if (!authToken) {
+    set.status = 500;
+    return { error: { code: "INTERNAL_ERROR", message: "Cookie system is missing" } };
+  }
 
   // 1. Find user by username
   const userList = await db.select().from(users).where(eq(users.username, body.username)).limit(1);
@@ -78,7 +88,10 @@ export async function loginHandler(context: LoginContext) {
 }
 
 export async function logoutHandler(context: LogoutContext) {
-  context.cookie[APP_CONFIG.COOKIE.NAME].remove();
+  const authToken = context.cookie[APP_CONFIG.COOKIE.NAME];
+  if (authToken) {
+    authToken.remove();
+  }
   return { message: "Logout successful" };
 }
 
