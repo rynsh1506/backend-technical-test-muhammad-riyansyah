@@ -1,5 +1,6 @@
 import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core";
 import { t, type Static } from "elysia";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 // 1. Drizzle Database Schema
 export const users = pgTable("users", {
@@ -11,20 +12,21 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// 2. Elysia Request/Response Validation Schema
+// 2. Auto-Generate Base Elysia Schemas from Drizzle
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
+// 3. Compose Specific API Validation Models
 export const AuthModel = {
-  loginBody: t.Object({
-    username: t.String(),
-    password: t.String(),
-  }),
+  // Directly extract 'username' and 'password' requirements from the database schema!
+  loginBody: t.Pick(insertUserSchema, ["username", "password"]),
+  
   loginResponse: t.Object({
     message: t.String(),
-    user: t.Object({
-      id: t.Number(),
-      username: t.String(),
-      role: t.String(),
-    }),
+    // Directly extract safe fields from the select schema to return to the user
+    user: t.Pick(selectUserSchema, ["id", "username", "role"]),
   }),
+  
   loginInvalid: t.Object({
     error: t.Object({
       code: t.String(),
@@ -33,7 +35,7 @@ export const AuthModel = {
   }),
 } as const;
 
-// 3. TypeScript Type Extraction
+// 4. TypeScript Type Extraction
 export type AuthModelTypes = {
   loginBody: Static<typeof AuthModel.loginBody>;
 };
