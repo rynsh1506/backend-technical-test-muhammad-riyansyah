@@ -6,7 +6,7 @@ export const authSetup = new Elysia()
   .use(
     jwt({
       name: "jwt",
-      secret: process.env.JWT_SECRET || "default_secret",
+      secret: APP_CONFIG.JWT.SECRET,
     })
   )
   .derive(async ({ jwt, cookie }) => {
