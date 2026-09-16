@@ -23,25 +23,34 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
 
   // --- 2. Database Rejections ---
   it("should fail login with non-existent username", async () => {
-    const { status } = await api.auth.login.post({ username: "ghost_user", password: "123" });
+    const { status } = await api.auth.login.post({
+      username: "ghost_user",
+      password: "123",
+    });
     expect(status).toBe(401);
   });
 
   it("should fail login with correct username but wrong password", async () => {
-    const { status } = await api.auth.login.post({ username: "staff_user", password: "wrongpassword" });
+    const { status } = await api.auth.login.post({
+      username: "staff_user",
+      password: "wrongpassword",
+    });
     expect(status).toBe(401);
   });
 
   // --- 3. Authentication Flow ---
   it("should successfully login with correct credentials and return HttpOnly cookie", async () => {
-    const { status, response } = await api.auth.login.post({ username: "staff_user", password: "password123" });
+    const { status, response } = await api.auth.login.post({
+      username: "staff_user",
+      password: "password123",
+    });
     expect(status).toBe(200);
-    
+
     const setCookie = response?.headers.get("Set-Cookie");
     expect(setCookie).toBeTruthy();
     expect(setCookie).toContain("HttpOnly");
     expect(setCookie).toContain(APP_CONFIG.COOKIE.NAME);
-    
+
     if (setCookie) {
       validCookie = setCookie.split(";")[0] || null;
     }
@@ -71,7 +80,7 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
       },
     });
     expect(status).toBe(200);
-    
+
     // Type-safe! 'data' is fully inferred from the backend's response model.
     expect(data?.user?.username).toBe("staff_user");
     expect(typeof data?.user?.role).toBe("string");
@@ -92,7 +101,7 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
       },
     });
     expect(status).toBe(200);
-    
+
     const setCookie = response?.headers.get("Set-Cookie");
     expect(String(setCookie)).toContain(`${APP_CONFIG.COOKIE.NAME}=`);
     expect(String(setCookie)).toContain("Max-Age=0");
