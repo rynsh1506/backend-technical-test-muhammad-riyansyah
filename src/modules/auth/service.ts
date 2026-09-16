@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
-import { db } from "../../utils/db";
-import { users } from "./model";
-import type { AuthModelTypes } from "./model";
+import { db } from "@/utils/db";
+import { users } from "@/modules/auth/model";
+import type { AuthModelTypes } from "@/modules/auth/model";
 
 export abstract class AuthService {
   static async login({ username, password }: AuthModelTypes["loginBody"]) {
