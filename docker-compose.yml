@@ -1,6 +1,22 @@
-version: "3.8"
+version: '3.8'
 
 services:
+  app:
+    build: .
+    container_name: inventory_api
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-inventory_db}
+      - JWT_SECRET=${JWT_SECRET:-secret}
+    depends_on:
+      - db
+    restart: unless-stopped
+
   db:
     image: postgres:15-alpine
     container_name: inventory_db
