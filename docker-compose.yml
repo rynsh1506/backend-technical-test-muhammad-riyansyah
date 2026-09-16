@@ -4,12 +4,13 @@ services:
   app:
     build: .
     container_name: inventory_api
+    env_file:
+      - .env
     ports:
-      - "${PORT:-3000}:3000"
+      - "${PORT}:3000"
     environment:
-      - DATABASE_URL=postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:${DB_PORT:-5432}/${DB_NAME:-inventory_db}
-      - JWT_SECRET=${JWT_SECRET:-secret}
-      - PORT=3000
+      # We overwrite the DATABASE_URL from .env because in Docker, the host must be 'db' instead of 'localhost'
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
     depends_on:
       - db
     restart: unless-stopped
@@ -17,10 +18,12 @@ services:
   db:
     image: postgres:15-alpine
     container_name: inventory_db
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_NAME:-inventory_db}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
