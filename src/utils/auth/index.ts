@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import Elysia from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { APP_CONFIG } from "../../config";
 
@@ -18,7 +18,7 @@ export const authSetup = (app: Elysia) =>
             return null;
           }
 
-          const payload = await jwt.verify(authToken.value);
+          const payload = await jwt.verify(authToken.value as string);
           if (!payload || !payload.id) {
             return null;
           }
