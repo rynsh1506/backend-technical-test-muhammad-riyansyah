@@ -20,7 +20,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       });
 
       const authToken = cookie[APP_CONFIG.COOKIE.NAME];
-      authToken.set({
+      authToken!.set({
         value: token,
         httpOnly: APP_CONFIG.COOKIE.HTTP_ONLY,
         maxAge: APP_CONFIG.COOKIE.MAX_AGE,
