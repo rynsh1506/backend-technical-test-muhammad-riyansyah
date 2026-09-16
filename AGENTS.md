@@ -18,7 +18,8 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
   1. ALWAYS pull the latest changes from the `dev` branch before starting any work.
   2. Create a new branch from `dev` using a descriptive format: `feature/<feature-name>` or `fix/<bug-name>` (e.g., `feature/product-schema`, `fix/goods-receipt-transaction`).
   3. Work entirely within this feature branch.
-  4. **CRITICAL:** Before moving on to the next task, the Agent MUST proactively commit the code, push the current branch, and **automatically create a Pull Request (PR) to the `dev` branch using the `gh pr create` CLI command**. Do NOT piggyback (pile up) multiple unrelated tasks into a single branch or PR.
+  4. **CRITICAL PRE-COMMIT (AUTO-FORMAT):** Before executing `git commit` or `git push`, the Agent MUST run an auto-formatter (`bunx prettier --write .`) across all modified files. This ensures the committed code strictly adheres to the user's IDE formatting rules and prevents dirty git diffs.
+  5. **CRITICAL:** Before moving on to the next task, the Agent MUST proactively commit the code, push the current branch, and **automatically create a Pull Request (PR) to the `dev` branch using the `gh pr create` CLI command**. Do NOT piggyback (pile up) multiple unrelated tasks into a single branch or PR.
 - **Conventional Commits:** Write clean and standard commit messages in English (e.g., `feat: add product schema`, `fix: correct transaction rollback in goods receipt`).
 
 ## 3. Naming Conventions, Language & Strict Typing (CRITICAL)

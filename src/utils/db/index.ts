@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { APP_CONFIG } from "../../config";
+import { APP_CONFIG } from "@/config";
 
 // Construct connection from centralized config
 const connectionString = APP_CONFIG.DB.URL;
