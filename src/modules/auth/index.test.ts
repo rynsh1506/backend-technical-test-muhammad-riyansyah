@@ -86,7 +86,7 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
   it("should successfully logout and clear the cookie of a logged-in user", async () => {
     expect(validCookie).toBeTruthy();
 
-    const { status, response } = await api.auth.logout.post({
+    const { status, response } = await api.auth.logout.post(null, {
       headers: {
         cookie: validCookie as string,
       },
