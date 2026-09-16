@@ -5,7 +5,10 @@ import {
   boolean,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
+import { t, type Static } from "elysia";
 
+// 1. Drizzle Database Schema
 export const warehouses = pgTable("warehouses", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
@@ -15,3 +18,22 @@ export const warehouses = pgTable("warehouses", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// 2. Auto-Generate Base Elysia Schemas
+export const insertWarehouseSchema = createInsertSchema(warehouses);
+export const selectWarehouseSchema = createSelectSchema(warehouses);
+
+// 3. Compose Specific API Validation Models
+export const WarehouseModel = {
+  create: t.Omit(insertWarehouseSchema, ["id", "createdAt", "updatedAt"]),
+  update: t.Partial(
+    t.Omit(insertWarehouseSchema, ["id", "code", "createdAt", "updatedAt"]),
+  ),
+  response: selectWarehouseSchema,
+  listResponse: t.Array(selectWarehouseSchema),
+} as const;
+
+export type WarehouseModelTypes = {
+  create: Static<typeof WarehouseModel.create>;
+  update: Static<typeof WarehouseModel.update>;
+};
