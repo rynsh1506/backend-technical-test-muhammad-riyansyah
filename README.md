@@ -72,6 +72,11 @@ _(Instructions will be added as the project is built)_
 
 ## 🧠 Engineering Decisions
 
+- **Strict Architecture (Controller vs Service)**: Following the official ElysiaJS feature-based structure, the *Controller* (`index.ts`) strictly handles HTTP specifics (Routing, Cookie assignment, JWT signing, Status Codes), while the *Service* (`service.ts`) is completely decoupled from the HTTP Context and focuses purely on Business Logic and Database operations. This ensures 100% Type Safety without resorting to `any` or manual type assertions.
+- **Modern API Documentation**: Transitioned from classic Swagger UI (`@elysiajs/swagger`) to the modern Scalar UI (`@elysia/openapi`) to provide a highly interactive, fast, and aesthetically pleasing API playground for reviewers.
+- **Robust Route Guards (Middleware)**: Leveraged Elysia's `.resolve` lifecycle hook to create an `isAuthenticated` middleware. This acts as a highly typed "Guard" that automatically rejects unauthorized requests before they reach the controller, ensuring the controller receives a strictly non-null User object.
+- **Comprehensive Edge-Case Testing**: Automated test coverage goes beyond happy paths. The test suite aggressively validates malformed payloads, forged JWT signatures, absence of cookies, and idempotency of logout operations to guarantee a bulletproof Auth module.
+
 - **Framework Choice**: Chosen **ElysiaJS** running on **Bun** for maximum performance and excellent end-to-end TypeScript support.
 - **Database Architecture**: **PostgreSQL** is used as the relational engine. **Drizzle ORM** was chosen to maintain type-safe queries and strict `snake_case` database schema while elegantly keeping `camelCase` in the TypeScript codebase.
 - **Authentication & Security**: Utilized Bun's native `Bun.password.hash` for password hashing to minimize dependencies. For Session Management, **JWT via HttpOnly Cookies** was chosen over traditional LocalStorage/Bearer tokens. This protects the application against XSS (Cross-Site Scripting) attacks and simplifies the frontend implementation, fulfilling the test's security and simplicity mandates.
