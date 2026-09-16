@@ -2,31 +2,63 @@ import { eq } from "drizzle-orm";
 import { db } from "../../utils/db";
 import { users } from "./model";
 
-/**
- * Validates user credentials against the database.
- * @param username The user's username
- * @param password The user's plain-text password
- * @returns The user object if valid, otherwise null
- */
-export async function validateUserCredentials(username: string, password: string) {
+export async function loginHandler(context: any) {
+  const { body, jwt, cookie, set } = context;
+  const { auth_token } = cookie;
+
   // 1. Find user by username
-  const userList = await db.select().from(users).where(eq(users.username, username)).limit(1);
+  const userList = await db.select().from(users).where(eq(users.username, body.username)).limit(1);
   const user = userList[0];
 
   if (!user) {
-    return null;
+    set.status = 401;
+    return { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } };
   }
 
   // 2. Verify password
-  const isMatch = await Bun.password.verify(password, user.password);
+  const isMatch = await Bun.password.verify(body.password, user.password);
   if (!isMatch) {
-    return null;
+    set.status = 401;
+    return { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } };
   }
 
-  // 3. Return safe user data
-  return {
+  // 3. Generate JWT
+  const token = await jwt.sign({
     id: user.id,
-    username: user.username,
     role: user.role,
+    username: user.username,
+  });
+
+  // 4. Set HttpOnly Cookie
+  auth_token.set({
+    value: token,
+    httpOnly: true,
+    maxAge: 7 * 86400, // 7 days
+    path: "/",
+    sameSite: "lax",
+  });
+
+  return {
+    message: "Login successful",
+    user: {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+    },
   };
+}
+
+export async function logoutHandler(context: any) {
+  context.cookie.auth_token.remove();
+  return { message: "Logout successful" };
+}
+
+export async function getMeHandler(context: any) {
+  const user = await context.getCurrentUser();
+  if (!user) {
+    context.set.status = 401;
+    return { error: { code: "UNAUTHORIZED", message: "Not authenticated" } };
+  }
+
+  return { user };
 }
