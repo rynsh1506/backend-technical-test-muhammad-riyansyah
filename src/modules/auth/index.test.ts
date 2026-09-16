@@ -94,7 +94,7 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
     expect(status).toBe(200);
     
     const setCookie = response?.headers.get("Set-Cookie");
-    expect(setCookie).toContain(`${APP_CONFIG.COOKIE.NAME}=`);
-    expect(setCookie).toContain("Max-Age=0");
+    expect(String(setCookie)).toContain(`${APP_CONFIG.COOKIE.NAME}=`);
+    expect(String(setCookie)).toContain("Max-Age=0");
   });
 });
