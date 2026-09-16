@@ -18,7 +18,7 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
   1. ALWAYS pull the latest changes from the `dev` branch before starting any work.
   2. Create a new branch from `dev` using a descriptive format: `feature/<feature-name>` or `fix/<bug-name>` (e.g., `feature/product-schema`, `fix/goods-receipt-transaction`).
   3. Work entirely within this feature branch.
-  4. **CRITICAL:** Before moving on to the next task, you MUST push the current branch and create a Pull Request (PR) to `dev`. Do NOT piggyback (pile up) multiple unrelated tasks into a single branch or PR.
+  4. **CRITICAL:** Before moving on to the next task, the Agent MUST proactively commit the code, push the current branch, and **automatically create a Pull Request (PR) to the `dev` branch using the `gh pr create` CLI command**. Do NOT piggyback (pile up) multiple unrelated tasks into a single branch or PR.
 - **Conventional Commits:** Write clean and standard commit messages in English (e.g., `feat: add product schema`, `fix: correct transaction rollback in goods receipt`).
 
 ## 3. Naming Conventions, Language & Strict Typing (CRITICAL)
@@ -70,14 +70,14 @@ When receiving a prompt from the user, you MUST respond with your plan in this e
 1. **Current Context:** (Acknowledge the task you are addressing)
 2. **Target Branch:** (State the exact branch name you will create/use, derived from `dev`)
 3. **Action Plan:** (List the step-by-step atomic actions you will take)
-4. **PR Reminder:** (Briefly remind the user to commit, push, and open a PR for this specific task once done, to avoid piggybacking)
+4. **PR Automation:** (Confirm that the Agent will automatically commit, push, and create a PR to `dev` using the `gh` CLI once the task is done, to avoid piggybacking)
 
 ## 7. Production Readiness & Quality Assurance
 
 - **Validation & Error Handling:** You MUST implement consistent JSON error responses (e.g., `{ error: { code, message } }`). You MUST use the correct HTTP Status Codes (e.g., 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Unprocessable Entity). Do NOT fallback to `500 Internal Server Error` for predictable client or business logic errors.
 - **Informative Logging:** You MUST implement a neat, structured logger. All incoming requests, outgoing errors, and critical business transactions (like Goods Receipt) must be logged informatively to allow easy tracing and debugging.
 - **Database Migrations & Seeders:** Every schema change MUST be accompanied by a valid database migration. You MUST also provide seeder scripts for essential master data (e.g., creating 1 USER and 1 APPROVER) so the reviewer can run the app without manual database entry.
-- **Continuous Documentation:** Whenever you make a significant technical choice or business assumption due to unclear requirements, you MUST immediately document it in `README.md` under the sections `Engineering Decisions` or `Assumptions`. Do not wait until the end of the project to write the documentation.
+- **Continuous Documentation & Aesthetics:** You MUST maintain a comprehensive and **visually attractive** `README.md` from the beginning of the project. Use professional formatting, including **real technology icons/badges** (e.g., via Shields.io or Markdown SVGs) rather than plain emojis. It MUST clearly explain how to use the app, including sections for: Project Overview, Tech Stack, Setup, Env Vars, Migration, **Seed (crucial for reviewers)**, Run Application, Testing, and API Documentation. Additionally, whenever you make a significant technical choice or business assumption, immediately document it under `Engineering Decisions` or `Assumptions`.
 
 ## 8. Bonus Points Targets (Mandatory Implementation)
 
