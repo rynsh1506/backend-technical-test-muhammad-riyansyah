@@ -1,0 +1,57 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: inventory_db_test
+      JWT_SECRET: testing_secret_key_ci
+
+    # Start a Postgres service for testing
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: inventory_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Database Migrations
+        run: bunx drizzle-kit migrate
+
+      - name: Run Database Seeder
+        run: bun run src/utils/db/seed.ts
+
+      - name: Run Unit Tests
+        run: bun test
