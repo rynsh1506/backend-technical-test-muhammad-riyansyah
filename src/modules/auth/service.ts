@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { error } from "elysia";
+import { status } from "elysia";
 import { db } from "../../utils/db";
 import { users } from "./model";
 import type { AuthModelTypes } from "./model";
@@ -13,13 +13,13 @@ export abstract class AuthService {
 
     if (!user) {
       // You can throw an HTTP error directly
-      throw error(401, { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } });
+      throw status(401, { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } });
     }
 
     const isMatch = await Bun.password.verify(password, user.password);
     if (!isMatch) {
       // You can throw an HTTP error directly
-      throw error(401, { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } });
+      throw status(401, { error: { code: "UNAUTHORIZED", message: "Invalid username or password" } });
     }
 
     return {
@@ -31,7 +31,7 @@ export abstract class AuthService {
 
   static async getMe(user: { id: number; role: string; username: string } | null) {
     if (!user) {
-      throw error(401, { error: { code: "UNAUTHORIZED", message: "Not authenticated" } });
+      throw status(401, { error: { code: "UNAUTHORIZED", message: "Not authenticated" } });
     }
     return { user };
   }
