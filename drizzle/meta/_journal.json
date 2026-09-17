@@ -15,6 +15,20 @@
       "when": 1789573091113,
       "tag": "0001_friendly_kylun",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789666982823,
+      "tag": "0002_fix_user_role_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789667033415,
+      "tag": "0003_use_native_pg_enum_for_roles",
+      "breakpoints": true
     }
   ]
 }
