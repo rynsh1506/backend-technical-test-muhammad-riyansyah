@@ -49,7 +49,6 @@ export const authController = new Elysia({ prefix: "/auth" })
       },
     },
   )
-  // === PRIVATE ROUTES START HERE ===
   .use(isAuthenticated)
   .get(
     "/me",

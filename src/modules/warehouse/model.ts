@@ -8,7 +8,6 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t, type Static } from "elysia";
 
-// 1. Drizzle Database Schema
 export const warehouses = pgTable("warehouses", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
@@ -19,11 +18,9 @@ export const warehouses = pgTable("warehouses", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// 2. Auto-Generate Base Elysia Schemas
 export const insertWarehouseSchema = createInsertSchema(warehouses);
 export const selectWarehouseSchema = createSelectSchema(warehouses);
 
-// 3. Compose Specific API Validation Models
 export const WarehouseModel = {
   create: t.Omit(insertWarehouseSchema, ["id", "createdAt", "updatedAt"]),
   update: t.Partial(

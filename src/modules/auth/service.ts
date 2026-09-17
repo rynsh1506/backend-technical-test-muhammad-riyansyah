@@ -5,6 +5,13 @@ import { users } from "@/modules/auth/model";
 import type { AuthModelTypes } from "@/modules/auth/model";
 
 export abstract class AuthService {
+  /**
+   * Validates user credentials against the database.
+   *
+   * @param credentials - The login payload containing username and password.
+   * @returns A safe user object (id, username, role) on successful authentication.
+   * @throws {401} If the username does not exist or the password is incorrect.
+   */
   static async login({ username, password }: AuthModelTypes["loginBody"]) {
     const userList = await db
       .select()
