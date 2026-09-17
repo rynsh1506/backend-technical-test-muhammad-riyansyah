@@ -23,14 +23,28 @@ export const isAuthenticated = (app: Elysia) =>
     }
 
     const payload = await jwt.verify(authToken.value as string);
-    if (!payload || !payload.id) {
+
+    if (
+      !payload ||
+      typeof payload !== "object" ||
+      !("id" in payload) ||
+      !("role" in payload) ||
+      !("username" in payload) ||
+      typeof payload.id !== "number" ||
+      typeof payload.role !== "string" ||
+      typeof payload.username !== "string"
+    ) {
       throw status(401, {
-        error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+        error: { code: "UNAUTHORIZED", message: "Invalid or corrupted token" },
       });
     }
 
     return {
-      user: payload as { id: number; role: string; username: string },
+      user: {
+        id: payload.id,
+        role: payload.role,
+        username: payload.username,
+      },
     };
   });
 
