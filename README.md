@@ -11,6 +11,15 @@
 
 Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Request**. Sistem ini dirancang untuk menangani pencatatan Master Data (Produk, Supplier, Gudang), pergerakan stok barang, hingga alur persetujuan (Approval) untuk pengadaan barang secara _End-to-End_.
 
+### 🗺️ Status Fitur (Roadmap)
+
+- [x] **Authentication**: Login dengan JWT (HttpOnly Cookie), RBAC statis (USER & APPROVER).
+- [x] **Master Data**: CRUD Produk, Supplier, dan Gudang (Warehouse).
+- [ ] **Purchase Request (PR)**: Pembuatan PR oleh USER, daftar PR.
+- [ ] **Approval Workflow**: Persetujuan/Penolakan PR oleh APPROVER.
+- [ ] **Purchase Order (PO)**: Konversi PR yang disetujui menjadi PO ke Supplier.
+- [ ] **Goods Receipt (GR) & Inventory**: Penerimaan barang (GR) yang otomatis menambah stok Inventory (Database Transaction).
+
 ## 🛠️ Tech Stack
 
 - **Runtime & Package Manager**: Bun
@@ -19,7 +28,7 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 - **Database**: PostgreSQL 15
 - **ORM & Migrations**: Drizzle ORM
 - **Validation**: Elysia TypeBox (`t.Object`, `t.String`, dll) + Drizzle-Typebox
-- **Documentation**: Scalar UI (OpenAPI)
+- **Documentation**: Swagger/OpenAPI (Dirender menggunakan Scalar UI)
 - **Infrastructure**: Docker & Docker Compose
 
 ## 📂 Struktur Proyek (Project Structure)
@@ -28,35 +37,72 @@ Proyek ini secara ketat mengadopsi struktur berbasis fitur (_Vertical Slice / Do
 
 - `src/modules/`: Berisi berbagai domain bisnis (seperti `auth`, `products`, dll). Setiap modul wajib memisahkan HTTP Controller (`index.ts`), Logika Bisnis (`service.ts`), dan Skema Database/Validasi (`model.ts`).
 - `src/config/`: Konfigurasi global (Database, Env).
-- `src/utils/`: Fungsi utilitas _reusable_ (seperti setup JWT, _Route Guard/Middleware_, dll).
+- `src/utils/`: Fungsi utilitas _reusable_ (seperti setup JWT, _Route Guard/Middleware_, Seeder).
 - `*.test.ts`: _End-to-End Type-Safe Unit Testing_ menggunakan Eden Treaty diletakkan berdampingan langsung di dalam folder modul masing-masing.
 
-## 🗄️ Desain Database (Database Design)
+## 🔄 Alur Bisnis Utama (Business Flow)
 
-_(Akan diperbarui saat modul Master Data & Transaksi dikerjakan)_
+```mermaid
+flowchart TD
+    A([1. Login as USER]) --> B[Create Purchase Request]
+    B --> C{2. Login as APPROVER}
+    C -->|Reject| D[PR Status: REJECTED]
+    C -->|Approve| E[PR Status: APPROVED]
+    E --> F[3. Create Purchase Order]
+    F --> G[4. Goods Receipt]
+    G --> H[(5. Auto-Update Inventory Stock)]
+
+    style A fill:#007ACC,color:#fff
+    style C fill:#FF0420,color:#fff
+    style H fill:#316192,color:#fff
+```
+
+## 🗄️ Desain Database Saat Ini (Current ERD)
+
+```mermaid
+erDiagram
+    USERS {
+        serial id PK
+        varchar username UK
+        varchar password
+        enum role "USER | APPROVER"
+        timestamp created_at
+    }
+
+    PRODUCTS {
+        serial id PK
+        varchar sku UK
+        varchar name
+        varchar unit
+        boolean is_active
+    }
+
+    SUPPLIERS {
+        serial id PK
+        varchar name
+        varchar email
+        varchar phone
+        boolean is_active
+    }
+
+    WAREHOUSES {
+        serial id PK
+        varchar code UK
+        varchar name
+        varchar location
+        boolean is_active
+    }
+```
+
+_(Catatan: Diagram ini akan terus berkembang seiring penyelesaian fitur PR, PO, dan GR)._
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
-- **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur resmi dari ElysiaJS. _Controller_ (`index.ts`) secara khusus hanya mengurus urusan HTTP (seperti _Cookie_, kode status, rute), sedangkan _Service_ (`service.ts`) murni menangani logika bisnis dan operasi _database_.
-  - **Kenapa?** Untuk memastikan pemisahan tanggung jawab (_separation of concerns_) yang murni dan mencapai 100% _Type Safety_ tanpa menggunakan _casting_ tipe data secara paksa (`any` / `as unknown`).
-- **Dokumentasi API Modern (Scalar UI)**: Beralih dari antarmuka Swagger UI klasik ke Scalar UI (`@elysia/openapi`) yang jauh lebih modern.
-  - **Kenapa?** Untuk memberikan _playground_ API yang sangat interaktif, responsif, dan estetis, lengkap dengan cuplikan kode (_code snippet_) multibahasa bagi para penguji (_Reviewer_).
-- **Penjaga Rute yang Kuat (Middleware)**: Memanfaatkan fungsi siklus hidup (_lifecycle hook_) `.resolve` dari Elysia untuk menciptakan _middleware_ `isAuthenticated`.
-  - **Kenapa?** Berfungsi sebagai "Penjaga" (_Guard_) ber-tipe kuat yang otomatis memblokir _request_ tanpa izin sebelum mencapai _Controller_. Ini menjaga _Controller_ tetap bersih dan menjamin bahwa ia selalu menerima objek _User_ yang tidak mungkin bernilai `null`.
-- **Validasi DRY (Drizzle-Typebox)**: Mengadopsi `drizzle-typebox` untuk secara otomatis menghasilkan skema validasi Elysia (TypeBox) langsung dari skema PostgreSQL Drizzle (menggunakan fungsi `t.Pick`).
-  - **Kenapa?** Untuk membangun _Single Source of Truth_ (Satu Sumber Kebenaran). Hal ini memastikan lapisan validasi API selalu 100% sinkron dengan struktur _database_ tanpa perlu mengetik ulang kodenya (menerapkan prinsip DRY - _Don't Repeat Yourself_).
-- **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _unit testing_ alih-alih menyusun objek `Request` secara manual.
-  - **Kenapa?** Untuk menegakkan _End-to-End Type Safety_ mutlak. Klien ini secara otomatis membaca tipe data dari _backend_ langsung di dalam file _test_, mencegah _typo_, dan memastikan setiap perubahan pada skema API akan langsung memunculkan _error_ TypeScript pada sesi pengujian.
-- **Arsitektur Database**: Menggunakan **PostgreSQL** bersama **Drizzle ORM**.
-  - **Kenapa?** Untuk menjaga _query_ yang aman dari tipe data (_type-safe_) dan secara ketat menerapkan standar penamaan `snake_case` di tabel _database_, sambil dengan elegan memetakannya ke `camelCase` di dalam _codebase_ TypeScript.
-- **Keamanan (JWT via HttpOnly Cookies)**: Dipilih sebagai pengganti token _Bearer/LocalStorage_ tradisional.
-  - **Kenapa?** Untuk melindungi aplikasi dari serangan _XSS (Cross-Site Scripting)_ dan menyederhanakan manajemen _state_ di _frontend_, sekaligus memenuhi mandat keamanan dari _technical test_ ini.
-- **Manajemen Peran (Role)**: Diimplementasikan sebagai kolom `VARCHAR` sederhana di dalam tabel `users` daripada membuat tabel relasional `roles` terpisah.
-  - **Kenapa?** Aturan bisnis di soal secara tegas hanya meminta dua peran statis (USER dan APPROVER). Pendekatan ini mencegah _over-engineering_ dan memenuhi instruksi untuk menjaga solusi tetap sederhana (_Keep it simple_).
-
-## 💡 Asumsi (Assumptions)
-
-_(Akan diisi ketika ada kondisi bisnis yang tidak disebutkan dalam spesifikasi soal dan membutuhkan pengambilan keputusan mandiri)_
+- **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
+- **Dokumentasi API Terpadu (Swagger / Scalar UI)**: Memanfaatkan standar Swagger/OpenAPI (`@elysiajs/swagger`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
+- **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _unit testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
+- **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
+- **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
@@ -83,28 +129,38 @@ Aplikasi akan menyala di `http://localhost:3000`.
 Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
 
 1. Pastikan PostgreSQL sudah menyala dan sesuaikan `DATABASE_URL` di `.env`.
-2. Install dependensi:
-   ```bash
-   bun install
-   ```
-3. Jalankan migrasi _database_:
-   ```bash
-   bun run db:migrate
-   ```
-4. Jalankan aplikasi:
-   ```bash
-   bun run dev
-   ```
+2. Install dependensi: `bun install`
+3. Jalankan migrasi _database_: `bun run db:migrate`
+4. Jalankan aplikasi: `bun run dev`
+
+---
+
+## 🌱 Seeding Database (Penting untuk Penguji)
+
+Untuk memudahkan pengujian (baik via Scalar UI maupun Postman), jalankan _Seeder_ untuk mengisi _Master Data_ dan 2 Akun Utama secara otomatis:
+
+```bash
+bun run db:seed
+```
+
+**Akun yang digenerate:**
+
+- **USER:** username: `staff_user` | password: `password123`
+- **APPROVER:** username: `manager_approver` | password: `password123`
+
+_(Catatan: Jika menggunakan Docker, Anda bisa menjalankan seeder ke dalam container dengan `docker exec -it <container_name> bun run db:seed`)_
+
+---
 
 ## 🧪 Pengujian (Testing)
 
-Untuk menjalankan _End-to-End Type-Safe Unit Test_ (menggunakan Bun Test + Eden Treaty):
+Menjalankan _End-to-End Type-Safe Unit Test_ (termasuk skenario validasi, penolakan auth, dan flow success):
 
 ```bash
 bun test
 ```
 
-## 📚 Dokumentasi API
+## 📚 Dokumentasi API (Swagger / Scalar UI)
 
-Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API (Scalar UI) secara interaktif:
+Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
 👉 **[http://localhost:3000/openapi](http://localhost:3000/openapi)**
