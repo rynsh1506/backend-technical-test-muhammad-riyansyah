@@ -4,7 +4,6 @@ import { jwt } from "@elysiajs/jwt";
 import { status } from "elysia";
 import { APP_CONFIG } from "@/config";
 
-// --- Middleware Providers ---
 export const authSetup = (app: Elysia) =>
   app.use(
     jwt({
@@ -35,7 +34,6 @@ export const isAuthenticated = (app: Elysia) =>
     };
   });
 
-// --- Cookie Helpers ---
 export const setAuthCookie = (
   cookie: Record<string, Cookie<unknown> | undefined>,
   token: string,

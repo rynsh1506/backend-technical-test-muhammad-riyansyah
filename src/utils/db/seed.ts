@@ -4,14 +4,19 @@ import { products } from "@/modules/product/model";
 import { suppliers } from "@/modules/supplier/model";
 import { warehouses } from "@/modules/warehouse/model";
 
+/**
+ * Executes the database seeding process.
+ * Populates essential initial data for users (staff and approver), products,
+ * suppliers, and warehouses to ensure the application is immediately testable.
+ *
+ * Safe to run multiple times (uses onConflictDoNothing).
+ */
 async function main() {
   console.log("🌱 Starting database seeding...");
 
   try {
-    // Hash password using Bun's built-in password hasher
     const defaultPassword = await Bun.password.hash("password123");
 
-    // 1. Seed Users (1 USER, 1 APPROVER)
     console.log("Seeding users...");
     await db
       .insert(users)
@@ -29,7 +34,6 @@ async function main() {
       ])
       .onConflictDoNothing();
 
-    // 2. Seed Product
     console.log("Seeding products...");
     await db
       .insert(products)
@@ -47,7 +51,6 @@ async function main() {
       ])
       .onConflictDoNothing();
 
-    // 3. Seed Supplier
     console.log("Seeding suppliers...");
     await db
       .insert(suppliers)
@@ -60,7 +63,6 @@ async function main() {
       ])
       .onConflictDoNothing();
 
-    // 4. Seed Warehouse
     console.log("Seeding warehouses...");
     await db
       .insert(warehouses)
@@ -83,7 +85,6 @@ async function main() {
     console.error("❌ Error during seeding:", error);
     process.exit(1);
   } finally {
-    // Close DB connection so the script exits
     await queryClient.end();
   }
 }

@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { SupplierService } from "./service";
-import { SupplierModel } from "./model";
+import { SupplierService } from "@/modules/supplier/service";
+import { SupplierModel } from "@/modules/supplier/model";
 import { isAuthenticated } from "@/utils/auth";
 
 export const supplierController = new Elysia({ prefix: "/suppliers" })

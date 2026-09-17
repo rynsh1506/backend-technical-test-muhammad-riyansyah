@@ -28,6 +28,7 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
 ## 3. Naming Conventions, Language & Strict Typing (CRITICAL)
 
 - **English Only:** All variable names, function names, class names, comments, and API error messages MUST be written in clear, professional English. Do not use Indonesian or any mixed languages.
+- **Absolute Imports (NO Relative Paths):** You MUST NEVER use relative path imports (`./`, `../`) anywhere in the codebase — including test files. ALL imports MUST use the `@/` alias (e.g., `import { db } from "@/utils/db"`). To enable this for the root entrypoint, the Elysia app instance MUST live in `src/app.ts`, not `index.ts`. The root `index.ts` is a thin entrypoint that only calls `app.listen()`.
 - **Strict Static Typing (NO `any`):** You MUST use proper TypeScript types for all variables, parameters, and return values. The use of `any` is STRICTLY PROHIBITED. Fall back to `unknown` if the type is truly dynamically determined, but always prefer precise typing.
 - **Code Conventions (TypeScript):**
   - Use `camelCase` for variables, functions, and object properties.
@@ -62,6 +63,7 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
 
 ## 5. Engineering Standards & Infrastructure
 
+- **Test File Structure (NO Section Comments):** In `*.test.ts` files, you MUST NEVER use `// --- section ---` style comments to group tests. Instead, use nested `describe()` blocks. Add a JSDoc block above the root `describe()` explaining what module is being tested. The `// @ts-expect-error` directive is the only allowed inline comment in test files (for intentional type violations).
 - **Comprehensive Unit Testing:** All business logic functions (especially in `service.ts`) MUST have comprehensive unit tests covering both positive and edge cases. Do not write dummy tests; write meaningful tests that validate business rules.
 - **Data Consistency is King:** When dealing with multiple database operations (e.g., inserting a record and updating a balance simultaneously), you MUST use Drizzle Database Transactions to prevent partial updates or race conditions.
 - **Interviewer-Friendly Infrastructure (Docker):** The project MUST be easy to test. You must maintain a `Dockerfile` for the ElysiaJS app and a `docker-compose.yml` that seamlessly spins up both the application and the PostgreSQL database together. No manual database setup should be required by the reviewer.
