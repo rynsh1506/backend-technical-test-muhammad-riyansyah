@@ -6,6 +6,7 @@ import { authController } from "@/modules/auth";
 import { productController } from "@/modules/product";
 import { supplierController } from "@/modules/supplier";
 import { warehouseController } from "@/modules/warehouse";
+import { purchaseRequestController } from "@/modules/purchase-request";
 
 /**
  * The main Elysia application instance.
@@ -30,4 +31,5 @@ export const app = new Elysia()
   .use(authController)
   .use(productController)
   .use(supplierController)
-  .use(warehouseController);
+  .use(warehouseController)
+  .use(purchaseRequestController);

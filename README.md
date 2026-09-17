@@ -15,8 +15,8 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 
 - [x] **Authentication**: Login dengan JWT (HttpOnly Cookie), RBAC statis (USER & APPROVER).
 - [x] **Master Data**: CRUD Produk, Supplier, dan Gudang (Warehouse).
-- [ ] **Purchase Request (PR)**: Pembuatan PR oleh USER, daftar PR.
-- [ ] **Approval Workflow**: Persetujuan/Penolakan PR oleh APPROVER.
+- [x] **Purchase Request (PR)**: Pembuatan PR oleh USER, daftar PR.
+- [x] **Approval Workflow**: Persetujuan/Penolakan PR oleh APPROVER.
 - [ ] **Purchase Order (PO)**: Konversi PR yang disetujui menjadi PO ke Supplier.
 - [ ] **Goods Receipt (GR) & Inventory**: Penerimaan barang (GR) yang otomatis menambah stok Inventory (Database Transaction).
 

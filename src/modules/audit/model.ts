@@ -1,0 +1,30 @@
+import {
+  pgTable,
+  serial,
+  varchar,
+  timestamp,
+  integer,
+  jsonb,
+} from "drizzle-orm/pg-core";
+import { users } from "@/modules/auth/model";
+
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  entityName: varchar("entity_name", { length: 50 }).notNull(), // e.g., 'purchase_requests', 'purchase_orders'
+  entityId: integer("entity_id").notNull(),
+  action: varchar("action", { length: 50 }).notNull(), // e.g., 'SUBMIT', 'APPROVE', 'REJECT'
+  performedBy: integer("performed_by")
+    .references(() => users.id)
+    .notNull(),
+  changes: jsonb("changes"), // Store what was changed, if any
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const idempotencyKeys = pgTable("idempotency_keys", {
+  key: varchar("key", { length: 255 }).primaryKey(),
+  userId: integer("user_id").notNull(),
+  path: varchar("path", { length: 255 }).notNull(),
+  method: varchar("method", { length: 10 }).notNull(),
+  response: jsonb("response"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
