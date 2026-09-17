@@ -1,5 +1,5 @@
 import { db } from "@/utils/db";
-import { purchaseRequests, purchaseRequestItems } from "./model";
+import { purchaseRequests, purchaseRequestItems } from "@/modules/purchase-request/model";
 import { auditLogs } from "@/modules/audit/model";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { status } from "elysia";
@@ -18,7 +18,7 @@ const generateRequestNumber = async () => {
 
   let sequence = 1;
   if (latestPr.length > 0) {
-    const lastNum = parseInt(latestPr[0].requestNumber.split("-")[2], 10);
+    const lastNum = parseInt(latestPr[0]!.requestNumber.split("-")[2] ?? "0", 10);
     if (!isNaN(lastNum)) {
       sequence = lastNum + 1;
     }
@@ -68,7 +68,7 @@ export const purchaseRequestService = {
       .from(purchaseRequests)
       .where(whereCondition);
 
-    const total = Number(totalRes[0].count);
+    const total = Number(totalRes[0]!.count);
 
     return {
       data,
@@ -172,7 +172,7 @@ export const purchaseRequestService = {
       });
     }
 
-    const prId = items[0].purchaseRequestId;
+    const prId = items[0]!.purchaseRequestId;
     const pr = await purchaseRequestService.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
@@ -202,7 +202,7 @@ export const purchaseRequestService = {
       });
     }
 
-    const prId = items[0].purchaseRequestId;
+    const prId = items[0]!.purchaseRequestId;
     const pr = await purchaseRequestService.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
@@ -231,7 +231,7 @@ export const purchaseRequestService = {
         });
       }
 
-      const pr = prData[0];
+      const pr = prData[0]!;
       if (pr.status !== "DRAFT") {
         throw status(400, {
           error: {
@@ -284,7 +284,7 @@ export const purchaseRequestService = {
         });
       }
 
-      const pr = prData[0];
+      const pr = prData[0]!;
       if (pr.status !== "SUBMITTED") {
         throw status(400, {
           error: {
@@ -324,7 +324,7 @@ export const purchaseRequestService = {
         });
       }
 
-      const pr = prData[0];
+      const pr = prData[0]!;
       if (pr.status !== "SUBMITTED") {
         throw status(400, {
           error: {

@@ -1,11 +1,11 @@
 import Elysia, { t } from "elysia";
-import { purchaseRequestService } from "./service";
+import { purchaseRequestService } from "@/modules/purchase-request/service";
 import {
   prCreateDto,
   prUpdateDraftDto,
   prItemAddDto,
   prItemUpdateDto,
-} from "./model";
+} from "@/modules/purchase-request/model";
 import { isAuthenticated } from "@/utils/auth";
 import { idempotencyPlugin } from "@/utils/idempotency";
 import { status } from "elysia";
