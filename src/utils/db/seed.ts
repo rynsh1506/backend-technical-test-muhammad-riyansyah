@@ -6,7 +6,7 @@ import { warehouses } from "@/modules/warehouse/model";
 
 /**
  * Executes the database seeding process.
- * Populates essential initial data for users (staff and approver), products,
+ * Populates essential initial data for users (USER and APPROVER), products,
  * suppliers, and warehouses to ensure the application is immediately testable.
  *
  * Safe to run multiple times (uses onConflictDoNothing).
