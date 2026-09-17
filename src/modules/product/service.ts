@@ -1,19 +1,37 @@
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { products } from "./model";
-import type { ProductModelTypes } from "./model";
+import { products } from "@/modules/product/model";
+import type { ProductModelTypes } from "@/modules/product/model";
 
 export abstract class ProductService {
+  /**
+   * Creates a new product record.
+   *
+   * @param data - The product creation payload.
+   * @returns The newly created product.
+   */
   static async create(data: ProductModelTypes["create"]) {
     const result = await db.insert(products).values(data).returning();
     return result[0];
   }
 
+  /**
+   * Retrieves all products ordered by ID (ascending).
+   *
+   * @returns An array of all product records.
+   */
   static async list() {
     return await db.select().from(products).orderBy(products.id);
   }
 
+  /**
+   * Retrieves a single product by its primary key.
+   *
+   * @param id - The numeric ID of the product.
+   * @returns The matching product record.
+   * @throws {404} If no product with the given ID exists.
+   */
   static async getById(id: number) {
     const result = await db
       .select()
@@ -28,8 +46,16 @@ export abstract class ProductService {
     return result[0];
   }
 
+  /**
+   * Updates an existing product by its primary key.
+   *
+   * @param id - The numeric ID of the product to update.
+   * @param data - The partial update payload.
+   * @returns The updated product record.
+   * @throws {404} If no product with the given ID exists.
+   */
   static async update(id: number, data: ProductModelTypes["update"]) {
-    const existing = await this.getById(id);
+    await this.getById(id);
     const result = await db
       .update(products)
       .set(data)
