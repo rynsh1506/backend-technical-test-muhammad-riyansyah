@@ -19,7 +19,7 @@ describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
     });
     const setCookie = response?.headers.get("Set-Cookie");
     if (setCookie) {
-      validCookie = setCookie.split(";")[0];
+      validCookie = setCookie.split(";")[0] ?? "";
     }
   });
 
@@ -30,8 +30,8 @@ describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should block creation with missing required fields", async () => {
-      // @ts-expect-error intentionally missing fields
       const { status } = await api.products.post(
+        // @ts-expect-error intentionally missing fields
         { name: "Incomplete Product" },
         { headers: { cookie: validCookie } },
       );

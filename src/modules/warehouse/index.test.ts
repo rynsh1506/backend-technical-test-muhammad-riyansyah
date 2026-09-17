@@ -18,7 +18,7 @@ describe("Warehouse Module (Eden Treaty E2E Type-Safe)", () => {
     });
     const setCookie = response?.headers.get("Set-Cookie");
     if (setCookie) {
-      validCookie = setCookie.split(";")[0];
+      validCookie = setCookie.split(";")[0] ?? "";
     }
   });
 
@@ -29,9 +29,9 @@ describe("Warehouse Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should block creation with missing required fields", async () => {
-      // @ts-expect-error intentionally missing fields
       const { status } = await api.warehouses.post(
-        { location: "Jakarta" }, // missing code and name
+        // @ts-expect-error intentionally missing fields
+        { location: "Jakarta" },
         { headers: { cookie: validCookie } },
       );
       expect(status).toBeGreaterThanOrEqual(400);
