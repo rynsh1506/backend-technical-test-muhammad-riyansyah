@@ -10,9 +10,15 @@ export abstract class ProductService {
    *
    * @param data - The product creation payload.
    * @returns The newly created product.
+   * @throws {500} If the database insert unexpectedly returns no data.
    */
   static async create(data: ProductModelTypes["create"]) {
     const result = await db.insert(products).values(data).returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: { code: "INTERNAL_ERROR", message: "Failed to create Product" },
+      });
+    }
     return result[0];
   }
 
@@ -53,6 +59,7 @@ export abstract class ProductService {
    * @param data - The partial update payload.
    * @returns The updated product record.
    * @throws {404} If no product with the given ID exists.
+   * @throws {500} If the database update unexpectedly returns no data.
    */
   static async update(id: number, data: ProductModelTypes["update"]) {
     await this.getById(id);
@@ -61,6 +68,11 @@ export abstract class ProductService {
       .set(data)
       .where(eq(products.id, id))
       .returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: { code: "INTERNAL_ERROR", message: "Failed to update Product" },
+      });
+    }
     return result[0];
   }
 }

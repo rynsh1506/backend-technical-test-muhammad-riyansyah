@@ -10,9 +10,15 @@ export abstract class SupplierService {
    *
    * @param data - The supplier creation payload.
    * @returns The newly created supplier.
+   * @throws {500} If the database insert unexpectedly returns no data.
    */
   static async create(data: SupplierModelTypes["create"]) {
     const result = await db.insert(suppliers).values(data).returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: { code: "INTERNAL_ERROR", message: "Failed to create Supplier" },
+      });
+    }
     return result[0];
   }
 
@@ -53,6 +59,7 @@ export abstract class SupplierService {
    * @param data - The partial update payload.
    * @returns The updated supplier record.
    * @throws {404} If no supplier with the given ID exists.
+   * @throws {500} If the database update unexpectedly returns no data.
    */
   static async update(id: number, data: SupplierModelTypes["update"]) {
     await this.getById(id);
@@ -61,6 +68,11 @@ export abstract class SupplierService {
       .set(data)
       .where(eq(suppliers.id, id))
       .returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: { code: "INTERNAL_ERROR", message: "Failed to update Supplier" },
+      });
+    }
     return result[0];
   }
 }
