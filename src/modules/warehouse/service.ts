@@ -10,9 +10,18 @@ export abstract class WarehouseService {
    *
    * @param data - The warehouse creation payload.
    * @returns The newly created warehouse.
+   * @throws {500} If the database insert unexpectedly returns no data.
    */
   static async create(data: WarehouseModelTypes["create"]) {
     const result = await db.insert(warehouses).values(data).returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to create Warehouse",
+        },
+      });
+    }
     return result[0];
   }
 
@@ -53,6 +62,7 @@ export abstract class WarehouseService {
    * @param data - The partial update payload.
    * @returns The updated warehouse record.
    * @throws {404} If no warehouse with the given ID exists.
+   * @throws {500} If the database update unexpectedly returns no data.
    */
   static async update(id: number, data: WarehouseModelTypes["update"]) {
     await this.getById(id);
@@ -61,6 +71,14 @@ export abstract class WarehouseService {
       .set(data)
       .where(eq(warehouses.id, id))
       .returning();
+    if (!result[0]) {
+      throw status(500, {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to update Warehouse",
+        },
+      });
+    }
     return result[0];
   }
 }
