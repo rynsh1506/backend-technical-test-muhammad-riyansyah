@@ -28,6 +28,7 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
 ## 3. Naming Conventions, Language & Strict Typing (CRITICAL)
 
 - **English Only:** All variable names, function names, class names, comments, and API error messages MUST be written in clear, professional English. Do not use Indonesian or any mixed languages.
+- **Absolute Imports (NO Relative Paths):** You MUST NEVER use relative path imports (`./`, `../`) anywhere in the codebase — including test files. ALL imports MUST use the `@/` alias (e.g., `import { db } from "@/utils/db"`). To enable this for the root entrypoint, the Elysia app instance MUST live in `src/app.ts`, not `index.ts`. The root `index.ts` is a thin entrypoint that only calls `app.listen()`.
 - **Strict Static Typing (NO `any`):** You MUST use proper TypeScript types for all variables, parameters, and return values. The use of `any` is STRICTLY PROHIBITED. Fall back to `unknown` if the type is truly dynamically determined, but always prefer precise typing.
 - **Code Conventions (TypeScript):**
   - Use `camelCase` for variables, functions, and object properties.

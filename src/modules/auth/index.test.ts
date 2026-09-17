@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { app } from "../../../index";
+import { app } from "@/app";
 import { treaty } from "@elysiajs/eden";
 import { APP_CONFIG } from "@/config";
 
