@@ -4,6 +4,13 @@ import { products } from "@/modules/product/model";
 import { suppliers } from "@/modules/supplier/model";
 import { warehouses } from "@/modules/warehouse/model";
 
+/**
+ * Executes the database seeding process.
+ * Populates essential initial data for users (staff and approver), products,
+ * suppliers, and warehouses to ensure the application is immediately testable.
+ *
+ * Safe to run multiple times (uses onConflictDoNothing).
+ */
 async function main() {
   console.log("🌱 Starting database seeding...");
 
