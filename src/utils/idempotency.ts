@@ -32,7 +32,7 @@ export const idempotencyPlugin = (app: Elysia) =>
 
         if (existing.length > 0) {
           // It was already processed, return the cached response
-          throw status(200, existing[0].response);
+          throw status(200, existing[0]!.response);
         }
       },
       saveIdempotency: async (
