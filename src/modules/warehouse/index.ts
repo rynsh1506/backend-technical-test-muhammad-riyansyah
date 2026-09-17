@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { WarehouseService } from "./service";
-import { WarehouseModel } from "./model";
+import { WarehouseService } from "@/modules/warehouse/service";
+import { WarehouseModel } from "@/modules/warehouse/model";
 import { isAuthenticated } from "@/utils/auth";
 
 export const warehouseController = new Elysia({ prefix: "/warehouses" })
