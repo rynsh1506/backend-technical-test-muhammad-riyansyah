@@ -12,9 +12,8 @@ describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
   let createdProductId: number;
 
   beforeAll(async () => {
-    // Login to get a valid session cookie for protected routes
     const { response } = await api.auth.login.post({
-      username: "staff_user", // seeded user
+      username: "staff_user",
       password: "password123",
     });
     const setCookie = response?.headers.get("Set-Cookie");
