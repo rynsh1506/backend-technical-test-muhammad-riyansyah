@@ -38,7 +38,7 @@ Proyek ini secara ketat mengadopsi struktur berbasis fitur (_Vertical Slice / Do
 - `src/modules/`: Berisi berbagai domain bisnis (seperti `auth`, `products`, dll). Setiap modul wajib memisahkan HTTP Controller (`index.ts`), Logika Bisnis (`service.ts`), dan Skema Database/Validasi (`model.ts`).
 - `src/config/`: Konfigurasi global (Database, Env).
 - `src/utils/`: Fungsi utilitas _reusable_ (seperti setup JWT, _Route Guard/Middleware_, Seeder).
-- `*.test.ts`: _Integration Integration End-to-End Type-Safe Unit Test E2E Type-Safe Testing E2E Type-Safe Testing_ menggunakan Eden Treaty diletakkan berdampingan langsung di dalam folder modul masing-masing.
+- `*.test.ts`: _Integration & E2E Type-Safe Testing_ menggunakan Eden Treaty diletakkan berdampingan langsung di dalam folder modul masing-masing.
 
 ## 🔄 Alur Bisnis Utama (Business Flow)
 
@@ -99,7 +99,7 @@ _(Catatan: Diagram ini akan terus berkembang seiring penyelesaian fitur PR, PO, 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
 - **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
-- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Memanfaatkan standar Swagger/OpenAPI (`@elysiajs/swagger`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
+- **Dokumentasi API Terpadu (@elysia/openapi)**: Memanfaatkan standar Swagger/OpenAPI (`@elysia/openapi`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
