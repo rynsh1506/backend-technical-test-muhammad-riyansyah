@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { openapi } from "@elysia/openapi";
 import { cors } from "@elysiajs/cors";
+import { logger } from "@/utils/logger";
 import { authController } from "@/modules/auth";
 import { productController } from "@/modules/product";
 import { supplierController } from "@/modules/supplier";
@@ -11,7 +12,9 @@ import { warehouseController } from "@/modules/warehouse";
  * Export this for use in tests and the root entrypoint.
  */
 export const app = new Elysia()
+  .use(logger)
   .use(cors())
+
   .use(
     openapi({
       documentation: {
