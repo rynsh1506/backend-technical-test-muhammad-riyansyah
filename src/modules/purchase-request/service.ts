@@ -5,6 +5,7 @@ import {
 } from "@/modules/purchase-request/model";
 import { auditLogs } from "@/modules/audit/model";
 import { eq, desc, and, sql } from "drizzle-orm";
+import { generateDocumentNumber } from "@/utils/generator";
 import { status } from "elysia";
 
 export abstract class PurchaseRequestService {
@@ -17,7 +18,11 @@ export abstract class PurchaseRequestService {
    */
   static async createDraft(userId: number, warehouseId: number) {
     return await db.transaction(async (tx) => {
-      const requestNumber = await this.generateRequestNumber();
+      const requestNumber = await generateDocumentNumber(
+        purchaseRequests,
+        purchaseRequests.requestNumber,
+        "PR",
+      );
       const [newPr] = await tx
         .insert(purchaseRequests)
         .values({
@@ -401,34 +406,5 @@ export abstract class PurchaseRequestService {
 
       return updated;
     });
-  }
-
-  /**
-   * Generates a unique purchase request number in the format PR-YYYY-XXXXXX
-   *
-   * @returns {Promise<string>} The generated request number (e.g., "PR-2026-000001").
-   */
-  private static async generateRequestNumber() {
-    const year = new Date().getFullYear();
-    const latestPr = await db
-      .select({ requestNumber: purchaseRequests.requestNumber })
-      .from(purchaseRequests)
-      .where(sql`${purchaseRequests.requestNumber} LIKE ${`PR-${year}-%`}`)
-      .orderBy(desc(purchaseRequests.requestNumber))
-      .limit(1);
-
-    let sequence = 1;
-    if (latestPr.length > 0) {
-      const lastNum = parseInt(
-        latestPr[0]!.requestNumber.split("-")[2] ?? "0",
-        10,
-      );
-      if (!isNaN(lastNum)) {
-        sequence = lastNum + 1;
-      }
-    }
-
-    const paddedSequence = sequence.toString().padStart(6, "0");
-    return `PR-${year}-${paddedSequence}`;
   }
 }
