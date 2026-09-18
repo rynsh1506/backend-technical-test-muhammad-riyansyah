@@ -34,8 +34,15 @@ const generateRequestNumber = async () => {
   return `PR-${year}-${paddedSequence}`;
 };
 
-export const purchaseRequestService = {
-  createDraft: async (userId: number, warehouseId: number) => {
+export abstract class PurchaseRequestService {
+  /**
+   * Creates a draft purchase request.
+   *
+   * @param userId - The ID of the user creating the request.
+   * @param warehouseId - The warehouse ID for this purchase request.
+   * @returns The newly created purchase request.
+   */
+  static async createDraft(userId: number, warehouseId: number) {
     return await db.transaction(async (tx) => {
       const requestNumber = await generateRequestNumber();
       const [newPr] = await tx
@@ -49,9 +56,17 @@ export const purchaseRequestService = {
         .returning();
       return newPr;
     });
-  },
+  }
 
-  getList: async (page = 1, limit = 10, filterStatus?: string) => {
+  /**
+   * Retrieves a paginated list of purchase requests.
+   *
+   * @param page - The page number to retrieve.
+   * @param limit - The maximum number of records per page.
+   * @param filterStatus - Optional status filter.
+   * @returns Paginated purchase requests.
+   */
+  static async getList(page = 1, limit = 10, filterStatus?: string) {
     const offset = (page - 1) * limit;
 
     let whereCondition = undefined;
@@ -83,9 +98,16 @@ export const purchaseRequestService = {
         totalPages: Math.ceil(total / limit),
       },
     };
-  },
+  }
 
-  getDetail: async (prId: number) => {
+  /**
+   * Retrieves the details of a specific purchase request including its items.
+   *
+   * @param prId - The purchase request ID.
+   * @returns The purchase request and its items.
+   * @throws {404} If the purchase request is not found.
+   */
+  static async getDetail(prId: number) {
     const pr = await db
       .select()
       .from(purchaseRequests)
@@ -103,10 +125,19 @@ export const purchaseRequestService = {
       .where(eq(purchaseRequestItems.purchaseRequestId, prId));
 
     return { ...pr[0], items };
-  },
+  }
 
-  updateDraft: async (prId: number, userId: number, warehouseId: number) => {
-    const pr = await purchaseRequestService.getDetail(prId);
+  /**
+   * Updates the warehouse of a draft purchase request.
+   *
+   * @param prId - The purchase request ID.
+   * @param userId - The user ID making the update.
+   * @param warehouseId - The new warehouse ID.
+   * @returns The updated purchase request.
+   * @throws {400} If the request is not in DRAFT status.
+   */
+  static async updateDraft(prId: number, userId: number, warehouseId: number) {
+    const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
         error: {
@@ -123,15 +154,25 @@ export const purchaseRequestService = {
       .returning();
 
     return updated;
-  },
+  }
 
-  addItem: async (
+  /**
+   * Adds an item to a draft purchase request.
+   *
+   * @param prId - The purchase request ID.
+   * @param userId - The user ID adding the item.
+   * @param productId - The product ID to add.
+   * @param quantity - The quantity of the product.
+   * @returns The newly added item.
+   * @throws {400} If the request is not in DRAFT status or product is duplicate.
+   */
+  static async addItem(
     prId: number,
     userId: number,
     productId: number,
     quantity: number,
-  ) => {
-    const pr = await purchaseRequestService.getDetail(prId);
+  ) {
+    const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
         error: {
@@ -162,9 +203,19 @@ export const purchaseRequestService = {
       }
       throw error;
     }
-  },
+  }
 
-  updateItem: async (itemId: number, userId: number, quantity: number) => {
+  /**
+   * Updates the quantity of an item in a draft purchase request.
+   *
+   * @param itemId - The ID of the item to update.
+   * @param userId - The user ID making the update.
+   * @param quantity - The new quantity.
+   * @returns The updated item.
+   * @throws {404} If the item is not found.
+   * @throws {400} If the purchase request is not in DRAFT status.
+   */
+  static async updateItem(itemId: number, userId: number, quantity: number) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -176,7 +227,7 @@ export const purchaseRequestService = {
     }
 
     const prId = items[0]!.purchaseRequestId;
-    const pr = await purchaseRequestService.getDetail(prId);
+    const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
         error: {
@@ -192,9 +243,18 @@ export const purchaseRequestService = {
       .where(eq(purchaseRequestItems.id, itemId))
       .returning();
     return updated;
-  },
+  }
 
-  removeItem: async (itemId: number, userId: number) => {
+  /**
+   * Removes an item from a draft purchase request.
+   *
+   * @param itemId - The ID of the item to remove.
+   * @param userId - The user ID making the removal.
+   * @returns A success status.
+   * @throws {404} If the item is not found.
+   * @throws {400} If the purchase request is not in DRAFT status.
+   */
+  static async removeItem(itemId: number, userId: number) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -206,7 +266,7 @@ export const purchaseRequestService = {
     }
 
     const prId = items[0]!.purchaseRequestId;
-    const pr = await purchaseRequestService.getDetail(prId);
+    const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
         error: {
@@ -220,9 +280,18 @@ export const purchaseRequestService = {
       .delete(purchaseRequestItems)
       .where(eq(purchaseRequestItems.id, itemId));
     return { success: true };
-  },
+  }
 
-  submit: async (prId: number, userId: number) => {
+  /**
+   * Submits a draft purchase request for approval.
+   *
+   * @param prId - The purchase request ID.
+   * @param userId - The user ID submitting the request.
+   * @returns The updated purchase request.
+   * @throws {404} If the purchase request is not found.
+   * @throws {400} If the request is not in DRAFT status or has no items.
+   */
+  static async submit(prId: number, userId: number) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -272,9 +341,18 @@ export const purchaseRequestService = {
 
       return updated;
     });
-  },
+  }
 
-  approve: async (prId: number, approverId: number) => {
+  /**
+   * Approves a submitted purchase request.
+   *
+   * @param prId - The purchase request ID.
+   * @param approverId - The user ID approving the request.
+   * @returns The updated purchase request.
+   * @throws {404} If the purchase request is not found.
+   * @throws {400} If the request is not in SUBMITTED status.
+   */
+  static async approve(prId: number, approverId: number) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -311,9 +389,18 @@ export const purchaseRequestService = {
 
       return updated;
     });
-  },
+  }
 
-  reject: async (prId: number, approverId: number) => {
+  /**
+   * Rejects a submitted purchase request.
+   *
+   * @param prId - The purchase request ID.
+   * @param approverId - The user ID rejecting the request.
+   * @returns The updated purchase request.
+   * @throws {404} If the purchase request is not found.
+   * @throws {400} If the request is not in SUBMITTED status.
+   */
+  static async reject(prId: number, approverId: number) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -350,5 +437,5 @@ export const purchaseRequestService = {
 
       return updated;
     });
-  },
-};
+  }
+}
