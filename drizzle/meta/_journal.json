@@ -50,6 +50,13 @@
       "when": 1789741898653,
       "tag": "0006_add_purchase_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789742994529,
+      "tag": "0007_add_inventory_and_goods_receipt",
+      "breakpoints": true
     }
   ]
 }
