@@ -9,36 +9,11 @@ import {
 } from "@/modules/purchase-request/model";
 import { suppliers } from "@/modules/supplier/model";
 import { eq, desc, sql } from "drizzle-orm";
+import { generateDocumentNumber } from "@/utils/generator";
 import { status } from "elysia";
 import { auditLogs } from "@/modules/audit/model";
 
 export abstract class PurchaseOrderService {
-  /**
-   * Generates a unique purchase order number in the format PO-YYYY-XXXXXX
-   *
-   * @returns {Promise<string>} The generated order number (e.g., "PO-2026-000001").
-   */
-  private static async generateOrderNumber() {
-    const year = new Date().getFullYear();
-    const latestPo = await db
-      .select({ poNumber: purchaseOrders.poNumber })
-      .from(purchaseOrders)
-      .where(sql`${purchaseOrders.poNumber} LIKE ${`PO-${year}-%`}`)
-      .orderBy(desc(purchaseOrders.poNumber))
-      .limit(1);
-
-    let sequence = 1;
-    if (latestPo.length > 0) {
-      const lastNum = parseInt(latestPo[0]!.poNumber.split("-")[2] ?? "0", 10);
-      if (!isNaN(lastNum)) {
-        sequence = lastNum + 1;
-      }
-    }
-
-    const paddedSequence = sequence.toString().padStart(6, "0");
-    return `PO-${year}-${paddedSequence}`;
-  }
-
   /**
    * Creates a Purchase Order from an APPROVED Purchase Request.
    *
@@ -116,7 +91,11 @@ export abstract class PurchaseOrderService {
       }
 
       // Create PO
-      const poNumber = await this.generateOrderNumber();
+      const poNumber = await generateDocumentNumber(
+        purchaseOrders,
+        purchaseOrders.poNumber,
+        "PO",
+      );
       const [newPo] = await tx
         .insert(purchaseOrders)
         .values({
