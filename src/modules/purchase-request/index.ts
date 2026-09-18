@@ -119,7 +119,6 @@ export const purchaseRequestController = new Elysia({
       }
       return await PurchaseRequestService.updateDraft(
         Number(id),
-        user.id,
         body.warehouseId!,
       );
     },
@@ -143,7 +142,6 @@ export const purchaseRequestController = new Elysia({
       }
       return await PurchaseRequestService.addItem(
         Number(id),
-        user.id,
         body.productId,
         body.quantity,
       );
@@ -171,7 +169,6 @@ export const purchaseRequestController = new Elysia({
       }
       return await PurchaseRequestService.updateItem(
         Number(itemId),
-        user.id,
         body.quantity,
       );
     },
@@ -196,7 +193,7 @@ export const purchaseRequestController = new Elysia({
           },
         });
       }
-      return await PurchaseRequestService.removeItem(Number(itemId), user.id);
+      return await PurchaseRequestService.removeItem(Number(itemId));
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Remove Item from PR" },
