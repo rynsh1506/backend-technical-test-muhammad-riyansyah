@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { purchaseRequestService } from "@/modules/purchase-request/service";
+import { PurchaseRequestService } from "@/modules/purchase-request/service";
 import {
   prCreateDto,
   prUpdateDraftDto,
@@ -44,7 +44,7 @@ export const purchaseRequestController = new Elysia({
         );
       }
 
-      const pr = await purchaseRequestService.createDraft(
+      const pr = await PurchaseRequestService.createDraft(
         user.id,
         body.warehouseId,
       );
@@ -73,7 +73,7 @@ export const purchaseRequestController = new Elysia({
     async ({ query }) => {
       const page = query.page ? parseInt(query.page as string, 10) : 1;
       const limit = query.limit ? parseInt(query.limit as string, 10) : 10;
-      return await purchaseRequestService.getList(
+      return await PurchaseRequestService.getList(
         page,
         limit,
         query.status as string | undefined,
@@ -98,7 +98,7 @@ export const purchaseRequestController = new Elysia({
   .get(
     "/:id",
     async ({ params: { id } }) => {
-      return await purchaseRequestService.getDetail(Number(id));
+      return await PurchaseRequestService.getDetail(Number(id));
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Get PR Detail" },
@@ -117,7 +117,7 @@ export const purchaseRequestController = new Elysia({
           error: { code: "FORBIDDEN", message: "Only USER can update PR" },
         });
       }
-      return await purchaseRequestService.updateDraft(
+      return await PurchaseRequestService.updateDraft(
         Number(id),
         user.id,
         body.warehouseId!,
@@ -141,7 +141,7 @@ export const purchaseRequestController = new Elysia({
           error: { code: "FORBIDDEN", message: "Only USER can add PR items" },
         });
       }
-      return await purchaseRequestService.addItem(
+      return await PurchaseRequestService.addItem(
         Number(id),
         user.id,
         body.productId,
@@ -169,7 +169,7 @@ export const purchaseRequestController = new Elysia({
           },
         });
       }
-      return await purchaseRequestService.updateItem(
+      return await PurchaseRequestService.updateItem(
         Number(itemId),
         user.id,
         body.quantity,
@@ -196,7 +196,7 @@ export const purchaseRequestController = new Elysia({
           },
         });
       }
-      return await purchaseRequestService.removeItem(Number(itemId), user.id);
+      return await PurchaseRequestService.removeItem(Number(itemId), user.id);
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Remove Item from PR" },
@@ -230,7 +230,7 @@ export const purchaseRequestController = new Elysia({
         );
       }
 
-      const pr = await purchaseRequestService.submit(Number(id), user.id);
+      const pr = await PurchaseRequestService.submit(Number(id), user.id);
 
       if (saveIdempotency) {
         await saveIdempotency(
@@ -274,7 +274,7 @@ export const purchaseRequestController = new Elysia({
         );
       }
 
-      const pr = await purchaseRequestService.approve(Number(id), user.id);
+      const pr = await PurchaseRequestService.approve(Number(id), user.id);
 
       if (saveIdempotency) {
         await saveIdempotency(
@@ -318,7 +318,7 @@ export const purchaseRequestController = new Elysia({
         );
       }
 
-      const pr = await purchaseRequestService.reject(Number(id), user.id);
+      const pr = await PurchaseRequestService.reject(Number(id), user.id);
 
       if (saveIdempotency) {
         await saveIdempotency(
