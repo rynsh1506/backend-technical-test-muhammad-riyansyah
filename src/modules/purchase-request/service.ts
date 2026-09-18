@@ -9,33 +9,6 @@ import { status } from "elysia";
 
 export abstract class PurchaseRequestService {
   /**
-   * Generates a unique purchase request number in the format PR-YYYY-XXXXXX
-   */
-  private static async generateRequestNumber() {
-    const year = new Date().getFullYear();
-    const latestPr = await db
-      .select({ requestNumber: purchaseRequests.requestNumber })
-      .from(purchaseRequests)
-      .where(sql`${purchaseRequests.requestNumber} LIKE ${`PR-${year}-%`}`)
-      .orderBy(desc(purchaseRequests.requestNumber))
-      .limit(1);
-
-    let sequence = 1;
-    if (latestPr.length > 0) {
-      const lastNum = parseInt(
-        latestPr[0]!.requestNumber.split("-")[2] ?? "0",
-        10,
-      );
-      if (!isNaN(lastNum)) {
-        sequence = lastNum + 1;
-      }
-    }
-
-    const paddedSequence = sequence.toString().padStart(6, "0");
-    return `PR-${year}-${paddedSequence}`;
-  }
-
-  /**
    * Creates a draft purchase request.
    *
    * @param userId - The ID of the user creating the request.
@@ -428,5 +401,34 @@ export abstract class PurchaseRequestService {
 
       return updated;
     });
+  }
+
+  /**
+   * Generates a unique purchase request number in the format PR-YYYY-XXXXXX
+   *
+   * @returns {Promise<string>} The generated request number (e.g., "PR-2026-000001").
+   */
+  private static async generateRequestNumber() {
+    const year = new Date().getFullYear();
+    const latestPr = await db
+      .select({ requestNumber: purchaseRequests.requestNumber })
+      .from(purchaseRequests)
+      .where(sql`${purchaseRequests.requestNumber} LIKE ${`PR-${year}-%`}`)
+      .orderBy(desc(purchaseRequests.requestNumber))
+      .limit(1);
+
+    let sequence = 1;
+    if (latestPr.length > 0) {
+      const lastNum = parseInt(
+        latestPr[0]!.requestNumber.split("-")[2] ?? "0",
+        10,
+      );
+      if (!isNaN(lastNum)) {
+        sequence = lastNum + 1;
+      }
+    }
+
+    const paddedSequence = sequence.toString().padStart(6, "0");
+    return `PR-${year}-${paddedSequence}`;
   }
 }
