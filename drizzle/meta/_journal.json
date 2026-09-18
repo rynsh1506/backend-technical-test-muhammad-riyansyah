@@ -43,6 +43,13 @@
       "when": 1789672508197,
       "tag": "0005_steady_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789741898653,
+      "tag": "0006_add_purchase_orders",
+      "breakpoints": true
     }
   ]
 }
