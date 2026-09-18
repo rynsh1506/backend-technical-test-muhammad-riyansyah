@@ -4,6 +4,10 @@ import { treaty } from "@elysiajs/eden";
 
 const api = treaty(app);
 
+/**
+ * End-to-end test suite for the Purchase Request module.
+ * Tests draft creation, item management, submission, approval workflows, and idempotency.
+ */
 describe("Purchase Request Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
@@ -12,7 +16,6 @@ describe("Purchase Request Module", () => {
   let productId2: number;
 
   beforeAll(async () => {
-    // 1. Login USER
     const { response: userRes } = await api.auth.login.post({
       username: "staff_user",
       password: "password123",
@@ -21,7 +24,6 @@ describe("Purchase Request Module", () => {
       userRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
     userCookie = { Cookie: userCookieStr };
 
-    // 1b. Login APPROVER
     const { response: appRes } = await api.auth.login.post({
       username: "manager_approver",
       password: "password123",
@@ -213,9 +215,9 @@ describe("Purchase Request Module", () => {
         { headers: headersWithKey },
       );
       expect(submit2.status).toBe(200);
-      expect(new Date((submit2.data as any).updatedAt as string).toISOString()).toBe(
-        new Date((submit1.data as any).updatedAt as string).toISOString(),
-      );
+      expect(
+        new Date((submit2.data as any).updatedAt as string).toISOString(),
+      ).toBe(new Date((submit1.data as any).updatedAt as string).toISOString());
     });
   });
 });

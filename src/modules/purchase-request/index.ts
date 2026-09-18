@@ -16,7 +16,10 @@ export const purchaseRequestController = new Elysia({
   .use(isAuthenticated)
   .use(idempotencyPlugin)
 
-  // CREATE DRAFT (USER ONLY)
+  /**
+   * Creates a draft purchase request.
+   * Requires USER role.
+   */
   .post(
     "/",
     async ({
@@ -62,7 +65,9 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // GET LIST
+  /**
+   * Retrieves a paginated list of purchase requests.
+   */
   .get(
     "/",
     async ({ query }) => {
@@ -87,7 +92,9 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // GET DETAIL
+  /**
+   * Retrieves the details of a specific purchase request including its items.
+   */
   .get(
     "/:id",
     async ({ params: { id } }) => {
@@ -98,7 +105,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // UPDATE DRAFT (USER ONLY)
+  /**
+   * Updates the warehouse of a draft purchase request.
+   * Requires USER role.
+   */
   .patch(
     "/:id/draft",
     async ({ params: { id }, body, user }) => {
@@ -119,7 +129,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // ADD ITEM (USER ONLY)
+  /**
+   * Adds an item to a draft purchase request.
+   * Requires USER role.
+   */
   .post(
     "/:id/items",
     async ({ params: { id }, body, user }) => {
@@ -141,7 +154,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // UPDATE ITEM (USER ONLY)
+  /**
+   * Updates the quantity of an item in a draft purchase request.
+   * Requires USER role.
+   */
   .patch(
     "/items/:itemId",
     async ({ params: { itemId }, body, user }) => {
@@ -165,7 +181,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // REMOVE ITEM (USER ONLY)
+  /**
+   * Removes an item from a draft purchase request.
+   * Requires USER role.
+   */
   .delete(
     "/items/:itemId",
     async ({ params: { itemId }, user }) => {
@@ -184,7 +203,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // SUBMIT PR (USER ONLY)
+  /**
+   * Submits a draft purchase request for approval.
+   * Requires USER role.
+   */
   .post(
     "/:id/submit",
     async ({
@@ -225,7 +247,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // APPROVE PR (APPROVER ONLY)
+  /**
+   * Approves a submitted purchase request.
+   * Requires APPROVER role.
+   */
   .post(
     "/:id/approve",
     async ({
@@ -266,7 +291,10 @@ export const purchaseRequestController = new Elysia({
     },
   )
 
-  // REJECT PR (APPROVER ONLY)
+  /**
+   * Rejects a submitted purchase request.
+   * Requires APPROVER role.
+   */
   .post(
     "/:id/reject",
     async ({
