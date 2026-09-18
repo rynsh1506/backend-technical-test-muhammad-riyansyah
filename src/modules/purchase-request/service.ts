@@ -7,34 +7,34 @@ import { auditLogs } from "@/modules/audit/model";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { status } from "elysia";
 
-const generateRequestNumber = async () => {
+export abstract class PurchaseRequestService {
   /**
    * Generates a unique purchase request number in the format PR-YYYY-XXXXXX
    */
-  const year = new Date().getFullYear();
-  const latestPr = await db
-    .select({ requestNumber: purchaseRequests.requestNumber })
-    .from(purchaseRequests)
-    .where(sql`${purchaseRequests.requestNumber} LIKE ${`PR-${year}-%`}`)
-    .orderBy(desc(purchaseRequests.requestNumber))
-    .limit(1);
+  private static async generateRequestNumber() {
+    const year = new Date().getFullYear();
+    const latestPr = await db
+      .select({ requestNumber: purchaseRequests.requestNumber })
+      .from(purchaseRequests)
+      .where(sql`${purchaseRequests.requestNumber} LIKE ${`PR-${year}-%`}`)
+      .orderBy(desc(purchaseRequests.requestNumber))
+      .limit(1);
 
-  let sequence = 1;
-  if (latestPr.length > 0) {
-    const lastNum = parseInt(
-      latestPr[0]!.requestNumber.split("-")[2] ?? "0",
-      10,
-    );
-    if (!isNaN(lastNum)) {
-      sequence = lastNum + 1;
+    let sequence = 1;
+    if (latestPr.length > 0) {
+      const lastNum = parseInt(
+        latestPr[0]!.requestNumber.split("-")[2] ?? "0",
+        10,
+      );
+      if (!isNaN(lastNum)) {
+        sequence = lastNum + 1;
+      }
     }
+
+    const paddedSequence = sequence.toString().padStart(6, "0");
+    return `PR-${year}-${paddedSequence}`;
   }
 
-  const paddedSequence = sequence.toString().padStart(6, "0");
-  return `PR-${year}-${paddedSequence}`;
-};
-
-export abstract class PurchaseRequestService {
   /**
    * Creates a draft purchase request.
    *
@@ -44,7 +44,7 @@ export abstract class PurchaseRequestService {
    */
   static async createDraft(userId: number, warehouseId: number) {
     return await db.transaction(async (tx) => {
-      const requestNumber = await generateRequestNumber();
+      const requestNumber = await this.generateRequestNumber();
       const [newPr] = await tx
         .insert(purchaseRequests)
         .values({
