@@ -1,5 +1,5 @@
 import { db } from "@/utils/db";
-import { purchaseOrders, purchaseOrderItems } from "./model";
+import { purchaseOrders, purchaseOrderItems } from "@/modules/purchase-order/model";
 import {
   purchaseRequests,
   purchaseRequestItems,
