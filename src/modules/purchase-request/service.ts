@@ -1,14 +1,17 @@
 import { db } from "@/utils/db";
-import { purchaseRequests, purchaseRequestItems } from "@/modules/purchase-request/model";
+import {
+  purchaseRequests,
+  purchaseRequestItems,
+} from "@/modules/purchase-request/model";
 import { auditLogs } from "@/modules/audit/model";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { status } from "elysia";
 
-// --- HELPER ---
 const generateRequestNumber = async () => {
-  // Simple generator: PR-YYYY-XXXXXX
+  /**
+   * Generates a unique purchase request number in the format PR-YYYY-XXXXXX
+   */
   const year = new Date().getFullYear();
-  // Get latest PR for this year
   const latestPr = await db
     .select({ requestNumber: purchaseRequests.requestNumber })
     .from(purchaseRequests)
@@ -18,7 +21,10 @@ const generateRequestNumber = async () => {
 
   let sequence = 1;
   if (latestPr.length > 0) {
-    const lastNum = parseInt(latestPr[0]!.requestNumber.split("-")[2] ?? "0", 10);
+    const lastNum = parseInt(
+      latestPr[0]!.requestNumber.split("-")[2] ?? "0",
+      10,
+    );
     if (!isNaN(lastNum)) {
       sequence = lastNum + 1;
     }
@@ -27,8 +33,6 @@ const generateRequestNumber = async () => {
   const paddedSequence = sequence.toString().padStart(6, "0");
   return `PR-${year}-${paddedSequence}`;
 };
-
-// --- CORE SERVICES ---
 
 export const purchaseRequestService = {
   createDraft: async (userId: number, warehouseId: number) => {
@@ -149,7 +153,6 @@ export const purchaseRequestService = {
       return item;
     } catch (error: any) {
       if (error.code === "23505" || error.cause?.code === "23505") {
-        // Unique violation in PG
         throw status(400, {
           error: {
             code: "DUPLICATE_PRODUCT",
@@ -260,7 +263,6 @@ export const purchaseRequestService = {
         .where(eq(purchaseRequests.id, prId))
         .returning();
 
-      // Audit Log
       await tx.insert(auditLogs).values({
         entityName: "purchase_requests",
         entityId: prId,
@@ -300,7 +302,6 @@ export const purchaseRequestService = {
         .where(eq(purchaseRequests.id, prId))
         .returning();
 
-      // Audit Log
       await tx.insert(auditLogs).values({
         entityName: "purchase_requests",
         entityId: prId,
@@ -340,7 +341,6 @@ export const purchaseRequestService = {
         .where(eq(purchaseRequests.id, prId))
         .returning();
 
-      // Audit Log
       await tx.insert(auditLogs).values({
         entityName: "purchase_requests",
         entityId: prId,
