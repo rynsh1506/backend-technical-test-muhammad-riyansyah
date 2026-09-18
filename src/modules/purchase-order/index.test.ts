@@ -43,7 +43,7 @@ describe("Purchase Order Module", () => {
     warehouseId = (wh.data as any).id;
 
     const supp = await api.suppliers.post(
-      { code: `SUP-PO-${randomSuffix}`, name: "PO Test Supp", email: `po${randomSuffix}@supp.com` },
+      { name: "PO Test Supp", email: `po${randomSuffix}@supp.com` },
       { headers: userCookie },
     );
     supplierId = (supp.data as any).id;
@@ -61,7 +61,7 @@ describe("Purchase Order Module", () => {
     );
     prId = (prDraft.data as any).id;
 
-    await api["purchase-requests"][prId.toString()].items.post(
+    await api["purchase-requests"]({ id: prId }).items.post(
       { productId: product1Id, quantity: 15 },
       { headers: userCookie },
     );
@@ -79,13 +79,13 @@ describe("Purchase Order Module", () => {
 
     it("should allow creating PO after PR is APPROVED", async () => {
       // Submit PR
-      await api["purchase-requests"][prId.toString()].submit.post(
+      await api["purchase-requests"]({ id: prId }).submit.post(
         {},
         { headers: userCookie },
       );
 
       // Approve PR
-      await api["purchase-requests"][prId.toString()].approve.post(
+      await api["purchase-requests"]({ id: prId }).approve.post(
         {},
         { headers: approverCookie },
       );
@@ -113,7 +113,7 @@ describe("Purchase Order Module", () => {
 
   describe("Retrieval and Status Updates", () => {
     it("should retrieve PO details and include items exactly matching PR", async () => {
-      const { data, status } = await api["purchase-orders"][poId.toString()].get({
+      const { data, status } = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
       
@@ -124,7 +124,7 @@ describe("Purchase Order Module", () => {
     });
 
     it("should mark the PO as ORDERED", async () => {
-      const { data, status } = await api["purchase-orders"][poId.toString()].order.post(
+      const { data, status } = await api["purchase-orders"]({ id: poId }).order.post(
         {},
         { headers: userCookie },
       );

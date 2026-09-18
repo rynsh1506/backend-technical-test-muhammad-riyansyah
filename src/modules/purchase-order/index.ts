@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
-import { PurchaseOrderService } from "./service";
-import { poCreateDto } from "./model";
+import { PurchaseOrderService } from "@/modules/purchase-order/service";
+import { poCreateDto } from "@/modules/purchase-order/model";
 import { isAuthenticated } from "@/utils/auth";
 import { idempotencyPlugin } from "@/utils/idempotency";
 
@@ -9,22 +9,15 @@ export const purchaseOrderController = new Elysia({
 })
   .use(isAuthenticated)
   .use(idempotencyPlugin)
-
-  /**
-   * Creates a Purchase Order from an APPROVED Purchase Request.
-   */
   .post(
     "/",
-    async ({
-      body,
-      user,
-      idempotencyKey,
-      checkIdempotency,
-      saveIdempotency,
-    }) => {
-      if (idempotencyKey) {
-        const cached = await checkIdempotency(idempotencyKey);
-        if (cached) return cached;
+    async ({ body, user, request, checkIdempotency, saveIdempotency }) => {
+      if (checkIdempotency) {
+        await checkIdempotency(
+          user.id,
+          new URL(request.url).pathname,
+          request.method,
+        );
       }
 
       const result = await PurchaseOrderService.createFromPr(
@@ -33,8 +26,13 @@ export const purchaseOrderController = new Elysia({
         user.id,
       );
 
-      if (idempotencyKey) {
-        await saveIdempotency(idempotencyKey, result);
+      if (saveIdempotency) {
+        await saveIdempotency(
+          user.id,
+          new URL(request.url).pathname,
+          request.method,
+          result,
+        );
       }
 
       return result;
@@ -47,10 +45,6 @@ export const purchaseOrderController = new Elysia({
       }),
     },
   )
-
-  /**
-   * Retrieves a paginated list of purchase orders.
-   */
   .get(
     "/",
     async ({ query }) => {
@@ -66,29 +60,24 @@ export const purchaseOrderController = new Elysia({
       }),
     },
   )
-
-  /**
-   * Retrieves the details of a specific purchase order including its items.
-   */
   .get("/:id", async ({ params: { id } }) => {
     return await PurchaseOrderService.getDetail(Number(id));
   })
-
-  /**
-   * Marks a Purchase Order as ORDERED.
-   */
   .post(
     "/:id/order",
     async ({
       params: { id },
       user,
-      idempotencyKey,
+      request,
       checkIdempotency,
       saveIdempotency,
     }) => {
-      if (idempotencyKey) {
-        const cached = await checkIdempotency(idempotencyKey);
-        if (cached) return cached;
+      if (checkIdempotency) {
+        await checkIdempotency(
+          user.id,
+          new URL(request.url).pathname,
+          request.method,
+        );
       }
 
       const result = await PurchaseOrderService.markAsOrdered(
@@ -96,8 +85,13 @@ export const purchaseOrderController = new Elysia({
         user.id,
       );
 
-      if (idempotencyKey) {
-        await saveIdempotency(idempotencyKey, result);
+      if (saveIdempotency) {
+        await saveIdempotency(
+          user.id,
+          new URL(request.url).pathname,
+          request.method,
+          result,
+        );
       }
 
       return result;
