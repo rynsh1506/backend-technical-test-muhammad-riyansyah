@@ -65,3 +65,11 @@ export const insertInventoryMovementSchema =
   createInsertSchema(inventoryMovements);
 export const selectInventoryMovementSchema =
   createSelectSchema(inventoryMovements);
+
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
+// (No API DTOs defined yet for this module)

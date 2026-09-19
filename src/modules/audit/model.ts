@@ -46,3 +46,11 @@ export const insertAuditLogSchema = createInsertSchema(auditLogs);
 export const selectAuditLogSchema = createSelectSchema(auditLogs);
 export const insertIdempotencyKeySchema = createInsertSchema(idempotencyKeys);
 export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
+
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
+// (No API DTOs defined yet for this module)
