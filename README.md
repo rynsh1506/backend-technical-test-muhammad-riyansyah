@@ -236,7 +236,7 @@ erDiagram
 Proyek ini dibangun menggunakan arsitektur **Vertical Slice** (berbasis fitur) agar sangat mudah dinavigasi. Jika Anda baru pertama kali melihat proyek ini, ikuti urutan berikut:
 
 1. **Titik Masuk (Entrypoint)**: Buka `src/app.ts`. Ini adalah tulang punggung aplikasi (Elysia App). Di sinilah semua modul/routing didaftarkan.
-2. **Definisi Database**: Buka file di dalam masing-masing modul dengan nama `model.ts` (misal: `src/modules/product/model.ts`). File ini mendefinisikan bentuk tabel database (Drizzle ORM) sekaligus menghasilkan skema validasi API otomatis.
+2. **Definisi Database & Validasi**: Buka folder `entities/` di dalam masing-masing modul (misal: `src/modules/product/entities/products.schema.ts`). File ini mendefinisikan bentuk tabel database (Drizzle ORM). Sementara itu, skema validasi API dan Data Transfer Object (DTO) dipisahkan secara rapi ke dalam file `dto.ts`.
 3. **Logika Bisnis (Core)**: Buka `service.ts` (misal: `src/modules/purchase-request/service.ts`). Ini adalah jantung dari aplikasi. Semua perhitungan, logika _approval_, dan operasi database (_transaction_) terjadi di sini. **Jangan menaruh logika bisnis di Controller!**
 4. **Jalur API (Controller)**: Buka `index.ts` di dalam modul (misal: `src/modules/purchase-request/index.ts`). Ini adalah pintu gerbang HTTP. File ini menerima _request_, memvalidasinya, memanggil `Service`, lalu mengembalikan respons JSON.
 5. **Cara Test Bekerja**: Buka `index.test.ts` (misal: `src/modules/purchase-request/index.test.ts`). Di sini Anda bisa melihat bagaimana seluruh fungsi _backend_ (Elysia) dipanggil dan diuji seolah-olah dari _browser_/_frontend_ menggunakan _Eden Treaty_.
