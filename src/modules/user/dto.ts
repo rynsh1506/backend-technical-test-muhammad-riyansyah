@@ -1,5 +1,6 @@
 import { t } from "elysia";
 import { createSelectSchema } from "drizzle-typebox";
+import { spread } from "@/utils/drizzle";
 import { users } from "@/modules/user/entities/users.schema";
 import { createPaginatedDto } from "@/utils/dto";
 
@@ -8,15 +9,22 @@ import { createPaginatedDto } from "@/utils/dto";
  * BASE SCHEMAS (Drizzle TypeBox)
  * ==========================================
  */
-export const selectUserSchema = createSelectSchema(users, {
-  passwordHash: t.Optional(t.String()),
-});
+export const selectUserSchema = createSelectSchema(users);
+const userSelect = spread(users, "select");
 
 /**
  * ==========================================
  * API DTOs (Elysia TypeBox)
  * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ * Explicitly excluding the 'password' field.
  */
-// Omit sensitive data like password hash from API responses
-export const userResponseDto = t.Omit(selectUserSchema, ["passwordHash"]);
+export const userResponseDto = t.Object({
+  id: userSelect.id,
+  username: userSelect.username,
+  role: userSelect.role,
+  createdAt: userSelect.createdAt,
+  updatedAt: userSelect.updatedAt,
+});
+
 export const userListResponseDto = createPaginatedDto(userResponseDto);
