@@ -10,6 +10,12 @@ import { warehouses } from "@/modules/warehouse/model";
 import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
+/**
+ * ==========================================
+ * 1. DATABASE SCHEMA (Drizzle ORM)
+ * ==========================================
+ * Defines the PostgreSQL tables, columns, and relations.
+ */
 export const inventoryBalances = pgTable(
   "inventory_balances",
   {
@@ -46,6 +52,12 @@ export const inventoryMovements = pgTable("inventory_movements", {
 });
 
 export const insertInventoryBalanceSchema =
+  /**
+   * ==========================================
+   * 2. BASE SCHEMAS (Drizzle TypeBox)
+   * ==========================================
+   * Auto-generated TypeBox schemas directly from the database tables.
+   */
   createInsertSchema(inventoryBalances);
 export const selectInventoryBalanceSchema =
   createSelectSchema(inventoryBalances);
