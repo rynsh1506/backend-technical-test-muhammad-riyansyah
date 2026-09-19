@@ -14,14 +14,18 @@ describe("Auth Module (Eden Treaty E2E Type-Safe)", () => {
 
   describe("Validation & Bad Requests", () => {
     it("should block login attempt with missing body", async () => {
-      // @ts-expect-error — intentionally omitting required body to test validation
-      const { status } = await api.auth.login.post();
+      const payload1 = undefined as unknown as Parameters<
+        typeof api.auth.login.post
+      >[0];
+      const { status } = await api.auth.login.post(payload1);
       expect(status).toBeGreaterThanOrEqual(400);
     });
 
     it("should block login attempt with incomplete payload (missing password)", async () => {
-      // @ts-expect-error — intentionally sending partial payload to test validation
-      const { status } = await api.auth.login.post({ username: "staff_user" });
+      const payload2 = { username: "staff_user" } as unknown as Parameters<
+        typeof api.auth.login.post
+      >[0];
+      const { status } = await api.auth.login.post(payload2);
       expect(status).toBeGreaterThanOrEqual(400);
     });
   });
