@@ -1,6 +1,9 @@
 import { describe, expect, it, beforeAll } from "bun:test";
 import { app } from "@/app";
 import { treaty } from "@elysiajs/eden";
+import { db } from "@/utils/db";
+import { purchaseOrders } from "@/modules/purchase-order/model";
+import { eq } from "drizzle-orm";
 
 const api = treaty(app);
 
@@ -75,7 +78,7 @@ describe("Goods Receipt Module", () => {
 
     const poRes = await api["purchase-orders"].post(
       { purchaseRequestId: prId, supplierId },
-      { headers: userCookie },
+      { headers: approverCookie },
     );
     poId = (poRes.data as { id: number }).id;
 
@@ -86,13 +89,54 @@ describe("Goods Receipt Module", () => {
   });
 
   describe("Goods Receipt Operations", () => {
+    it("should prevent USER from creating Goods Receipt", async () => {
+      const { status, error } = await api["goods-receipts"].post(
+        {
+          purchaseOrderId: poId,
+          items: [{ productId: product1Id, quantity: 5 }],
+        },
+        { headers: userCookie },
+      );
+      expect(status).toBe(403);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("FORBIDDEN");
+    });
+
+    it("should prevent receiving goods for a CANCELLED PO", async () => {
+      // Temporarily mark PO as CANCELLED directly in DB
+      await db
+        .update(purchaseOrders)
+        .set({ status: "CANCELLED" })
+        .where(eq(purchaseOrders.id, poId));
+
+      const { status, error } = await api["goods-receipts"].post(
+        {
+          purchaseOrderId: poId,
+          items: [{ productId: product1Id, quantity: 5 }],
+        },
+        { headers: approverCookie },
+      );
+
+      expect(status).toBe(400);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("INVALID_STATUS");
+
+      // Revert status back to ORDERED so remaining tests pass
+      await db
+        .update(purchaseOrders)
+        .set({ status: "ORDERED" })
+        .where(eq(purchaseOrders.id, poId));
+    });
+
     it("should allow partial goods receipt and increase inventory", async () => {
       const { data, status } = await api["goods-receipts"].post(
         {
           purchaseOrderId: poId,
           items: [{ productId: product1Id, quantity: 60 }],
         },
-        { headers: userCookie },
+        { headers: approverCookie },
       );
 
       expect(status).toBe(200);
@@ -112,7 +156,7 @@ describe("Goods Receipt Module", () => {
           purchaseOrderId: poId,
           items: [{ productId: product1Id, quantity: 50 }],
         },
-        { headers: userCookie },
+        { headers: approverCookie },
       );
 
       expect(status).toBe(400); // OVER_RECEIPT
@@ -124,7 +168,7 @@ describe("Goods Receipt Module", () => {
           purchaseOrderId: poId,
           items: [{ productId: product1Id, quantity: 40 }],
         },
-        { headers: userCookie },
+        { headers: approverCookie },
       );
 
       expect(status).toBe(200);
@@ -132,7 +176,37 @@ describe("Goods Receipt Module", () => {
       const poRes = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
+
       expect((poRes.data as { status: string }).status).toBe("RECEIVED");
+    });
+
+    it("should verify inventory levels and detailed movement records after receipt", async () => {
+      // Fetch inventory level
+      const { data: levelData, status: levelStatus } =
+        await api.inventory.levels.get({
+          query: { warehouseId, productId: product1Id },
+          headers: userCookie,
+        });
+      expect(levelStatus).toBe(200);
+      expect((levelData as { stock: number }).stock).toBe(100);
+
+      // Fetch movements
+      const { data: moveData, status: moveStatus } =
+        await api.inventory.movements.get({
+          query: { warehouseId, productId: product1Id },
+          headers: userCookie,
+        });
+      expect(moveStatus).toBe(200);
+      const moves = moveData as unknown as {
+        quantity: number;
+        referenceType: string;
+      }[];
+      expect(moves.length).toBeGreaterThanOrEqual(2); // Two partial receipts
+      // Most recent first due to desc sorting
+      expect(moves[0]!.quantity).toBe(40);
+      expect(moves[0]!.referenceType).toBe("GOODS_RECEIPT");
+      expect(moves[1]!.quantity).toBe(60);
+      expect(moves[1]!.referenceType).toBe("GOODS_RECEIPT");
     });
   });
 });
