@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import { GoodsReceiptService } from "@/modules/goods-receipt/service";
-import { grCreateDto } from "@/modules/goods-receipt/model";
+import { goodsReceiptCreateDto } from "@/modules/goods-receipt/model";
 import { isAuthenticated } from "@/utils/auth";
 import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
@@ -40,7 +40,7 @@ export const goodsReceiptController = new Elysia({
       return result;
     },
     {
-      body: grCreateDto,
+      body: goodsReceiptCreateDto,
       headers: t.Object({
         "idempotency-key": t.Optional(t.String()),
         cookie: t.Optional(t.String()),

@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import { PurchaseOrderService } from "@/modules/purchase-order/service";
-import { poCreateDto } from "@/modules/purchase-order/model";
+import { purchaseOrderCreateDto } from "@/modules/purchase-order/model";
 import { isAuthenticated } from "@/utils/auth";
 import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
@@ -40,7 +40,7 @@ export const purchaseOrderController = new Elysia({
       return result;
     },
     {
-      body: poCreateDto,
+      body: purchaseOrderCreateDto,
       headers: t.Object({
         "idempotency-key": t.Optional(t.String()),
         cookie: t.Optional(t.String()),
