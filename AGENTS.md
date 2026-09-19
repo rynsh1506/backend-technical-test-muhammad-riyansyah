@@ -100,5 +100,6 @@ To achieve maximum points on this technical test, you MUST integrate the followi
 - **Deployed API:** Prepare the application to be easily deployable (e.g., via Docker container) and provide instructions or a live link if possible.
 
 ## 9. Release Management & Versioning (CRITICAL)
-- **Version Synchronization:** Whenever a new Git tag release is created (e.g., `v2.0.4`), the Agent MUST ensure that the `version` field inside `package.json` is updated to match the exact same version number (e.g., `"2.0.4"`). 
+
+- **Version Synchronization:** Whenever a new Git tag release is created (e.g., `v2.0.4`), the Agent MUST ensure that the `version` field inside `package.json` is updated to match the exact same version number (e.g., `"2.0.4"`).
 - **Application Level Versioning:** The Agent MUST ensure that any version definitions used by Swagger, API routes, or metadata inside the application (like `src/app.ts`) are completely synchronized with `package.json` to prevent desync between the source code and the Git release tag.

@@ -3,7 +3,8 @@ import { goodsReceipts } from "@/modules/goods-receipt/entities/goods_receipts.s
 import {
   pgTable,
   timestamp,
-  varchar, integer,
+  varchar,
+  integer,
   check,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -12,7 +13,9 @@ import { products } from "@/modules/product/entities/products.schema";
 export const goodsReceiptItems = pgTable(
   "goods_receipt_items",
   {
-    id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+    id: varchar("id", { length: 24 })
+      .$defaultFn(() => createId())
+      .primaryKey(),
     goodsReceiptId: varchar("goods_receipt_id", { length: 24 })
       .notNull()
       .references(() => goodsReceipts.id, { onDelete: "cascade" }),
