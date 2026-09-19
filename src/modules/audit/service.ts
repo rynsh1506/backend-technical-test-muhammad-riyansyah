@@ -1,5 +1,5 @@
 import { db } from "@/utils/db";
-import { auditLogs } from "./model";
+import { auditLogs } from "@/modules/audit/model";
 import { users } from "@/modules/auth/model";
 import { desc, eq } from "drizzle-orm";
 
