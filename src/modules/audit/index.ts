@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { AuditService } from "./service";
+import { AuditService } from "@/modules/audit/service";
 import { isAuthenticated } from "@/utils/auth";
 
 export const auditController = new Elysia({ prefix: "/audit" })
@@ -7,7 +7,7 @@ export const auditController = new Elysia({ prefix: "/audit" })
   .get(
     "/logs",
     async ({ user, set }) => {
-      // Typically only APPROVER / Admin should see audit logs
+      /** Typically only APPROVER / Admin should see audit logs */
       if (user.role !== "APPROVER") {
         set.status = 403;
         return {
