@@ -4,7 +4,6 @@ import {
   serial,
   varchar,
   timestamp,
-  unique,
 } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["USER", "APPROVER"]);
