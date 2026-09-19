@@ -2,7 +2,8 @@ import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { suppliers } from "@/modules/supplier/model";
-import type { SupplierModelTypes } from "@/modules/supplier/model";
+import { supplierCreateDto, supplierUpdateDto } from "@/modules/supplier/model";
+import type { Static } from "elysia";
 
 export abstract class SupplierService {
   /**
@@ -12,7 +13,7 @@ export abstract class SupplierService {
    * @returns The newly created supplier.
    * @throws {500} If the database insert unexpectedly returns no data.
    */
-  static async create(data: SupplierModelTypes["create"]) {
+  static async create(data: Static<typeof supplierCreateDto>) {
     const result = await db.insert(suppliers).values(data).returning();
     if (!result[0]) {
       throw status(500, {
@@ -97,7 +98,7 @@ export abstract class SupplierService {
    * @throws {404} If no supplier with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: SupplierModelTypes["update"]) {
+  static async update(id: number, data: Static<typeof supplierUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(suppliers)

@@ -1,6 +1,11 @@
 import { Elysia, t } from "elysia";
 import { ProductService } from "@/modules/product/service";
-import { ProductModel } from "@/modules/product/model";
+import {
+  productCreateDto,
+  productUpdateDto,
+  productResponseDto,
+  productListResponseDto,
+} from "@/modules/product/model";
 import { isAuthenticated } from "@/utils/auth";
 
 export const productController = new Elysia({ prefix: "/products" })
@@ -11,8 +16,8 @@ export const productController = new Elysia({ prefix: "/products" })
       return await ProductService.create(body);
     },
     {
-      body: ProductModel.create,
-      response: ProductModel.response,
+      body: productCreateDto,
+      response: productResponseDto,
       detail: {
         tags: ["Master Data: Product"],
         summary: "Create Product",
@@ -36,7 +41,7 @@ export const productController = new Elysia({ prefix: "/products" })
         limit: t.Optional(t.String()),
         search: t.Optional(t.String()),
       }),
-      response: ProductModel.listResponse,
+      response: productListResponseDto,
       detail: {
         tags: ["Master Data: Product"],
         summary: "List all Products",
@@ -50,7 +55,7 @@ export const productController = new Elysia({ prefix: "/products" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      response: ProductModel.response,
+      response: productResponseDto,
       detail: {
         tags: ["Master Data: Product"],
         summary: "Get Product by ID",
@@ -64,8 +69,8 @@ export const productController = new Elysia({ prefix: "/products" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      body: ProductModel.update,
-      response: ProductModel.response,
+      body: productUpdateDto,
+      response: productResponseDto,
       detail: {
         tags: ["Master Data: Product"],
         summary: "Update Product",
