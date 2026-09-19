@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { AuditService } from "@/modules/audit/service";
 import { isAuthenticated } from "@/utils/auth";
 import { auditLogListResponseDto } from "@/modules/audit/model";
@@ -20,7 +20,12 @@ export const auditController = new Elysia({ prefix: "/audit" })
       return await AuditService.getLogs();
     },
     {
-      response: { 200: auditLogListResponseDto },
+      response: {
+        200: auditLogListResponseDto,
+        403: t.Object({
+          error: t.Object({ code: t.String(), message: t.String() }),
+        }),
+      },
       detail: {
         tags: ["Audit Trail"],
         summary: "Get all audit logs",
