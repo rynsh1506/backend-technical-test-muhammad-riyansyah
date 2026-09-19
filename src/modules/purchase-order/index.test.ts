@@ -4,6 +4,10 @@ import { treaty } from "@elysiajs/eden";
 
 const api = treaty(app);
 
+/**
+ * Integration tests for the Purchase Order Module.
+ * Covers creation from approved PRs and status updates.
+ */
 describe("Purchase Order Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
@@ -133,7 +137,7 @@ describe("Purchase Order Module", () => {
 
       expect(status).toBe(200);
       expect(data).toHaveProperty("items");
-      const items = (data as { items: any[] }).items;
+      const items = (data as { items: unknown[] }).items;
       expect(items.length).toBe(1);
       expect((items[0] as { productId: number }).productId).toBe(product1Id);
     });
