@@ -104,7 +104,6 @@ describe("Goods Receipt Module", () => {
     });
 
     it("should prevent receiving goods for a CANCELLED PO", async () => {
-      // Temporarily mark PO as CANCELLED directly in DB
       await db
         .update(purchaseOrders)
         .set({ status: "CANCELLED" })
@@ -123,7 +122,6 @@ describe("Goods Receipt Module", () => {
         (error?.value as unknown as { error: { code: string } }).error.code,
       ).toBe("INVALID_STATUS");
 
-      // Revert status back to ORDERED so remaining tests pass
       await db
         .update(purchaseOrders)
         .set({ status: "ORDERED" })
@@ -159,7 +157,7 @@ describe("Goods Receipt Module", () => {
         { headers: approverCookie },
       );
 
-      expect(status).toBe(400); // OVER_RECEIPT
+      expect(status).toBe(400);
     });
 
     it("should allow completing the goods receipt and mark PO as RECEIVED", async () => {
@@ -181,7 +179,6 @@ describe("Goods Receipt Module", () => {
     });
 
     it("should verify inventory levels and detailed movement records after receipt", async () => {
-      // Fetch inventory level
       const { data: levelData, status: levelStatus } =
         await api.inventory.levels.get({
           query: { warehouseId, productId: product1Id },
@@ -190,7 +187,6 @@ describe("Goods Receipt Module", () => {
       expect(levelStatus).toBe(200);
       expect((levelData as { stock: number }).stock).toBe(100);
 
-      // Fetch movements
       const { data: moveData, status: moveStatus } =
         await api.inventory.movements.get({
           query: { warehouseId, productId: product1Id },
@@ -201,8 +197,7 @@ describe("Goods Receipt Module", () => {
         quantity: number;
         referenceType: string;
       }[];
-      expect(moves.length).toBeGreaterThanOrEqual(2); // Two partial receipts
-      // Most recent first due to desc sorting
+      expect(moves.length).toBeGreaterThanOrEqual(2);
       expect(moves[0]!.quantity).toBe(40);
       expect(moves[0]!.referenceType).toBe("GOODS_RECEIPT");
       expect(moves[1]!.quantity).toBe(60);
