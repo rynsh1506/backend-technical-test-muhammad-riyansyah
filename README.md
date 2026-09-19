@@ -222,12 +222,22 @@ erDiagram
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
 - **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
-- **Dokumentasi API Terpadu (@elysia/openapi)**: Memanfaatkan standar Swagger/OpenAPI (`@elysia/openapi`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
+- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Memanfaatkan standar Swagger/OpenAPI (`@elysiajs/swagger`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
 - **Pemisahan Inventory**: Saldo saat ini (`inventory_balances`) dan histori mutasi (`inventory_movements`) dipisah. Hal ini memastikan setiap pergerakan terekam dengan jelas (Auditabilitas) dan mencegah _race condition_ saat kalkulasi stok massal.
 - **Data Consistency via Transactions**: Seluruh transaksi kritikal (Submit PR, Goods Receipt) dibungkus dalam _Database Transactions_ (`db.transaction`). Jika proses update stok gagal, seluruh data Goods Receipt akan di-_rollback_ otomatis.
+
+## 🧭 Cara Membaca Source Code (Untuk Pemula)
+
+Proyek ini dibangun menggunakan arsitektur **Vertical Slice** (berbasis fitur) agar sangat mudah dinavigasi. Jika Anda baru pertama kali melihat proyek ini, ikuti urutan berikut:
+
+1. **Titik Masuk (Entrypoint)**: Buka `src/app.ts`. Ini adalah tulang punggung aplikasi (Elysia App). Di sinilah semua modul/routing didaftarkan.
+2. **Definisi Database**: Buka file di dalam masing-masing modul dengan nama `model.ts` (misal: `src/modules/product/model.ts`). File ini mendefinisikan bentuk tabel database (Drizzle ORM) sekaligus menghasilkan skema validasi API otomatis.
+3. **Logika Bisnis (Core)**: Buka `service.ts` (misal: `src/modules/purchase-request/service.ts`). Ini adalah jantung dari aplikasi. Semua perhitungan, logika _approval_, dan operasi database (_transaction_) terjadi di sini. **Jangan menaruh logika bisnis di Controller!**
+4. **Jalur API (Controller)**: Buka `index.ts` di dalam modul (misal: `src/modules/purchase-request/index.ts`). Ini adalah pintu gerbang HTTP. File ini menerima _request_, memvalidasinya, memanggil `Service`, lalu mengembalikan respons JSON.
+5. **Cara Test Bekerja**: Buka `index.test.ts` (misal: `src/modules/purchase-request/index.test.ts`). Di sini Anda bisa melihat bagaimana seluruh fungsi _backend_ (Elysia) dipanggil dan diuji seolah-olah dari _browser_/_frontend_ menggunakan _Eden Treaty_.
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
@@ -257,8 +267,6 @@ Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
 2. Install dependensi: `bun install`
 3. Jalankan migrasi _database_: `bun run db:migrate`
 4. Jalankan aplikasi: `bun run dev`
-
----
 
 ---
 
@@ -374,30 +382,4 @@ bun test
 ## 📚 Dokumentasi API (Swagger / Scalar UI)
 
 Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
-👉 **[http://localhost:3000/openapi](http://localhost:3000/openapi)**
-
-### 📖 End-to-End API Flow Example
-
-To simulate a complete procurement lifecycle, follow these steps in your API Client (like Insomnia/Postman) or via the [Swagger UI](http://localhost:3000/swagger):
-
-1. **Login as USER**
-   - \`POST /auth/login\` with \`{ "username": "staff_user", "password": "password123" }\`
-   - _Extract the HTTP-only cookie._
-2. **Create a Purchase Request (Draft)**
-   - \`POST /purchase-requests\` (Returns PR ID, e.g., \`1\`)
-3. **Add Items to PR**
-   - \`POST /purchase-requests/1/items\` with \`{ "productId": 1, "quantity": 100 }\`
-4. **Submit PR for Approval**
-   - \`POST /purchase-requests/1/submit\`
-5. **Login as APPROVER**
-   - \`POST /auth/login\` with \`{ "username": "manager_user", "password": "password123" }\`
-6. **Approve PR**
-   - \`POST /purchase-requests/1/approve\`
-7. **Create Purchase Order**
-   - \`POST /purchase-orders\` with \`{ "purchaseRequestId": 1, "supplierId": 1 }\` (Returns PO ID, e.g., \`1\`)
-8. **Mark PO as Ordered**
-   - \`POST /purchase-orders/1/order\`
-9. **Receive Goods (Partial/Full)**
-   - \`POST /goods-receipts\` with \`{ "purchaseOrderId": 1, "items": [{ "productId": 1, "quantity": 100 }] }\`
-10. **Verify Inventory**
-    - \`GET /inventory/levels?warehouseId=1&productId=1\` -> Should now show stock increased by 100!
+👉 **[http://localhost:3000/swagger](http://localhost:3000/swagger)**
