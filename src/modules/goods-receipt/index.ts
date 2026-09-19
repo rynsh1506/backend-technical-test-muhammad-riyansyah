@@ -45,8 +45,15 @@ export const goodsReceiptController = new Elysia({
         "idempotency-key": t.Optional(t.String()),
         cookie: t.Optional(t.String()),
       }),
+      detail: { tags: ["Goods Receipt"], summary: "Create Goods Receipt" },
     },
   )
-  .get("/:id", async ({ params: { id } }) => {
-    return await GoodsReceiptService.getDetail(Number(id));
-  });
+  .get(
+    "/:id",
+    async ({ params: { id } }) => {
+      return await GoodsReceiptService.getDetail(Number(id));
+    },
+    {
+      detail: { tags: ["Goods Receipt"], summary: "Get GR Details" },
+    },
+  );
