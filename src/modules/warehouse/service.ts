@@ -2,7 +2,10 @@ import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
-import { warehouseCreateDto, warehouseUpdateDto } from "@/modules/warehouse/dto";
+import {
+  warehouseCreateDto,
+  warehouseUpdateDto,
+} from "@/modules/warehouse/dto";
 import type { Static } from "elysia";
 
 export abstract class WarehouseService {
