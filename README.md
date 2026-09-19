@@ -82,47 +82,129 @@ erDiagram
     USERS {
         serial id PK
         varchar username UK
+        varchar password
         enum role "USER | APPROVER"
+        timestamp created_at
+        timestamp updated_at
     }
 
     PRODUCTS {
         serial id PK
         varchar sku UK
         varchar name
+        varchar unit
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
     }
 
     SUPPLIERS {
         serial id PK
         varchar name
         varchar email
+        varchar phone
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
     }
 
     WAREHOUSES {
         serial id PK
         varchar code UK
         varchar name
+        varchar location
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
     }
 
     PURCHASE_REQUESTS {
         serial id PK
-        varchar pr_number UK
-        enum status
+        varchar request_number UK
+        integer warehouse_id FK
+        integer requested_by FK
+        enum status "DRAFT|SUBMITTED|APPROVED|REJECTED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PURCHASE_REQUEST_ITEMS {
+        serial id PK
+        integer purchase_request_id FK
+        integer product_id FK
+        integer quantity
     }
 
     PURCHASE_ORDERS {
         serial id PK
         varchar po_number UK
-        enum status
+        integer purchase_request_id FK
+        integer supplier_id FK
+        enum status "PENDING|ORDERED|PARTIALLY_RECEIVED|RECEIVED|CANCELLED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PURCHASE_ORDER_ITEMS {
+        serial id PK
+        integer purchase_order_id FK
+        integer product_id FK
+        integer quantity
+        timestamp created_at
     }
 
     GOODS_RECEIPTS {
         serial id PK
         varchar gr_number UK
+        integer purchase_order_id FK
+        integer received_by FK
+        timestamp created_at
+    }
+
+    GOODS_RECEIPT_ITEMS {
+        serial id PK
+        integer goods_receipt_id FK
+        integer product_id FK
+        integer quantity
+        timestamp created_at
     }
 
     INVENTORY_BALANCES {
         serial id PK
+        integer warehouse_id FK
+        integer product_id FK
         integer stock
+        timestamp updated_at
+    }
+
+    INVENTORY_MOVEMENTS {
+        serial id PK
+        integer warehouse_id FK
+        integer product_id FK
+        integer quantity
+        varchar reference_type
+        varchar reference_id
+        timestamp created_at
+    }
+
+    AUDIT_LOGS {
+        serial id PK
+        varchar entity_name
+        integer entity_id
+        varchar action
+        integer performed_by FK
+        timestamp created_at
+    }
+
+    IDEMPOTENCY_KEYS {
+        serial id PK
+        integer user_id FK
+        varchar request_path
+        varchar method
+        varchar idempotency_key
+        json response_body
+        integer response_status
+        timestamp created_at
     }
 ```
 
