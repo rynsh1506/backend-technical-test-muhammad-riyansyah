@@ -29,11 +29,12 @@ describe("Supplier Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should block creation with missing required fields", async () => {
-      const { status } = await api.suppliers.post(
-        // @ts-expect-error intentionally missing fields
-        { email: "test@example.com" },
-        { headers: { cookie: validCookie } },
-      );
+      const payload = { email: "test@example.com" } as unknown as Parameters<
+        typeof api.suppliers.post
+      >[0];
+      const { status } = await api.suppliers.post(payload, {
+        headers: { cookie: validCookie },
+      });
       expect(status).toBeGreaterThanOrEqual(400);
     });
   });

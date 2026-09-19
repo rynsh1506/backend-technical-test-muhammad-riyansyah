@@ -29,11 +29,12 @@ describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should block creation with missing required fields", async () => {
-      const { status } = await api.products.post(
-        // @ts-expect-error intentionally missing fields
-        { name: "Incomplete Product" },
-        { headers: { cookie: validCookie } },
-      );
+      const payload = { name: "Incomplete Product" } as unknown as Parameters<
+        typeof api.products.post
+      >[0];
+      const { status } = await api.products.post(payload, {
+        headers: { cookie: validCookie },
+      });
       expect(status).toBeGreaterThanOrEqual(400);
     });
   });
