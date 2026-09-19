@@ -1,7 +1,7 @@
-import { eq, desc, ilike, or, sql } from "drizzle-orm";
+import { eq, desc, ilike, sql } from "drizzle-orm";
+import { status } from "elysia";
 import { db } from "@/utils/db";
 import { users } from "@/modules/user/entities/users.schema";
-import { status } from "elysia";
 
 export class UserService {
   /**
@@ -16,7 +16,7 @@ export class UserService {
       });
     }
 
-    const { passwordHash, ...userWithoutPassword } = result[0];
+    const { password, ...userWithoutPassword } = result[0];
     return userWithoutPassword;
   }
 
@@ -38,7 +38,7 @@ export class UserService {
     const page = Math.floor(offset / limit) + 1;
 
     return {
-      data: results.map(({ passwordHash, ...u }) => u),
+      data: results.map(({ password, ...u }) => u),
       meta: {
         page,
         limit,
