@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { warehouses } from "@/modules/warehouse/model";
@@ -26,12 +26,48 @@ export abstract class WarehouseService {
   }
 
   /**
-   * Retrieves all warehouses ordered by ID (ascending).
+   * Retrieves a paginated list of warehouses.
    *
-   * @returns An array of all warehouse records.
+   * @param page - The page number to retrieve.
+   * @param limit - The maximum number of records per page.
+   * @param search - Optional search string for name or code.
+   * @returns Paginated warehouse records.
    */
-  static async list() {
-    return await db.select().from(warehouses).orderBy(warehouses.id);
+  static async list(page = 1, limit = 10, search?: string) {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = undefined;
+    if (search) {
+      whereCondition = or(
+        ilike(warehouses.name, `%${search}%`),
+        ilike(warehouses.code, `%${search}%`),
+      );
+    }
+
+    const data = await db
+      .select()
+      .from(warehouses)
+      .where(whereCondition)
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(warehouses.id));
+
+    const totalRes = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(warehouses)
+      .where(whereCondition);
+
+    const total = Number(totalRes[0]!.count);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalRecords: total,
+      },
+    };
   }
 
   /**

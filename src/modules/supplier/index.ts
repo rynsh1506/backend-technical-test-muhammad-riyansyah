@@ -21,10 +21,21 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
   )
   .get(
     "/",
-    async () => {
-      return await SupplierService.list();
+    async ({ query }) => {
+      const page = query.page ? parseInt(query.page as string, 10) : 1;
+      const limit = query.limit ? parseInt(query.limit as string, 10) : 10;
+      return await SupplierService.list(
+        page,
+        limit,
+        query.search as string | undefined,
+      );
     },
     {
+      query: t.Object({
+        page: t.Optional(t.String()),
+        limit: t.Optional(t.String()),
+        search: t.Optional(t.String()),
+      }),
       response: SupplierModel.listResponse,
       detail: {
         tags: ["Master Data: Supplier"],
