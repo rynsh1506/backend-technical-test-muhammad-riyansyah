@@ -22,6 +22,7 @@ export const app = new Elysia()
 
   .use(
     swagger({
+      path: "/swagger",
       documentation: {
         info: {
           title: "Backend Technical Test API",
