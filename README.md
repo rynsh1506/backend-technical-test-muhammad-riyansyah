@@ -13,12 +13,21 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 
 ### 🗺️ Status Fitur (Roadmap)
 
+**Core Requirements:**
+
 - [x] **Authentication**: Login dengan JWT (HttpOnly Cookie), RBAC statis (USER & APPROVER).
 - [x] **Master Data**: CRUD Produk, Supplier, dan Gudang (Warehouse).
 - [x] **Purchase Request (PR)**: Pembuatan PR oleh USER, daftar PR.
 - [x] **Approval Workflow**: Persetujuan/Penolakan PR oleh APPROVER.
-- [ ] **Purchase Order (PO)**: Konversi PR yang disetujui menjadi PO ke Supplier.
-- [ ] **Goods Receipt (GR) & Inventory**: Penerimaan barang (GR) yang otomatis menambah stok Inventory (Database Transaction).
+- [x] **Purchase Order (PO)**: Konversi PR yang disetujui menjadi PO ke Supplier.
+- [x] **Goods Receipt (GR) & Inventory**: Penerimaan barang (GR) yang otomatis menambah stok Inventory (Database Transaction).
+
+
+**Bonus Points Achieved:**
+- [x] **Audit Trail**: Melacak riwayat aksi penting di database.
+- [x] **Idempotency**: Mencegah klik-ganda (*double-submit*) pada API transaksional.
+- [x] **Docker & CI Pipeline**: Siap *deploy* dengan Docker Compose dan Github Actions.
+- [x] **Clean Architecture (3-Tier)**: Pemisahan tegas antara Controller, Service, dan Model.
 
 ## 🛠️ Tech Stack
 
@@ -92,9 +101,101 @@ erDiagram
         varchar location
         boolean is_active
     }
+
+    PURCHASE_REQUESTS {
+        serial id PK
+        varchar pr_number UK
+        integer warehouse_id FK
+        integer requested_by FK
+        enum status
+    }
+
+    PURCHASE_REQUEST_ITEMS {
+        serial id PK
+        integer pr_id FK
+        integer product_id FK
+        integer quantity
+    }
+
+    PURCHASE_ORDERS {
+        serial id PK
+        varchar po_number UK
+        integer pr_id FK
+        integer supplier_id FK
+        enum status
+    }
+
+    PURCHASE_ORDER_ITEMS {
+        serial id PK
+        integer po_id FK
+        integer product_id FK
+        integer quantity
+    }
+
+    GOODS_RECEIPTS {
+        serial id PK
+        varchar gr_number UK
+        integer po_id FK
+        integer received_by FK
+    }
+
+    GOODS_RECEIPT_ITEMS {
+        serial id PK
+        integer gr_id FK
+        integer product_id FK
+        integer quantity
+    }
+
+    INVENTORY_BALANCES {
+        serial id PK
+        integer warehouse_id FK
+        integer product_id FK
+        integer stock
+    }
+
+    INVENTORY_MOVEMENTS {
+        serial id PK
+        integer warehouse_id FK
+        integer product_id FK
+        integer quantity
+        varchar reference_type
+    }
+
+    AUDIT_LOGS {
+        serial id PK
+        varchar entity_name
+        integer entity_id
+        varchar action
+        integer performed_by FK
+    }
+
+    %% Relationships (Tali Relasi)
+    USERS ||--o{ PURCHASE_REQUESTS : "requests"
+    USERS ||--o{ GOODS_RECEIPTS : "receives"
+    USERS ||--o{ AUDIT_LOGS : "performs"
+    
+    WAREHOUSES ||--o{ PURCHASE_REQUESTS : "stores"
+    WAREHOUSES ||--o{ INVENTORY_BALANCES : "has"
+    WAREHOUSES ||--o{ INVENTORY_MOVEMENTS : "tracks"
+    
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : "supplies"
+    
+    PRODUCTS ||--o{ PURCHASE_REQUEST_ITEMS : "included_in"
+    PRODUCTS ||--o{ PURCHASE_ORDER_ITEMS : "included_in"
+    PRODUCTS ||--o{ GOODS_RECEIPT_ITEMS : "included_in"
+    PRODUCTS ||--o{ INVENTORY_BALANCES : "stocked_as"
+    PRODUCTS ||--o{ INVENTORY_MOVEMENTS : "moved_as"
+
+    PURCHASE_REQUESTS ||--o{ PURCHASE_REQUEST_ITEMS : "contains"
+    PURCHASE_REQUESTS ||--o| PURCHASE_ORDERS : "converted_to"
+
+    PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_ITEMS : "contains"
+    PURCHASE_ORDERS ||--o{ GOODS_RECEIPTS : "fulfilled_by"
+
+    GOODS_RECEIPTS ||--o{ GOODS_RECEIPT_ITEMS : "contains"
 ```
 
-_(Catatan: Diagram ini akan terus berkembang seiring penyelesaian fitur PR, PO, dan GR)._
+_(Catatan: Diagram di atas merupakan ERD lengkap dari keseluruhan domain proyek ini)._
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
@@ -103,6 +204,8 @@ _(Catatan: Diagram ini akan terus berkembang seiring penyelesaian fitur PR, PO, 
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
+- **Pemisahan Inventory**: Saldo saat ini (`inventory_balances`) dan histori mutasi (`inventory_movements`) dipisah. Hal ini memastikan setiap pergerakan terekam dengan jelas (Auditabilitas) dan mencegah *race condition* saat kalkulasi stok massal.
+- **Data Consistency via Transactions**: Seluruh transaksi kritikal (Submit PR, Goods Receipt) dibungkus dalam *Database Transactions* (`db.transaction`). Jika proses update stok gagal, seluruh data Goods Receipt akan di-*rollback* otomatis.
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
