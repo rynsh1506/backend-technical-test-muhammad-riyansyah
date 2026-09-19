@@ -283,6 +283,20 @@ Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
 
 Untuk mempermudah pengujian manual via Terminal atau Postman, berikut adalah urutan _End-to-End_ (_Happy Path_):
 
+### 0. Mencari ID User (Setelah Login)
+
+```bash
+curl http://localhost:3000/users \
+  -b cookies.txt
+```
+
+Filter berdasarkan username:
+
+```bash
+curl "http://localhost:3000/users?search=staff&limit=5" \
+  -b cookies.txt
+```
+
 ### 1. Login sebagai USER (Staff)
 
 ```bash
@@ -359,6 +373,18 @@ curl -X POST http://localhost:3000/goods-receipts \
       { "productId": "<cuid2_product>", "quantity": 50 }
     ]
   }'
+```
+
+### 9. Lihat Audit Log (Hanya APPROVER)
+
+```bash
+# Semua log
+curl http://localhost:3000/audit/logs \
+  -b cookies_manager.txt
+
+# Filter berdasarkan entitas dan aksi
+curl "http://localhost:3000/audit/logs?entityName=purchase_requests&action=APPROVE&limit=10" \
+  -b cookies_manager.txt
 ```
 
 ## 🌱 Seeding Database (Penting untuk Penguji)
