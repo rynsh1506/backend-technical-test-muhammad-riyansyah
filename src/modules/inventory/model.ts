@@ -41,8 +41,8 @@ export const inventoryMovements = pgTable("inventory_movements", {
   productId: integer("product_id")
     .notNull()
     .references(() => products.id, { onDelete: "restrict" }),
-  quantity: integer("quantity").notNull(), // positive for IN, negative for OUT
-  referenceType: varchar("reference_type", { length: 50 }).notNull(), // e.g., 'GOODS_RECEIPT'
-  referenceId: varchar("reference_id", { length: 100 }).notNull(), // e.g., GR number
+  quantity: integer("quantity").notNull(),
+  referenceType: varchar("reference_type", { length: 50 }).notNull(),
+  referenceId: varchar("reference_id", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
