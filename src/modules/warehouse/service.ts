@@ -2,7 +2,11 @@ import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { warehouses } from "@/modules/warehouse/model";
-import type { WarehouseModelTypes } from "@/modules/warehouse/model";
+import {
+  warehouseCreateDto,
+  warehouseUpdateDto,
+} from "@/modules/warehouse/model";
+import type { Static } from "elysia";
 
 export abstract class WarehouseService {
   /**
@@ -12,7 +16,7 @@ export abstract class WarehouseService {
    * @returns The newly created warehouse.
    * @throws {500} If the database insert unexpectedly returns no data.
    */
-  static async create(data: WarehouseModelTypes["create"]) {
+  static async create(data: Static<typeof warehouseCreateDto>) {
     const result = await db.insert(warehouses).values(data).returning();
     if (!result[0]) {
       throw status(500, {
@@ -100,7 +104,7 @@ export abstract class WarehouseService {
    * @throws {404} If no warehouse with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: WarehouseModelTypes["update"]) {
+  static async update(id: number, data: Static<typeof warehouseUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(warehouses)
