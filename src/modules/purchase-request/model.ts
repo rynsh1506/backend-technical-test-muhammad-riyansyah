@@ -15,6 +15,12 @@ import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
 
+/**
+ * ==========================================
+ * 1. DATABASE SCHEMA (Drizzle ORM)
+ * ==========================================
+ * Defines the PostgreSQL tables, columns, and relations.
+ */
 export const purchaseRequestStatusEnum = pgEnum("purchase_request_status", [
   "DRAFT",
   "SUBMITTED",
@@ -57,6 +63,12 @@ export const purchaseRequestItems = pgTable(
   ],
 );
 
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
 export const insertPurchaseRequestSchema = createInsertSchema(purchaseRequests);
 export const selectPurchaseRequestSchema = createSelectSchema(purchaseRequests);
 export const insertPurchaseRequestItemSchema =
@@ -64,6 +76,12 @@ export const insertPurchaseRequestItemSchema =
 export const selectPurchaseRequestItemSchema =
   createSelectSchema(purchaseRequestItems);
 
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
 export const purchaseRequestCreateDto = t.Pick(insertPurchaseRequestSchema, [
   "warehouseId",
 ]);
