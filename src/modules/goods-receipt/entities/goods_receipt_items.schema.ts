@@ -1,4 +1,4 @@
-import { goodsReceipts } from "./goods_receipts.schema";
+import { goodsReceipts } from "@/modules/goods-receipt/entities/goods_receipts.schema";
 import {
   pgTable,
   serial,
