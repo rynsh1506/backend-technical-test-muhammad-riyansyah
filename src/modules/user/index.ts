@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { UserService } from "./service";
-import { userResponseDto, userListResponseDto } from "./dto";
+import { UserService } from "@/modules/user/service";
+import { userResponseDto, userListResponseDto } from "@/modules/user/dto";
 import { isAuthenticated } from "@/utils/auth";
 
 export const userController = new Elysia({ prefix: "/users" })
