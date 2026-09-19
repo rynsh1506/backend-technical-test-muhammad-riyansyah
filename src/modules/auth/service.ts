@@ -2,7 +2,8 @@ import { eq } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { users } from "@/modules/auth/model";
-import type { AuthModelTypes } from "@/modules/auth/model";
+import { loginBodyDto } from "@/modules/auth/model";
+import type { Static } from "elysia";
 
 export abstract class AuthService {
   /**
@@ -12,7 +13,7 @@ export abstract class AuthService {
    * @returns A safe user object (id, username, role) on successful authentication.
    * @throws {401} If the username does not exist or the password is incorrect.
    */
-  static async login({ username, password }: AuthModelTypes["loginBody"]) {
+  static async login({ username, password }: Static<typeof loginBodyDto>) {
     const userList = await db
       .select()
       .from(users)
