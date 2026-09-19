@@ -39,12 +39,12 @@ export const goodsReceiptItems = pgTable(
   }),
 );
 
-export const grItemDto = t.Object({
+export const goodsReceiptItemDto = t.Object({
   productId: t.Number(),
   quantity: t.Number({ minimum: 1 }),
 });
 
-export const grCreateDto = t.Object({
+export const goodsReceiptCreateDto = t.Object({
   purchaseOrderId: t.Number(),
-  items: t.Array(grItemDto, { minItems: 1 }),
+  items: t.Array(goodsReceiptItemDto, { minItems: 1 }),
 });
