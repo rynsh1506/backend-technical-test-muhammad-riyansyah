@@ -2,7 +2,8 @@ import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { products } from "@/modules/product/model";
-import type { ProductModelTypes } from "@/modules/product/model";
+import { productCreateDto, productUpdateDto } from "@/modules/product/model";
+import type { Static } from "elysia";
 
 export abstract class ProductService {
   /**
@@ -12,7 +13,7 @@ export abstract class ProductService {
    * @returns The newly created product.
    * @throws {500} If the database insert unexpectedly returns no data.
    */
-  static async create(data: ProductModelTypes["create"]) {
+  static async create(data: Static<typeof productCreateDto>) {
     const result = await db.insert(products).values(data).returning();
     if (!result[0]) {
       throw status(500, {
@@ -97,7 +98,7 @@ export abstract class ProductService {
    * @throws {404} If no product with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: ProductModelTypes["update"]) {
+  static async update(id: number, data: Static<typeof productUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(products)

@@ -21,24 +21,21 @@ export const warehouses = pgTable("warehouses", {
 export const insertWarehouseSchema = createInsertSchema(warehouses);
 export const selectWarehouseSchema = createSelectSchema(warehouses);
 
-export const WarehouseModel = {
-  create: t.Omit(insertWarehouseSchema, ["id", "createdAt", "updatedAt"]),
-  update: t.Partial(
-    t.Omit(insertWarehouseSchema, ["id", "code", "createdAt", "updatedAt"]),
-  ),
-  response: selectWarehouseSchema,
-  listResponse: t.Object({
-    data: t.Array(selectWarehouseSchema),
-    meta: t.Object({
-      page: t.Number(),
-      limit: t.Number(),
-      totalPages: t.Number(),
-      totalRecords: t.Number(),
-    }),
+export const warehouseCreateDto = t.Omit(insertWarehouseSchema, [
+  "id",
+  "createdAt",
+  "updatedAt",
+]);
+export const warehouseUpdateDto = t.Partial(
+  t.Omit(insertWarehouseSchema, ["id", "code", "createdAt", "updatedAt"]),
+);
+export const warehouseResponseDto = selectWarehouseSchema;
+export const warehouseListResponseDto = t.Object({
+  data: t.Array(selectWarehouseSchema),
+  meta: t.Object({
+    page: t.Number(),
+    limit: t.Number(),
+    totalPages: t.Number(),
+    totalRecords: t.Number(),
   }),
-} as const;
-
-export type WarehouseModelTypes = {
-  create: Static<typeof WarehouseModel.create>;
-  update: Static<typeof WarehouseModel.update>;
-};
+});
