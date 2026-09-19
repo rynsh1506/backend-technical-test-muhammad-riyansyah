@@ -39,25 +39,25 @@ describe("Goods Receipt Module", () => {
       { code: `WH-GR-${randomSuffix}`, name: "GR Test WH", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (wh.data as any).id;
+    warehouseId = (wh.data as {id: number}).id;
 
     const supp = await api.suppliers.post(
       { name: "GR Test Supp", email: `gr${randomSuffix}@supp.com` },
       { headers: userCookie },
     );
-    supplierId = (supp.data as any).id;
+    supplierId = (supp.data as {id: number}).id;
 
     const prod1 = await api.products.post(
       { sku: `GR-PROD-${randomSuffix}`, name: "GR Product 1", unit: "PCS" },
       { headers: userCookie },
     );
-    product1Id = (prod1.data as any).id;
+    product1Id = (prod1.data as {id: number}).id;
 
     const prDraft = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
     );
-    prId = (prDraft.data as any).id;
+    prId = (prDraft.data as {id: number}).id;
 
     await api["purchase-requests"]({ id: prId }).items.post(
       { productId: product1Id, quantity: 100 },
@@ -77,7 +77,7 @@ describe("Goods Receipt Module", () => {
       { purchaseRequestId: prId, supplierId },
       { headers: userCookie },
     );
-    poId = (poRes.data as any).id;
+    poId = (poRes.data as {id: number}).id;
 
     await api["purchase-orders"]({ id: poId }).order.post(
       {},
@@ -96,12 +96,12 @@ describe("Goods Receipt Module", () => {
       );
 
       expect(status).toBe(200);
-      expect((data as any).grNumber).toContain("GR-");
+      expect((data as {grNumber: string}).grNumber).toContain("GR-");
 
       const poRes = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
-      expect((poRes.data as any).status).toBe("PARTIALLY_RECEIVED");
+      expect((poRes.data as {status: string}).status).toBe("PARTIALLY_RECEIVED");
     });
 
     it("should prevent receiving more quantity than ordered", async () => {
@@ -130,7 +130,7 @@ describe("Goods Receipt Module", () => {
       const poRes = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
-      expect((poRes.data as any).status).toBe("RECEIVED");
+      expect((poRes.data as {status: string}).status).toBe("RECEIVED");
     });
   });
 });
