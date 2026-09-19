@@ -14,6 +14,9 @@ describe("Purchase Request Module", () => {
   let warehouseId: number;
   let productId1: number;
   let productId2: number;
+  let inactiveWarehouseId: number;
+  let inactiveProductId: number;
+  let otherUserCookie: Record<string, string> = {};
 
   beforeAll(async () => {
     const { response: userRes } = await api.auth.login.post({
@@ -50,6 +53,36 @@ describe("Purchase Request Module", () => {
       { headers: userCookie },
     );
     productId2 = (p2Res.data as { id: number }).id;
+
+    const whInactiveRes = await api.warehouses.post(
+      {
+        code: `WH-INACT-${randomSuffix}`,
+        name: "Inactive WH",
+        location: "Loc",
+      },
+      { headers: userCookie },
+    );
+    inactiveWarehouseId = (whInactiveRes.data as { id: number }).id;
+    await api
+      .warehouses({ id: inactiveWarehouseId })
+      .put({ isActive: false }, { headers: userCookie });
+
+    const prodInactiveRes = await api.products.post(
+      { sku: `PROD-INACT-${randomSuffix}`, name: "Inactive Prod", unit: "PCS" },
+      { headers: userCookie },
+    );
+    inactiveProductId = (prodInactiveRes.data as { id: number }).id;
+    await api
+      .products({ id: inactiveProductId })
+      .put({ isActive: false }, { headers: userCookie });
+
+    const { response: otherRes } = await api.auth.login.post({
+      username: "staff_user_2",
+      password: "password123",
+    });
+    const otherCookieStr =
+      otherRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
+    otherUserCookie = { Cookie: otherCookieStr };
   });
 
   describe("Draft Creation and Updates", () => {
@@ -63,6 +96,36 @@ describe("Purchase Request Module", () => {
       expect((res.data as { requestNumber: string }).requestNumber).toStartWith(
         "PR-",
       );
+    });
+    it("should prevent creating PR with inactive warehouse", async () => {
+      const { status, error } = await api["purchase-requests"].post(
+        { warehouseId: inactiveWarehouseId },
+        { headers: userCookie },
+      );
+      expect(status).toBe(400);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("INVALID_WAREHOUSE");
+    });
+
+    it("should prevent ownership violation when modifying another user's PR", async () => {
+      const draftRes = await api["purchase-requests"].post(
+        { warehouseId },
+        { headers: userCookie },
+      );
+      const prId = (draftRes.data as { id: number }).id;
+
+      // PR is created by userCookie (staff_user)
+      const { status, error } = await api["purchase-requests"]({
+        id: prId,
+      }).items.post(
+        { productId: productId1, quantity: 10 },
+        { headers: otherUserCookie },
+      );
+      expect(status).toBe(403);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("FORBIDDEN");
     });
 
     it("should allow USER to add items to DRAFT PR", async () => {
@@ -78,6 +141,24 @@ describe("Purchase Request Module", () => {
       );
       expect(itemRes.status).toBe(200);
       expect((itemRes.data as { quantity: number }).quantity).toBe(10);
+    });
+    it("should prevent adding inactive product to PR", async () => {
+      const draftRes = await api["purchase-requests"].post(
+        { warehouseId },
+        { headers: userCookie },
+      );
+      const prId = (draftRes.data as { id: number }).id;
+
+      const { status, error } = await api["purchase-requests"]({
+        id: prId,
+      }).items.post(
+        { productId: inactiveProductId, quantity: 5 },
+        { headers: userCookie },
+      );
+      expect(status).toBe(400);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("INVALID_PRODUCT");
     });
 
     it("should prevent duplicate products in the same PR", async () => {
@@ -98,8 +179,11 @@ describe("Purchase Request Module", () => {
       );
       expect(dupRes.status).toBe(400);
       expect(
-        (dupRes.error?.value as unknown as { error: { code: string } }).error
-          .code,
+        (
+          dupRes.error?.value as unknown as unknown as {
+            error: { code: string };
+          }
+        ).error.code,
       ).toBe("DUPLICATE_PRODUCT");
     });
   });
@@ -116,8 +200,11 @@ describe("Purchase Request Module", () => {
       }).submit.post({}, { headers: userCookie });
       expect(submitRes.status).toBe(400);
       expect(
-        (submitRes.error?.value as unknown as { error: { code: string } }).error
-          .code,
+        (
+          submitRes.error?.value as unknown as unknown as {
+            error: { code: string };
+          }
+        ).error.code,
       ).toBe("EMPTY_REQUEST");
     });
 
@@ -149,8 +236,11 @@ describe("Purchase Request Module", () => {
       }).approve.post({}, { headers: approverCookie });
       expect(approveRes.status).toBe(400);
       expect(
-        (approveRes.error?.value as unknown as { error: { code: string } })
-          .error.code,
+        (
+          approveRes.error?.value as unknown as unknown as {
+            error: { code: string };
+          }
+        ).error.code,
       ).toBe("INVALID_STATUS");
     });
 
@@ -174,8 +264,11 @@ describe("Purchase Request Module", () => {
       }).approve.post({}, { headers: userCookie });
       expect(approveRes.status).toBe(403);
       expect(
-        (approveRes.error?.value as unknown as { error: { code: string } })
-          .error.code,
+        (
+          approveRes.error?.value as unknown as unknown as {
+            error: { code: string };
+          }
+        ).error.code,
       ).toBe("FORBIDDEN");
     });
 

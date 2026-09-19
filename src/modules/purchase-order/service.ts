@@ -52,9 +52,12 @@ export abstract class PurchaseOrderService {
         .from(suppliers)
         .where(eq(suppliers.id, supplierId));
 
-      if (supplierData.length === 0) {
-        throw status(404, {
-          error: { code: "NOT_FOUND", message: "Supplier not found" },
+      if (supplierData.length === 0 || !supplierData[0]!.isActive) {
+        throw status(400, {
+          error: {
+            code: "INVALID_SUPPLIER",
+            message: "Supplier is invalid or inactive",
+          },
         });
       }
 
