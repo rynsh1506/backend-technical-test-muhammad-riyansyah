@@ -1,8 +1,5 @@
 import { db } from "@/utils/db";
-import {
-  inventoryBalances,
-  inventoryMovements,
-} from "@/modules/inventory/model";
+import { inventoryBalances, inventoryMovements } from "@/entities/inventory.schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export abstract class InventoryService {

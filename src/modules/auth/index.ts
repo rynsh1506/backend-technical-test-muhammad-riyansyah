@@ -1,10 +1,6 @@
 import { Elysia } from "elysia";
 import { AuthService } from "@/modules/auth/service";
-import {
-  loginBodyDto,
-  loginResponseDto,
-  loginInvalidDto,
-} from "@/modules/auth/model";
+import { loginBodyDto, loginResponseDto, loginInvalidDto } from "@/modules/auth/dto";
 import {
   authSetup,
   isAuthenticated,

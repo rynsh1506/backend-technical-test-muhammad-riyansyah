@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll } from "bun:test";
 import { app } from "@/app";
 import { treaty } from "@elysiajs/eden";
 import { db } from "@/utils/db";
-import { purchaseOrders } from "@/modules/purchase-order/model";
+import { purchaseOrders } from "@/entities/purchase-order.schema";
 import { eq } from "drizzle-orm";
 
 const api = treaty(app);

@@ -1,30 +1,8 @@
-import { createPaginatedDto } from "@/utils/dto";
-import {
-  pgTable,
-  serial,
-  varchar,
-  boolean,
-  timestamp,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
-
-/**
- * ==========================================
- * 1. DATABASE SCHEMA (Drizzle ORM)
- * ==========================================
- * Defines the PostgreSQL tables, columns, and relations.
- */
-export const warehouses = pgTable("warehouses", {
-  id: serial("id").primaryKey(),
-  code: varchar("code", { length: 50 }).notNull().unique(),
-  name: varchar("name", { length: 255 }).notNull(),
-  location: varchar("location", { length: 255 }),
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+import { createPaginatedDto } from "@/utils/dto";
+import { warehouses } from "@/entities/warehouse.schema";
 
 /**
  * ==========================================

@@ -1,8 +1,8 @@
 import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { suppliers } from "@/modules/supplier/model";
-import { supplierCreateDto, supplierUpdateDto } from "@/modules/supplier/model";
+import { suppliers } from "@/entities/supplier.schema";
+import { supplierCreateDto, supplierUpdateDto } from "@/modules/supplier/dto";
 import type { Static } from "elysia";
 
 export abstract class SupplierService {

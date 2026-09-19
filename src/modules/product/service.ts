@@ -1,8 +1,8 @@
 import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { products } from "@/modules/product/model";
-import { productCreateDto, productUpdateDto } from "@/modules/product/model";
+import { products } from "@/entities/product.schema";
+import { productCreateDto, productUpdateDto } from "@/modules/product/dto";
 import type { Static } from "elysia";
 
 export abstract class ProductService {
