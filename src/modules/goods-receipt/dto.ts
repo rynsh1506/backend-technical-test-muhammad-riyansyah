@@ -25,7 +25,7 @@ const grItemInsert = spread(insertGoodsReceiptItemSchema, "insert");
 
 /**
  * ==========================================
- * 3. API DTOs (Elysia TypeBox)
+ * API DTOs (Elysia TypeBox)
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
