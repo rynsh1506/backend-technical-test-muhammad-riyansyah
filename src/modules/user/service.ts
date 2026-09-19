@@ -1,7 +1,7 @@
-import { eq, desc, ilike, or } from "drizzle-orm";
+import { eq, desc, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/utils/db";
 import { users } from "@/modules/user/entities/users.schema";
-import { status } from "@/utils/http";
+import { status } from "elysia";
 
 export class UserService {
   /**
@@ -27,20 +27,24 @@ export class UserService {
     let query = db.select().from(users).$dynamic();
 
     if (search) {
-      query = query.where(
-        or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`)),
-      );
+      query = query.where(ilike(users.username, `%${search}%`));
     }
 
     query = query.orderBy(desc(users.createdAt)).limit(limit).offset(offset);
 
     const results = await query;
-    const countResult = await db.select({ count: users.id }).from(users);
-    const total = countResult.length;
+    const countResult = await db.select({ count: sql`count(*)` }).from(users);
+    const total = Number(countResult[0].count);
+    const page = Math.floor(offset / limit) + 1;
 
     return {
       data: results.map(({ passwordHash, ...u }) => u),
-      meta: { limit, offset, total },
+      meta: {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalRecords: total,
+      },
     };
   }
 }
