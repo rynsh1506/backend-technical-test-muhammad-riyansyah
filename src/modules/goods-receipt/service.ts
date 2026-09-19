@@ -28,7 +28,6 @@ export abstract class GoodsReceiptService {
     items: { productId: number; quantity: number }[],
   ) {
     return await db.transaction(async (tx) => {
-      // 1. Validate PO exists and is in a receivable state
       const poList = await tx
         .select()
         .from(purchaseOrders)
@@ -51,7 +50,6 @@ export abstract class GoodsReceiptService {
         });
       }
 
-      // 2. Fetch all PO items to validate the incoming receipt
       const poItemsList = await tx
         .select()
         .from(purchaseOrderItems)
@@ -61,7 +59,6 @@ export abstract class GoodsReceiptService {
         poItemsList.map((item) => [item.productId, item]),
       );
 
-      // 3. Calculate previously received quantities for each product in this PO
       const previousReceipts = await tx
         .select({
           productId: goodsReceiptItems.productId,
@@ -79,11 +76,9 @@ export abstract class GoodsReceiptService {
         previousReceipts.map((pr) => [pr.productId, pr.totalReceived]),
       );
 
-      // 4. Validate incoming items
       let totalItemsOrdered = 0;
       let totalItemsReceivedAfterThis = 0;
 
-      // Group identical productIds in the request to avoid sum bypassing
       const groupedIncoming = new Map<number, number>();
       for (const item of items) {
         groupedIncoming.set(
@@ -116,7 +111,6 @@ export abstract class GoodsReceiptService {
         }
       }
 
-      // Check if this makes the PO fully received
       let isFullyReceived = true;
       for (const poItem of poItemsList) {
         const previouslyReceived = receivedMap.get(poItem.productId) || 0;
@@ -127,7 +121,6 @@ export abstract class GoodsReceiptService {
         }
       }
 
-      // 5. Generate GR Number and Insert GR
       const grNumber = await generateDocumentNumber(
         goodsReceipts,
         goodsReceipts.grNumber,
@@ -143,9 +136,6 @@ export abstract class GoodsReceiptService {
         })
         .returning();
 
-      // 6. Insert GR Items and Update Inventory
-      // Fetch the warehouse ID from the PO -> PR
-      // Wait, we don't have warehouseId directly on PO, we have it on PR.
       const prList = await tx
         .select({ warehouseId: purchaseRequests.warehouseId })
         .from(purchaseRequests)
@@ -164,7 +154,6 @@ export abstract class GoodsReceiptService {
           quantity: incomingQty,
         });
 
-        // Add movement
         inventoryMovementsToInsert.push({
           warehouseId,
           productId,
@@ -173,8 +162,6 @@ export abstract class GoodsReceiptService {
           referenceId: grNumber,
         });
 
-        // Upsert inventory balance
-        // Note: Drizzle raw upsert for Postgres
         await tx
           .insert(inventoryBalances)
           .values({
@@ -194,7 +181,6 @@ export abstract class GoodsReceiptService {
       await tx.insert(goodsReceiptItems).values(grItemsToInsert);
       await tx.insert(inventoryMovements).values(inventoryMovementsToInsert);
 
-      // 7. Update PO Status
       const newStatus = isFullyReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
       if (po.status !== newStatus) {
         await tx
@@ -203,7 +189,6 @@ export abstract class GoodsReceiptService {
           .where(eq(purchaseOrders.id, poId));
       }
 
-      // 8. Audit Log
       await tx.insert(auditLogs).values({
         entityName: "goods_receipts",
         entityId: newGr!.id,
