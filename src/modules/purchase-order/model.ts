@@ -15,7 +15,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
 
 export const purchaseOrderStatusEnum = pgEnum("purchase_order_status", [
-  "PENDING",
+  "DRAFT",
   "ORDERED",
   "PARTIALLY_RECEIVED",
   "RECEIVED",
@@ -32,7 +32,7 @@ export const purchaseOrders = pgTable("purchase_orders", {
   supplierId: integer("supplier_id")
     .notNull()
     .references(() => suppliers.id, { onDelete: "restrict" }),
-  status: purchaseOrderStatusEnum("status").default("PENDING").notNull(),
+  status: purchaseOrderStatusEnum("status").default("DRAFT").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

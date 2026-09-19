@@ -57,6 +57,13 @@
       "when": 1789742994529,
       "tag": "0007_add_inventory_and_goods_receipt",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789786589024,
+      "tag": "0008_fast_captain_flint",
+      "breakpoints": true
     }
   ]
 }
