@@ -73,69 +73,65 @@ flowchart TD
     style K fill:#28a745,color:#fff
 ```
 
-## 🗄️ Desain Database (Conceptual Model / Chen-style ERD)
+## 🗄️ Struktur Database Utama
 
-Berikut adalah relasi konseptual antar entitas untuk memperjelas bagaimana satu tabel menyambung ke tabel lainnya secara logis. Kotak melambangkan **Entitas**, sedangkan belah ketupat melambangkan **Relasi (Kata Kerja)**.
+Sistem ini terdiri dari beberapa entitas tabel yang dikelompokkan berdasarkan domain bisnisnya:
 
 ```mermaid
-flowchart TD
-    %% Entities
-    U[USERS]
-    PR[PURCHASE_REQUESTS]
-    PRI[PURCHASE_REQUEST_ITEMS]
-    PO[PURCHASE_ORDERS]
-    POI[PURCHASE_ORDER_ITEMS]
-    GR[GOODS_RECEIPTS]
-    GRI[GOODS_RECEIPT_ITEMS]
-    PROD[PRODUCTS]
-    WH[WAREHOUSES]
-    INV[INVENTORY_BALANCES]
-    SUPP[SUPPLIERS]
+erDiagram
+    USERS {
+        serial id PK
+        varchar username UK
+        enum role "USER | APPROVER"
+    }
 
-    %% Relationships (Diamonds)
-    req{Membuat}
-    conv{Dikonversi<br/>Menjadi}
-    store{Diterima<br/>Ke}
-    containPR{Memiliki}
-    containPO{Memiliki}
-    containGR{Memiliki}
-    refProd1{Merujuk}
-    refProd2{Merujuk}
-    refProd3{Merujuk}
-    refProd4{Mencatat}
-    sup{Menyuplai}
-    ful{Dipenuhi<br/>Oleh}
-    hasInv{Menyimpan}
+    PRODUCTS {
+        serial id PK
+        varchar sku UK
+        varchar name
+    }
 
-    %% Connections
-    U --- req --- PR
-    WH --- store --- PR
-    
-    PR --- containPR --- PRI
-    PRI --- refProd1 --- PROD
-    
-    PR --- conv --- PO
-    SUPP --- sup --- PO
-    
-    PO --- containPO --- POI
-    POI --- refProd2 --- PROD
-    
-    PO --- ful --- GR
-    GR --- containGR --- GRI
-    GRI --- refProd3 --- PROD
-    
-    WH --- hasInv --- INV
-    INV --- refProd4 --- PROD
+    SUPPLIERS {
+        serial id PK
+        varchar name
+        varchar email
+    }
 
-    %% Styling
-    classDef entity fill:#316192,color:#fff,stroke:#fff,stroke-width:2px;
-    classDef relation fill:#FF0420,color:#fff,shape:diamond;
-    
-    class U,PR,PRI,PO,POI,GR,GRI,PROD,WH,INV,SUPP entity;
-    class req,conv,store,containPR,containPO,containGR,refProd1,refProd2,refProd3,refProd4,sup,ful,hasInv relation;
+    WAREHOUSES {
+        serial id PK
+        varchar code UK
+        varchar name
+    }
+
+    PURCHASE_REQUESTS {
+        serial id PK
+        varchar pr_number UK
+        enum status
+    }
+
+    PURCHASE_ORDERS {
+        serial id PK
+        varchar po_number UK
+        enum status
+    }
+
+    GOODS_RECEIPTS {
+        serial id PK
+        varchar gr_number UK
+    }
+
+    INVENTORY_BALANCES {
+        serial id PK
+        integer stock
+    }
 ```
 
-*(Catatan: Diagram di atas merupakan pemetaan konseptual. Relasi fisik di database Postgres dihubungkan secara ketat (Strict Foreign Keys) melalui kolom `id` utama milik masing-masing tabel).*
+### Penjelasan Domain Data:
+1. **Master Data:** `users`, `products`, `suppliers`, `warehouses`. Menyimpan data induk yang menjadi referensi transaksi.
+2. **Procurement (Pengadaan):** `purchase_requests` & `purchase_orders`. Mencatat alur permintaan dari internal hingga pemesanan resmi ke pihak *Supplier*. Keduanya memiliki tabel *Items* masing-masing untuk mencatat detil produk.
+3. **Goods Receipt (Penerimaan):** `goods_receipts`. Mencatat bukti serah terima barang secara fisik dari *Supplier*.
+4. **Inventory (Persediaan):** `inventory_balances` (total stok saat ini) & `inventory_movements` (buku besar/histori keluar-masuk barang).
+5. **System:** `audit_logs` (rekaman jejak aktivitas) & `idempotency_keys` (mencegah duplikasi data API).
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
