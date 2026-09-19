@@ -1,5 +1,5 @@
 import { db, queryClient } from "@/utils/db";
-import { users } from "@/modules/auth/entities/users.schema";
+import { users } from "@/modules/user/entities/users.schema";
 import { products } from "@/modules/product/entities/products.schema";
 import { suppliers } from "@/modules/supplier/entities/suppliers.schema";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
