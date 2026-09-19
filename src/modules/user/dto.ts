@@ -1,6 +1,6 @@
 import { t } from "elysia";
 import { createSelectSchema } from "drizzle-typebox";
-import { users } from "@/modules/auth/entities/users.schema";
+import { users } from "@/modules/user/entities/users.schema";
 import { createPaginatedDto } from "@/utils/dto";
 
 /**

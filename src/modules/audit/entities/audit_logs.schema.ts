@@ -1,6 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { pgTable, varchar, timestamp, jsonb } from "drizzle-orm/pg-core";
-import { users } from "@/modules/auth/entities/users.schema";
+import { users } from "@/modules/user/entities/users.schema";
 
 export const auditLogs = pgTable("audit_logs", {
   id: varchar("id", { length: 24 })
