@@ -4,7 +4,6 @@ import {
   varchar,
   timestamp,
   integer,
-  unique,
 } from "drizzle-orm/pg-core";
 import { purchaseOrders } from "@/modules/purchase-order/entities/purchase_orders.schema";
 
