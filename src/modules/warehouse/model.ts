@@ -27,7 +27,15 @@ export const WarehouseModel = {
     t.Omit(insertWarehouseSchema, ["id", "code", "createdAt", "updatedAt"]),
   ),
   response: selectWarehouseSchema,
-  listResponse: t.Array(selectWarehouseSchema),
+  listResponse: t.Object({
+    data: t.Array(selectWarehouseSchema),
+    meta: t.Object({
+      page: t.Number(),
+      limit: t.Number(),
+      totalPages: t.Number(),
+      totalRecords: t.Number(),
+    }),
+  }),
 } as const;
 
 export type WarehouseModelTypes = {
