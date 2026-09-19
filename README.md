@@ -59,8 +59,11 @@ flowchart TD
     B2 --> C{2. Login as APPROVER}
     C -->|Reject| D[PR: REJECTED]
     C -->|Approve| E[PR: APPROVED]
-    E --> F[3. Create Purchase Order]
-    F --> G[4. Goods Receipt]
+    E --> F1[3. Create PO]
+    F1 --> F2[PO: PENDING]
+    F2 --> F3[Place Order to Supplier]
+    F3 --> F4[PO: ORDERED]
+    F4 --> G[4. Receive Goods]
     G --> H[(Auto-Update Inventory)]
     H --> I{Is Fully Received?}
     I -->|No| J[PO: PARTIALLY_RECEIVED]
