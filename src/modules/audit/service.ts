@@ -1,14 +1,13 @@
+import { desc, eq } from "drizzle-orm";
 import { db } from "@/utils/db";
 import { auditLogs } from "@/modules/audit/model";
 import { users } from "@/modules/auth/model";
-import { desc, eq } from "drizzle-orm";
 
-/**
- * Audit Trail Service
- */
-export class AuditService {
+export abstract class AuditService {
   /**
    * Retrieves all audit logs, joined with user information.
+   *
+   * @returns An array of audit logs ordered by creation date descending.
    */
   static async getLogs() {
     const logs = await db
