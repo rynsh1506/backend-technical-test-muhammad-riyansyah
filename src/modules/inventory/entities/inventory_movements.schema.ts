@@ -1,6 +1,6 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
-  serial,
   varchar,
   timestamp,
   integer,
@@ -9,11 +9,11 @@ import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 import { products } from "@/modules/product/entities/products.schema";
 
 export const inventoryMovements = pgTable("inventory_movements", {
-  id: serial("id").primaryKey(),
-  warehouseId: integer("warehouse_id")
+  id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+  warehouseId: varchar("warehouse_id", { length: 24 })
     .notNull()
     .references(() => warehouses.id, { onDelete: "restrict" }),
-  productId: integer("product_id")
+  productId: varchar("product_id", { length: 24 })
     .notNull()
     .references(() => products.id, { onDelete: "restrict" }),
   quantity: integer("quantity").notNull(),

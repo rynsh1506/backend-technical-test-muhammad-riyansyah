@@ -9,7 +9,7 @@ const api = treaty(app);
  */
 describe("Warehouse Module (Eden Treaty E2E Type-Safe)", () => {
   let validCookie: string = "";
-  let createdWarehouseId: number;
+  let createdWarehouseId: string;
 
   beforeAll(async () => {
     const { response } = await api.auth.login.post({
@@ -99,7 +99,7 @@ describe("Warehouse Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should return 404 for non-existent warehouse", async () => {
-      const { status } = await api.warehouses({ id: 999999 }).get({
+      const { status } = await api.warehouses({ id: "999999" }).get({
         headers: { cookie: validCookie },
       });
       expect(status).toBe(404);

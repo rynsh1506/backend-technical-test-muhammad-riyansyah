@@ -10,8 +10,8 @@ const api = treaty(app);
  */
 describe("Inventory Module", () => {
   let userCookie: Record<string, string> = {};
-  let warehouseId: number;
-  let productId: number;
+  let warehouseId: string;
+  let productId: string;
 
   beforeAll(async () => {
     const { response: userRes } = await api.auth.login.post({
@@ -27,13 +27,13 @@ describe("Inventory Module", () => {
       { code: `WH-INV-${randomSuffix}`, name: "WH INV", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (whRes.data as { id: number }).id;
+    warehouseId = (whRes.data as { id: string }).id;
 
     const prodRes = await api.products.post(
       { sku: `INV-${randomSuffix}`, name: "PROD INV", unit: "PCS" },
       { headers: userCookie },
     );
-    productId = (prodRes.data as { id: number }).id;
+    productId = (prodRes.data as { id: string }).id;
   });
 
   it("should return zero quantity for item with no inventory", async () => {

@@ -54,7 +54,7 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
       return await WarehouseService.getById(id);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       response: warehouseResponseDto,
       detail: {
         tags: ["Master Data: Warehouse"],
@@ -68,7 +68,7 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
       return await WarehouseService.update(id, body);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: warehouseUpdateDto,
       response: warehouseResponseDto,
       detail: {

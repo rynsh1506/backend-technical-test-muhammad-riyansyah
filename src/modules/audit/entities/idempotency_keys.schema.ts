@@ -1,14 +1,14 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
   varchar,
   timestamp,
-  integer,
   jsonb,
 } from "drizzle-orm/pg-core";
 
 export const idempotencyKeys = pgTable("idempotency_keys", {
   key: varchar("key", { length: 255 }).primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: varchar("user_id", { length: 24 }).notNull(),
   path: varchar("path", { length: 255 }).notNull(),
   method: varchar("method", { length: 10 }).notNull(),
   response: jsonb("response"),
