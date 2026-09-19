@@ -1,10 +1,10 @@
 import Elysia, { t } from "elysia";
 import { PurchaseRequestService } from "@/modules/purchase-request/service";
 import {
-  prCreateDto,
-  prUpdateDraftDto,
-  prItemAddDto,
-  prItemUpdateDto,
+  purchaseRequestCreateDto,
+  purchaseRequestUpdateDraftDto,
+  purchaseRequestItemAddDto,
+  purchaseRequestItemUpdateDto,
 } from "@/modules/purchase-request/model";
 import { isAuthenticated } from "@/utils/auth";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
@@ -46,7 +46,7 @@ export const purchaseRequestController = new Elysia({
       return pr;
     },
     {
-      body: prCreateDto,
+      body: purchaseRequestCreateDto,
       detail: { tags: ["Purchase Request"], summary: "Create Draft PR" },
     },
   )
@@ -110,7 +110,7 @@ export const purchaseRequestController = new Elysia({
       );
     },
     {
-      body: prUpdateDraftDto,
+      body: purchaseRequestUpdateDraftDto,
       detail: { tags: ["Purchase Request"], summary: "Update Draft PR" },
     },
   )
@@ -135,7 +135,7 @@ export const purchaseRequestController = new Elysia({
       );
     },
     {
-      body: prItemAddDto,
+      body: purchaseRequestItemAddDto,
       detail: { tags: ["Purchase Request"], summary: "Add Item to PR" },
     },
   )
@@ -162,7 +162,7 @@ export const purchaseRequestController = new Elysia({
       );
     },
     {
-      body: prItemUpdateDto,
+      body: purchaseRequestItemUpdateDto,
       detail: { tags: ["Purchase Request"], summary: "Update Item Quantity" },
     },
   )
