@@ -26,7 +26,7 @@ export const app = new Elysia()
       documentation: {
         info: {
           title: "Backend Technical Test API",
-          version: process.env.npm_package_version || "1.1.3",
+          version: process.env.npm_package_version || "1.1.5",
           description:
             "API Documentation for Master Data and Purchase Request System",
         },
