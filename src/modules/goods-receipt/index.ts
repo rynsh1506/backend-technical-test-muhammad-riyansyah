@@ -2,6 +2,7 @@ import Elysia, { t } from "elysia";
 import { GoodsReceiptService } from "@/modules/goods-receipt/service";
 import { grCreateDto } from "@/modules/goods-receipt/model";
 import { isAuthenticated } from "@/utils/auth";
+import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
 
 export const goodsReceiptController = new Elysia({
@@ -12,6 +13,14 @@ export const goodsReceiptController = new Elysia({
   .post(
     "/",
     async ({ body, user, request, headers }) => {
+      if (user.role !== "APPROVER") {
+        throw status(403, {
+          error: {
+            code: "FORBIDDEN",
+            message: "Only APPROVER can perform this action",
+          },
+        });
+      }
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const result = await GoodsReceiptService.create(
