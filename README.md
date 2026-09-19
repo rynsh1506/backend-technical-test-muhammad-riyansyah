@@ -53,17 +53,24 @@ Proyek ini secara ketat mengadopsi struktur berbasis fitur (_Vertical Slice / Do
 
 ```mermaid
 flowchart TD
-    A([1. Login as USER]) --> B[Create Purchase Request]
-    B --> C{2. Login as APPROVER}
-    C -->|Reject| D[PR Status: REJECTED]
-    C -->|Approve| E[PR Status: APPROVED]
+    A([1. Login as USER]) --> B[Create DRAFT PR]
+    B --> B1[Add PR Items]
+    B1 --> B2[Submit PR]
+    B2 --> C{2. Login as APPROVER}
+    C -->|Reject| D[PR: REJECTED]
+    C -->|Approve| E[PR: APPROVED]
     E --> F[3. Create Purchase Order]
     F --> G[4. Goods Receipt]
-    G --> H[(5. Auto-Update Inventory Stock)]
+    G --> H[(Auto-Update Inventory)]
+    H --> I{Is Fully Received?}
+    I -->|No| J[PO: PARTIALLY_RECEIVED]
+    J -.->|Next Delivery| G
+    I -->|Yes| K[PO: RECEIVED]
 
     style A fill:#007ACC,color:#fff
     style C fill:#FF0420,color:#fff
     style H fill:#316192,color:#fff
+    style K fill:#28a745,color:#fff
 ```
 
 ## 🗄️ Desain Database Saat Ini (Current ERD)
@@ -169,22 +176,18 @@ erDiagram
         integer performed_by FK
     }
 
-    %% Relationships (Tali Relasi)
-    USERS ||--o{ PURCHASE_REQUESTS : "requests"
-    USERS ||--o{ GOODS_RECEIPTS : "receives"
-    USERS ||--o{ AUDIT_LOGS : "performs"
+    %% Core Relationships (Tali Relasi Utama)
+    %% (Relasi ke USERS & AUDIT disembunyikan agar visual diagram tidak berantakan/spaghetti)
     
-    WAREHOUSES ||--o{ PURCHASE_REQUESTS : "stores"
     WAREHOUSES ||--o{ INVENTORY_BALANCES : "has"
     WAREHOUSES ||--o{ INVENTORY_MOVEMENTS : "tracks"
     
     SUPPLIERS ||--o{ PURCHASE_ORDERS : "supplies"
     
-    PRODUCTS ||--o{ PURCHASE_REQUEST_ITEMS : "included_in"
-    PRODUCTS ||--o{ PURCHASE_ORDER_ITEMS : "included_in"
-    PRODUCTS ||--o{ GOODS_RECEIPT_ITEMS : "included_in"
+    PRODUCTS ||--o{ PURCHASE_REQUEST_ITEMS : "has"
+    PRODUCTS ||--o{ PURCHASE_ORDER_ITEMS : "has"
+    PRODUCTS ||--o{ GOODS_RECEIPT_ITEMS : "has"
     PRODUCTS ||--o{ INVENTORY_BALANCES : "stocked_as"
-    PRODUCTS ||--o{ INVENTORY_MOVEMENTS : "moved_as"
 
     PURCHASE_REQUESTS ||--o{ PURCHASE_REQUEST_ITEMS : "contains"
     PURCHASE_REQUESTS ||--o| PURCHASE_ORDERS : "converted_to"
