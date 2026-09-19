@@ -34,9 +34,7 @@ export const goodsReceiptItems = pgTable(
     quantity: integer("quantity").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => ({
-    quantityCheck: check("gr_item_quantity_check", sql`${table.quantity} > 0`),
-  }),
+  (table) => [check("gr_item_quantity_check", sql`${table.quantity} > 0`)],
 );
 
 export const goodsReceiptItemDto = t.Object({
