@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { suppliers } from "@/modules/supplier/model";
@@ -23,12 +23,48 @@ export abstract class SupplierService {
   }
 
   /**
-   * Retrieves all suppliers ordered by ID (ascending).
+   * Retrieves a paginated list of suppliers.
    *
-   * @returns An array of all supplier records.
+   * @param page - The page number to retrieve.
+   * @param limit - The maximum number of records per page.
+   * @param search - Optional search string for name or email.
+   * @returns Paginated supplier records.
    */
-  static async list() {
-    return await db.select().from(suppliers).orderBy(suppliers.id);
+  static async list(page = 1, limit = 10, search?: string) {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = undefined;
+    if (search) {
+      whereCondition = or(
+        ilike(suppliers.name, `%${search}%`),
+        ilike(suppliers.email, `%${search}%`),
+      );
+    }
+
+    const data = await db
+      .select()
+      .from(suppliers)
+      .where(whereCondition)
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(suppliers.id));
+
+    const totalRes = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(suppliers)
+      .where(whereCondition);
+
+    const total = Number(totalRes[0]!.count);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalRecords: total,
+      },
+    };
   }
 
   /**

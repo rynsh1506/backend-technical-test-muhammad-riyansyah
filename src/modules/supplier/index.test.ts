@@ -63,8 +63,10 @@ describe("Supplier Module (Eden Treaty E2E Type-Safe)", () => {
       });
 
       expect(status).toBe(200);
-      expect(Array.isArray(data)).toBe(true);
-      expect(data?.length).toBeGreaterThan(0);
+      expect(data).toHaveProperty("data");
+      expect(data).toHaveProperty("meta");
+      expect(Array.isArray(data?.data)).toBe(true);
+      expect(data?.data.length).toBeGreaterThan(0);
     });
 
     it("should retrieve a supplier by its ID", async () => {
