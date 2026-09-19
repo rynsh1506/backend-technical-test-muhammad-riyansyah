@@ -84,7 +84,7 @@ export const purchaseRequestController = new Elysia({
   .get(
     "/:id",
     async ({ params: { id } }) => {
-      return await PurchaseRequestService.getDetail(Number(id));
+      return await PurchaseRequestService.getDetail(id);
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Get PR Detail" },
@@ -104,7 +104,7 @@ export const purchaseRequestController = new Elysia({
         });
       }
       return await PurchaseRequestService.updateDraft(
-        Number(id),
+        id,
         body.warehouseId!,
         user.id,
       );
@@ -128,7 +128,7 @@ export const purchaseRequestController = new Elysia({
         });
       }
       return await PurchaseRequestService.addItem(
-        Number(id),
+        id,
         body.productId,
         body.quantity,
         user.id,
@@ -156,7 +156,7 @@ export const purchaseRequestController = new Elysia({
         });
       }
       return await PurchaseRequestService.updateItem(
-        Number(itemId),
+        itemId,
         body.quantity,
         user.id,
       );
@@ -182,7 +182,7 @@ export const purchaseRequestController = new Elysia({
           },
         });
       }
-      return await PurchaseRequestService.removeItem(Number(itemId), user.id);
+      return await PurchaseRequestService.removeItem(itemId, user.id);
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Remove Item from PR" },
@@ -204,7 +204,7 @@ export const purchaseRequestController = new Elysia({
 
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
-      const pr = await PurchaseRequestService.submit(Number(id), user.id);
+      const pr = await PurchaseRequestService.submit(id, user.id);
 
       await IdempotencyService.save(
         user.id,
@@ -235,7 +235,7 @@ export const purchaseRequestController = new Elysia({
 
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
-      const pr = await PurchaseRequestService.approve(Number(id), user.id);
+      const pr = await PurchaseRequestService.approve(id, user.id);
 
       await IdempotencyService.save(
         user.id,
@@ -266,7 +266,7 @@ export const purchaseRequestController = new Elysia({
 
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
-      const pr = await PurchaseRequestService.reject(Number(id), user.id);
+      const pr = await PurchaseRequestService.reject(id, user.id);
 
       await IdempotencyService.save(
         user.id,

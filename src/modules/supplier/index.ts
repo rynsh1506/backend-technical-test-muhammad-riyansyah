@@ -54,7 +54,7 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
       return await SupplierService.getById(id);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       response: supplierResponseDto,
       detail: {
         tags: ["Master Data: Supplier"],
@@ -68,7 +68,7 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
       return await SupplierService.update(id, body);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: supplierUpdateDto,
       response: supplierResponseDto,
       detail: {

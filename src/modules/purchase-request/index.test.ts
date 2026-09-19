@@ -11,11 +11,11 @@ const api = treaty(app);
 describe("Purchase Request Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
-  let warehouseId: number;
-  let productId1: number;
-  let productId2: number;
-  let inactiveWarehouseId: number;
-  let inactiveProductId: number;
+  let warehouseId: string;
+  let productId1: string;
+  let productId2: string;
+  let inactiveWarehouseId: string;
+  let inactiveProductId: string;
   let otherUserCookie: Record<string, string> = {};
 
   beforeAll(async () => {
@@ -40,19 +40,19 @@ describe("Purchase Request Module", () => {
       { code: `WH-PR-${randomSuffix}`, name: "PR Warehouse", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (whRes.data as { id: number }).id;
+    warehouseId = (whRes.data as { id: string }).id;
 
     const p1Res = await api.products.post(
       { sku: `SKU-PR-1-${randomSuffix}`, name: "PR Prod 1", unit: "PCS" },
       { headers: userCookie },
     );
-    productId1 = (p1Res.data as { id: number }).id;
+    productId1 = (p1Res.data as { id: string }).id;
 
     const p2Res = await api.products.post(
       { sku: `SKU-PR-2-${randomSuffix}`, name: "PR Prod 2", unit: "PCS" },
       { headers: userCookie },
     );
-    productId2 = (p2Res.data as { id: number }).id;
+    productId2 = (p2Res.data as { id: string }).id;
 
     const whInactiveRes = await api.warehouses.post(
       {
@@ -62,7 +62,7 @@ describe("Purchase Request Module", () => {
       },
       { headers: userCookie },
     );
-    inactiveWarehouseId = (whInactiveRes.data as { id: number }).id;
+    inactiveWarehouseId = (whInactiveRes.data as { id: string }).id;
     await api
       .warehouses({ id: inactiveWarehouseId })
       .put({ isActive: false }, { headers: userCookie });
@@ -71,7 +71,7 @@ describe("Purchase Request Module", () => {
       { sku: `PROD-INACT-${randomSuffix}`, name: "Inactive Prod", unit: "PCS" },
       { headers: userCookie },
     );
-    inactiveProductId = (prodInactiveRes.data as { id: number }).id;
+    inactiveProductId = (prodInactiveRes.data as { id: string }).id;
     await api
       .products({ id: inactiveProductId })
       .put({ isActive: false }, { headers: userCookie });
@@ -113,7 +113,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
 
       const { status, error } = await api["purchase-requests"]({
         id: prId,
@@ -132,7 +132,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
 
       const itemRes = await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
@@ -146,7 +146,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
 
       const { status, error } = await api["purchase-requests"]({
         id: prId,
@@ -165,7 +165,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
 
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
@@ -193,7 +193,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       const submitRes = await api["purchase-requests"]({
         id: prId,
       }).submit.post({}, { headers: userCookie });
@@ -212,7 +212,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -229,7 +229,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       const approveRes = await api["purchase-requests"]({
         id: prId,
       }).approve.post({}, { headers: approverCookie });
@@ -248,7 +248,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -276,7 +276,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -300,7 +300,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as { id: number }).id;
+      const prId = (draftRes.data as { id: string }).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 5 },
         { headers: userCookie },

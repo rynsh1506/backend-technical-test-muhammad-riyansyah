@@ -14,11 +14,11 @@ const api = treaty(app);
 describe("Goods Receipt Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
-  let warehouseId: number;
-  let supplierId: number;
-  let product1Id: number;
-  let prId: number;
-  let poId: number;
+  let warehouseId: string;
+  let supplierId: string;
+  let product1Id: string;
+  let prId: string;
+  let poId: string;
 
   beforeAll(async () => {
     const { response: userRes } = await api.auth.login.post({
@@ -42,25 +42,25 @@ describe("Goods Receipt Module", () => {
       { code: `WH-GR-${randomSuffix}`, name: "GR Test WH", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (wh.data as { id: number }).id;
+    warehouseId = (wh.data as { id: string }).id;
 
     const supp = await api.suppliers.post(
       { name: "GR Test Supp", email: `gr${randomSuffix}@supp.com` },
       { headers: userCookie },
     );
-    supplierId = (supp.data as { id: number }).id;
+    supplierId = (supp.data as { id: string }).id;
 
     const prod1 = await api.products.post(
       { sku: `GR-PROD-${randomSuffix}`, name: "GR Product 1", unit: "PCS" },
       { headers: userCookie },
     );
-    product1Id = (prod1.data as { id: number }).id;
+    product1Id = (prod1.data as { id: string }).id;
 
     const prDraft = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
     );
-    prId = (prDraft.data as { id: number }).id;
+    prId = (prDraft.data as { id: string }).id;
 
     await api["purchase-requests"]({ id: prId }).items.post(
       { productId: product1Id, quantity: 100 },
@@ -80,7 +80,7 @@ describe("Goods Receipt Module", () => {
       { purchaseRequestId: prId, supplierId },
       { headers: approverCookie },
     );
-    poId = (poRes.data as { id: number }).id;
+    poId = (poRes.data as { id: string }).id;
 
     await api["purchase-orders"]({ id: poId }).order.post(
       {},

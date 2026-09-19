@@ -75,7 +75,7 @@ export abstract class SupplierService {
    * @returns The matching supplier record.
    * @throws {404} If no supplier with the given ID exists.
    */
-  static async getById(id: number) {
+  static async getById(id: string) {
     const result = await db
       .select()
       .from(suppliers)
@@ -98,7 +98,7 @@ export abstract class SupplierService {
    * @throws {404} If no supplier with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: Static<typeof supplierUpdateDto>) {
+  static async update(id: string, data: Static<typeof supplierUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(suppliers)

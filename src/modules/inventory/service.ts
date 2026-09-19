@@ -11,7 +11,7 @@ export abstract class InventoryService {
    * @param productId - The ID of the product.
    * @returns The current inventory balance record or a default zero-stock record if none exists.
    */
-  static async getLevel(warehouseId: number, productId: number) {
+  static async getLevel(warehouseId: string, productId: string) {
     const level = await db
       .select()
       .from(inventoryBalances)
@@ -34,7 +34,7 @@ export abstract class InventoryService {
    * @param productId - The ID of the product.
    * @returns An array of inventory movement records ordered by descending creation time.
    */
-  static async getMovements(warehouseId: number, productId: number) {
+  static async getMovements(warehouseId: string, productId: string) {
     return await db
       .select()
       .from(inventoryMovements)
