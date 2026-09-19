@@ -29,11 +29,12 @@ describe("Warehouse Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should block creation with missing required fields", async () => {
-      const { status } = await api.warehouses.post(
-        // @ts-expect-error intentionally missing fields
-        { location: "Jakarta" },
-        { headers: { cookie: validCookie } },
-      );
+      const payload = { location: "Jakarta" } as unknown as Parameters<
+        typeof api.warehouses.post
+      >[0];
+      const { status } = await api.warehouses.post(payload, {
+        headers: { cookie: validCookie },
+      });
       expect(status).toBeGreaterThanOrEqual(400);
     });
   });
