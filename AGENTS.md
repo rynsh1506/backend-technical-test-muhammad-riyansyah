@@ -31,7 +31,8 @@ You are an Expert Backend Engineer Assistant. Your primary goal is to write clea
 
 - **English Only:** All variable names, function names, class names, comments, and API error messages MUST be written in clear, professional English. Do not use Indonesian or any mixed languages.
 - **Absolute Imports (NO Relative Paths):** You MUST NEVER use relative path imports (`./`, `../`) anywhere in the codebase — including test files. ALL imports MUST use the `@/` alias (e.g., `import { db } from "@/utils/db"`). To enable this for the root entrypoint, the Elysia app instance MUST live in `src/app.ts`, not `index.ts`. The root `index.ts` is a thin entrypoint that only calls `app.listen()`.
-- **Strict Static Typing (NO `any`):** You MUST use proper TypeScript types for all variables, parameters, and return values. The use of `any` is STRICTLY PROHIBITED. Fall back to `unknown` if the type is truly dynamically determined, but always prefer precise typing.
+- **Strict Static Typing (NO `any`):** You MUST use proper TypeScript types for all variables, parameters, and return values. The use of `any` is STRICTLY PROHIBITED in application business logic, API handlers, services, and tests. Fall back to `unknown` if the type is truly dynamically determined.
+  - **Exception:** Framework adapter utilities (like Elysia/Drizzle schema inference wrappers in `src/utils/drizzle.ts`) may use a narrowly scoped type cast (`any`) ONLY when absolutely required to satisfy generic constraints that TypeScript cannot infer dynamically.
 - **Code Conventions (TypeScript):**
   - Use `camelCase` for variables, functions, and object properties.
   - Use `PascalCase` for Classes, DTOs, Interfaces, and Types.
