@@ -9,6 +9,7 @@ import {
 import { sql } from "drizzle-orm";
 import { purchaseOrders } from "@/modules/purchase-order/model";
 import { products } from "@/modules/product/model";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
 
 export const goodsReceipts = pgTable("goods_receipts", {
@@ -37,10 +38,17 @@ export const goodsReceiptItems = pgTable(
   (table) => [check("gr_item_quantity_check", sql`${table.quantity} > 0`)],
 );
 
-export const goodsReceiptItemDto = t.Object({
-  productId: t.Number(),
-  quantity: t.Number({ minimum: 1 }),
-});
+export const insertGoodsReceiptSchema = createInsertSchema(goodsReceipts);
+export const selectGoodsReceiptSchema = createSelectSchema(goodsReceipts);
+export const insertGoodsReceiptItemSchema =
+  createInsertSchema(goodsReceiptItems);
+export const selectGoodsReceiptItemSchema =
+  createSelectSchema(goodsReceiptItems);
+
+export const goodsReceiptItemDto = t.Pick(insertGoodsReceiptItemSchema, [
+  "productId",
+  "quantity",
+]);
 
 export const goodsReceiptCreateDto = t.Object({
   purchaseOrderId: t.Number(),

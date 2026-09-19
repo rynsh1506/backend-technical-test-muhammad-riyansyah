@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { warehouses } from "@/modules/warehouse/model";
 import { products } from "@/modules/product/model";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 export const inventoryBalances = pgTable(
   "inventory_balances",
@@ -43,3 +44,12 @@ export const inventoryMovements = pgTable("inventory_movements", {
   referenceId: varchar("reference_id", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const insertInventoryBalanceSchema =
+  createInsertSchema(inventoryBalances);
+export const selectInventoryBalanceSchema =
+  createSelectSchema(inventoryBalances);
+export const insertInventoryMovementSchema =
+  createInsertSchema(inventoryMovements);
+export const selectInventoryMovementSchema =
+  createSelectSchema(inventoryMovements);
