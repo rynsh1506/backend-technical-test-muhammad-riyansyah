@@ -28,7 +28,7 @@ export const purchaseOrders = pgTable("purchase_orders", {
   purchaseRequestId: integer("purchase_request_id")
     .notNull()
     .references(() => purchaseRequests.id, { onDelete: "restrict" })
-    .unique(), // 1 PR = 1 PO
+    .unique(),
   supplierId: integer("supplier_id")
     .notNull()
     .references(() => suppliers.id, { onDelete: "restrict" }),
@@ -58,7 +58,7 @@ export const purchaseOrderItems = pgTable(
   }),
 );
 
-// TypeBox Schemas
+/** TypeBox Schemas */
 export const purchaseOrderSelectSchema = createSelectSchema(purchaseOrders);
 export const purchaseOrderInsertSchema = createInsertSchema(purchaseOrders);
 
