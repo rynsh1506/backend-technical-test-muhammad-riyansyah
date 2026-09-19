@@ -21,24 +21,21 @@ export const suppliers = pgTable("suppliers", {
 export const insertSupplierSchema = createInsertSchema(suppliers);
 export const selectSupplierSchema = createSelectSchema(suppliers);
 
-export const SupplierModel = {
-  create: t.Omit(insertSupplierSchema, ["id", "createdAt", "updatedAt"]),
-  update: t.Partial(
-    t.Omit(insertSupplierSchema, ["id", "createdAt", "updatedAt"]),
-  ),
-  response: selectSupplierSchema,
-  listResponse: t.Object({
-    data: t.Array(selectSupplierSchema),
-    meta: t.Object({
-      page: t.Number(),
-      limit: t.Number(),
-      totalPages: t.Number(),
-      totalRecords: t.Number(),
-    }),
+export const supplierCreateDto = t.Omit(insertSupplierSchema, [
+  "id",
+  "createdAt",
+  "updatedAt",
+]);
+export const supplierUpdateDto = t.Partial(
+  t.Omit(insertSupplierSchema, ["id", "createdAt", "updatedAt"]),
+);
+export const supplierResponseDto = selectSupplierSchema;
+export const supplierListResponseDto = t.Object({
+  data: t.Array(selectSupplierSchema),
+  meta: t.Object({
+    page: t.Number(),
+    limit: t.Number(),
+    totalPages: t.Number(),
+    totalRecords: t.Number(),
   }),
-} as const;
-
-export type SupplierModelTypes = {
-  create: Static<typeof SupplierModel.create>;
-  update: Static<typeof SupplierModel.update>;
-};
+});
