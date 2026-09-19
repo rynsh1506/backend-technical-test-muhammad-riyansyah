@@ -14,6 +14,7 @@ import { warehouses } from "@/modules/warehouse/model";
 import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
+import { spread } from "@/utils/drizzle";
 
 /**
  * ==========================================
@@ -71,14 +72,16 @@ export const purchaseRequestItems = pgTable(
  */
 export const insertPurchaseRequestSchema = createInsertSchema(purchaseRequests);
 export const selectPurchaseRequestSchema = createSelectSchema(purchaseRequests);
+
 export const insertPurchaseRequestItemSchema = createInsertSchema(
   purchaseRequestItems,
-  {
-    quantity: t.Number({ minimum: 1 }),
-  },
+  { quantity: t.Number({ minimum: 1 }) },
 );
 export const selectPurchaseRequestItemSchema =
   createSelectSchema(purchaseRequestItems);
+
+const prInsert = spread(insertPurchaseRequestSchema, "insert");
+const prItemInsert = spread(insertPurchaseRequestItemSchema, "insert");
 
 /**
  * ==========================================
@@ -86,20 +89,21 @@ export const selectPurchaseRequestItemSchema =
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const purchaseRequestCreateDto = t.Pick(insertPurchaseRequestSchema, [
-  "warehouseId",
-]);
+export const purchaseRequestCreateDto = t.Object({
+  warehouseId: prInsert.warehouseId,
+});
 
 export const purchaseRequestUpdateDraftDto = t.Partial(
-  t.Pick(insertPurchaseRequestSchema, ["warehouseId"]),
+  t.Object({
+    warehouseId: prInsert.warehouseId,
+  }),
 );
 
-export const purchaseRequestItemAddDto = t.Pick(
-  insertPurchaseRequestItemSchema,
-  ["productId", "quantity"],
-);
+export const purchaseRequestItemAddDto = t.Object({
+  productId: prItemInsert.productId,
+  quantity: prItemInsert.quantity,
+});
 
-export const purchaseRequestItemUpdateDto = t.Pick(
-  insertPurchaseRequestItemSchema,
-  ["quantity"],
-);
+export const purchaseRequestItemUpdateDto = t.Object({
+  quantity: prItemInsert.quantity,
+});
