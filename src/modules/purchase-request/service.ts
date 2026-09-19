@@ -127,7 +127,7 @@ export abstract class PurchaseRequestService {
    * Updates the warehouse of a draft purchase request.
    *
    * @param prId - The purchase request ID.
-   *  @param warehouseId - The new warehouse ID.
+   * @param warehouseId - The new warehouse ID.
    * @returns The updated purchase request.
    * @throws {400} If the request is not in DRAFT status.
    */
@@ -176,7 +176,7 @@ export abstract class PurchaseRequestService {
    * Adds an item to a draft purchase request.
    *
    * @param prId - The purchase request ID.
-   *  @param productId - The product ID to add.
+   * @param productId - The product ID to add.
    * @param quantity - The quantity of the product.
    * @returns The newly added item.
    * @throws {400} If the request is not in DRAFT status or product is duplicate.
@@ -249,7 +249,7 @@ export abstract class PurchaseRequestService {
    * Updates the quantity of an item in a draft purchase request.
    *
    * @param itemId - The ID of the item to update.
-   *  @param quantity - The new quantity.
+   * @param quantity - The new quantity.
    * @returns The updated item.
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
@@ -297,7 +297,7 @@ export abstract class PurchaseRequestService {
    * Removes an item from a draft purchase request.
    *
    * @param itemId - The ID of the item to remove.
-   *  @returns A success status.
+   * @returns A success status.
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
    */
