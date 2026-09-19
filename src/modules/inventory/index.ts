@@ -1,7 +1,10 @@
 import Elysia, { t } from "elysia";
 import { InventoryService } from "@/modules/inventory/service";
 import { isAuthenticated } from "@/utils/auth";
-import { inventoryBalanceResponseDto, inventoryMovementListResponseDto } from "@/modules/inventory/dto";
+import {
+  inventoryBalanceResponseDto,
+  inventoryMovementListResponseDto,
+} from "@/modules/inventory/model";
 
 export const inventoryController = new Elysia({ prefix: "/inventory" })
   .use(isAuthenticated)

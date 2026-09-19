@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import { GoodsReceiptService } from "@/modules/goods-receipt/service";
-import { goodsReceiptCreateDto } from "@/modules/goods-receipt/dto";
+import { goodsReceiptCreateDto } from "@/modules/goods-receipt/model";
 import { isAuthenticated } from "@/utils/auth";
 import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
