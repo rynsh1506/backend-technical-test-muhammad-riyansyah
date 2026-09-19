@@ -22,17 +22,11 @@ export const users = pgTable("users", {
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
-export const AuthModel = {
-  loginBody: t.Pick(insertUserSchema, ["username", "password"]),
-  loginResponse: t.Object({
-    message: t.String(),
-    user: t.Pick(selectUserSchema, ["id", "username", "role"]),
-  }),
-  loginInvalid: t.Object({
-    error: t.Object({ code: t.String(), message: t.String() }),
-  }),
-};
-
-export type AuthModelTypes = {
-  loginBody: Static<typeof AuthModel.loginBody>;
-};
+export const loginBodyDto = t.Pick(insertUserSchema, ["username", "password"]);
+export const loginResponseDto = t.Object({
+  message: t.String(),
+  user: t.Pick(selectUserSchema, ["id", "username", "role"]),
+});
+export const loginInvalidDto = t.Object({
+  error: t.Object({ code: t.String(), message: t.String() }),
+});
