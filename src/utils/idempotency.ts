@@ -1,5 +1,5 @@
 import { db } from "@/utils/db";
-import { idempotencyKeys } from "@/modules/audit/model";
+import { idempotencyKeys } from "@/entities/audit.schema";
 import { eq, and } from "drizzle-orm";
 import { status } from "elysia";
 import Elysia from "elysia";
