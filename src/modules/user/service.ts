@@ -34,7 +34,7 @@ export class UserService {
 
     const results = await query;
     const countResult = await db.select({ count: sql`count(*)` }).from(users);
-    const total = Number(countResult[0].count);
+    const total = Number(countResult[0]?.count || 0);
     const page = Math.floor(offset / limit) + 1;
 
     return {
