@@ -1,6 +1,11 @@
 import { Elysia, t } from "elysia";
 import { SupplierService } from "@/modules/supplier/service";
-import { SupplierModel } from "@/modules/supplier/model";
+import {
+  supplierCreateDto,
+  supplierUpdateDto,
+  supplierResponseDto,
+  supplierListResponseDto,
+} from "@/modules/supplier/model";
 import { isAuthenticated } from "@/utils/auth";
 
 export const supplierController = new Elysia({ prefix: "/suppliers" })
@@ -11,8 +16,8 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
       return await SupplierService.create(body);
     },
     {
-      body: SupplierModel.create,
-      response: SupplierModel.response,
+      body: supplierCreateDto,
+      response: supplierResponseDto,
       detail: {
         tags: ["Master Data: Supplier"],
         summary: "Create Supplier",
@@ -36,7 +41,7 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
         limit: t.Optional(t.String()),
         search: t.Optional(t.String()),
       }),
-      response: SupplierModel.listResponse,
+      response: supplierListResponseDto,
       detail: {
         tags: ["Master Data: Supplier"],
         summary: "List all Suppliers",
@@ -50,7 +55,7 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      response: SupplierModel.response,
+      response: supplierResponseDto,
       detail: {
         tags: ["Master Data: Supplier"],
         summary: "Get Supplier by ID",
@@ -64,8 +69,8 @@ export const supplierController = new Elysia({ prefix: "/suppliers" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      body: SupplierModel.update,
-      response: SupplierModel.response,
+      body: supplierUpdateDto,
+      response: supplierResponseDto,
       detail: {
         tags: ["Master Data: Supplier"],
         summary: "Update Supplier",

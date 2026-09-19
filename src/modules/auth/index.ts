@@ -1,6 +1,10 @@
 import { Elysia } from "elysia";
 import { AuthService } from "@/modules/auth/service";
-import { AuthModel } from "@/modules/auth/model";
+import {
+  loginBodyDto,
+  loginResponseDto,
+  loginInvalidDto,
+} from "@/modules/auth/model";
 import {
   authSetup,
   isAuthenticated,
@@ -21,10 +25,10 @@ export const authController = new Elysia({ prefix: "/auth" })
       return { message: "Login successful", user };
     },
     {
-      body: AuthModel.loginBody,
+      body: loginBodyDto,
       response: {
-        200: AuthModel.loginResponse,
-        401: AuthModel.loginInvalid,
+        200: loginResponseDto,
+        401: loginInvalidDto,
       },
       detail: {
         tags: ["Authentication"],

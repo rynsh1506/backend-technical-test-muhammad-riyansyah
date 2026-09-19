@@ -1,6 +1,11 @@
 import { Elysia, t } from "elysia";
 import { WarehouseService } from "@/modules/warehouse/service";
-import { WarehouseModel } from "@/modules/warehouse/model";
+import {
+  warehouseCreateDto,
+  warehouseUpdateDto,
+  warehouseResponseDto,
+  warehouseListResponseDto,
+} from "@/modules/warehouse/model";
 import { isAuthenticated } from "@/utils/auth";
 
 export const warehouseController = new Elysia({ prefix: "/warehouses" })
@@ -11,8 +16,8 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
       return await WarehouseService.create(body);
     },
     {
-      body: WarehouseModel.create,
-      response: WarehouseModel.response,
+      body: warehouseCreateDto,
+      response: warehouseResponseDto,
       detail: {
         tags: ["Master Data: Warehouse"],
         summary: "Create Warehouse",
@@ -36,7 +41,7 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
         limit: t.Optional(t.String()),
         search: t.Optional(t.String()),
       }),
-      response: WarehouseModel.listResponse,
+      response: warehouseListResponseDto,
       detail: {
         tags: ["Master Data: Warehouse"],
         summary: "List all Warehouses",
@@ -50,7 +55,7 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      response: WarehouseModel.response,
+      response: warehouseResponseDto,
       detail: {
         tags: ["Master Data: Warehouse"],
         summary: "Get Warehouse by ID",
@@ -64,8 +69,8 @@ export const warehouseController = new Elysia({ prefix: "/warehouses" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-      body: WarehouseModel.update,
-      response: WarehouseModel.response,
+      body: warehouseUpdateDto,
+      response: warehouseResponseDto,
       detail: {
         tags: ["Master Data: Warehouse"],
         summary: "Update Warehouse",
