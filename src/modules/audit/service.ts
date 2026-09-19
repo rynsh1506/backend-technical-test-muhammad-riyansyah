@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/utils/db";
-import { auditLogs } from "@/modules/audit/model";
-import { users } from "@/modules/auth/model";
+import { auditLogs } from "@/entities/audit.schema";
+import { users } from "@/entities/auth.schema";
 
 export abstract class AuditService {
   /**
