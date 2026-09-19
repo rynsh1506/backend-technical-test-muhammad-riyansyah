@@ -21,24 +21,21 @@ export const products = pgTable("products", {
 export const insertProductSchema = createInsertSchema(products);
 export const selectProductSchema = createSelectSchema(products);
 
-export const ProductModel = {
-  create: t.Omit(insertProductSchema, ["id", "createdAt", "updatedAt"]),
-  update: t.Partial(
-    t.Omit(insertProductSchema, ["id", "sku", "createdAt", "updatedAt"]),
-  ),
-  response: selectProductSchema,
-  listResponse: t.Object({
-    data: t.Array(selectProductSchema),
-    meta: t.Object({
-      page: t.Number(),
-      limit: t.Number(),
-      totalPages: t.Number(),
-      totalRecords: t.Number(),
-    }),
+export const productCreateDto = t.Omit(insertProductSchema, [
+  "id",
+  "createdAt",
+  "updatedAt",
+]);
+export const productUpdateDto = t.Partial(
+  t.Omit(insertProductSchema, ["id", "sku", "createdAt", "updatedAt"]),
+);
+export const productResponseDto = selectProductSchema;
+export const productListResponseDto = t.Object({
+  data: t.Array(selectProductSchema),
+  meta: t.Object({
+    page: t.Number(),
+    limit: t.Number(),
+    totalPages: t.Number(),
+    totalRecords: t.Number(),
   }),
-} as const;
-
-export type ProductModelTypes = {
-  create: Static<typeof ProductModel.create>;
-  update: Static<typeof ProductModel.update>;
-};
+});
