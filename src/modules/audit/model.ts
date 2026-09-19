@@ -1,3 +1,4 @@
+import { t } from "elysia";
 import {
   pgTable,
   serial,
@@ -53,4 +54,5 @@ export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-// (No API DTOs defined yet for this module)
+export const auditLogResponseDto = selectAuditLogSchema;
+export const auditLogListResponseDto = t.Array(selectAuditLogSchema);
