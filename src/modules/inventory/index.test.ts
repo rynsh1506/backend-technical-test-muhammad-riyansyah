@@ -4,6 +4,10 @@ import { treaty } from "@elysiajs/eden";
 
 const api = treaty(app);
 
+/**
+ * Integration tests for the Inventory Module.
+ * Covers querying inventory levels and movements.
+ */
 describe("Inventory Module", () => {
   let userCookie: Record<string, string> = {};
   let warehouseId: number;
