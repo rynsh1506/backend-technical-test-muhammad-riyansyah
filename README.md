@@ -37,7 +37,7 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 - **Database**: PostgreSQL 15
 - **ORM & Migrations**: Drizzle ORM
 - **Validation**: Elysia TypeBox (`t.Object`, `t.String`, dll) + Drizzle-Typebox
-- **Documentation**: OpenAPI (Dirender menggunakan Scalar UI)
+- **Documentation**: OpenAPI (Dirender menggunakan Swagger UI)
 - **Infrastructure**: Docker & Docker Compose
 
 ## 📂 Struktur Proyek (Project Structure)
@@ -223,7 +223,7 @@ erDiagram
 
 - **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
 - **Eksplisit DTO via Spread Utility (Developer Experience)**: Walaupun menggunakan `drizzle-typebox`, DTO API sengaja ditulis secara eksplisit (seperti `t.Object({ name: table.name })`) menggunakan utilitas `spread()` **resmi dari Elysia** (lihat [Dokumentasi Elysia Drizzle](https://elysiajs.com/recipe/drizzle.html#utility)). Keputusan ini diambil agar kode tetap mudah dibaca dan disalin (_copy-paste-able_ layaknya kelas DTO di NestJS/Prisma), tanpa kehilangan fitur sinkronisasi tipe data dengan _database_ (Single Source of Truth) dan tanpa terjebak _anti-pattern_ `t.Pick`/`t.Omit` berantai yang _over-engineered_.
-- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Menghasilkan spesifikasi OpenAPI otomatis yang dirender secara bawaan menggunakan **Scalar UI** untuk tampilan yang lebih interaktif dan lengkap dengan _code snippet_.
+- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Menghasilkan spesifikasi OpenAPI otomatis yang dirender secara bawaan menggunakan **Swagger UI** untuk tampilan yang lebih interaktif dan lengkap dengan _code snippet_.
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
@@ -362,7 +362,7 @@ curl -X POST http://localhost:3000/goods-receipts \
 
 ## 🌱 Seeding Database (Penting untuk Penguji)
 
-Untuk memudahkan pengujian (baik via Scalar UI maupun Postman), jalankan _Seeder_ untuk mengisi _Master Data_ dan 2 Akun Utama secara otomatis:
+Untuk memudahkan pengujian (baik via Swagger UI maupun Postman), jalankan _Seeder_ untuk mengisi _Master Data_ dan 2 Akun Utama secara otomatis:
 
 ```bash
 bun run db:seed
@@ -387,7 +387,7 @@ Menjalankan _Integration & E2E Type-Safe Test_ (termasuk skenario validasi, peno
 bun test
 ```
 
-## 📚 Dokumentasi API (Scalar UI)
+## 📚 Dokumentasi API (Swagger UI)
 
 Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
 👉 **[http://localhost:3000/docs](http://localhost:3000/docs)**
