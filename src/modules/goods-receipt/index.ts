@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import { GoodsReceiptService } from "@/modules/goods-receipt/service";
 import { grCreateDto } from "@/modules/goods-receipt/model";
 import { isAuthenticated } from "@/utils/auth";
-import { idempotencyPlugin } from "@/utils/idempotency";
+import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
 
 export const goodsReceiptController = new Elysia({
   prefix: "/goods-receipts",
@@ -11,14 +11,8 @@ export const goodsReceiptController = new Elysia({
   .use(idempotencyPlugin)
   .post(
     "/",
-    async ({ body, user, request, checkIdempotency, saveIdempotency }) => {
-      if (checkIdempotency) {
-        await checkIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-        );
-      }
+    async ({ body, user, request, headers }) => {
+      await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const result = await GoodsReceiptService.create(
         body.purchaseOrderId,
@@ -26,14 +20,13 @@ export const goodsReceiptController = new Elysia({
         body.items,
       );
 
-      if (saveIdempotency) {
-        await saveIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-          result,
-        );
-      }
+      await IdempotencyService.save(
+        user.id,
+        "idempotency-key" in headers ? headers["idempotency-key"] : undefined,
+        new URL(request.url).pathname,
+        request.method,
+        result,
+      );
 
       return result;
     },

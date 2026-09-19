@@ -49,7 +49,7 @@ export abstract class PurchaseRequestService {
 
     let whereCondition = undefined;
     if (filterStatus) {
-      whereCondition = eq(purchaseRequests.status, filterStatus as any);
+      whereCondition = eq(purchaseRequests.status, filterStatus as "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED");
     }
 
     const data = await db
@@ -113,7 +113,7 @@ export abstract class PurchaseRequestService {
    * @returns The updated purchase request.
    * @throws {400} If the request is not in DRAFT status.
    */
-  static async updateDraft(prId: number, warehouseId: number) {
+  static async updateDraft(prId: number, warehouseId: number, userId: number) {
     const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
@@ -142,7 +142,7 @@ export abstract class PurchaseRequestService {
    * @returns The newly added item.
    * @throws {400} If the request is not in DRAFT status or product is duplicate.
    */
-  static async addItem(prId: number, productId: number, quantity: number) {
+  static async addItem(prId: number, productId: number, quantity: number, userId: number) {
     const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
@@ -151,6 +151,10 @@ export abstract class PurchaseRequestService {
           message: "Can only add items to DRAFT Purchase Request",
         },
       });
+    }
+
+    if (pr.requestedBy !== userId) {
+      throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to modify this PR" } });
     }
 
     try {
@@ -163,8 +167,9 @@ export abstract class PurchaseRequestService {
         })
         .returning();
       return item;
-    } catch (error: any) {
-      if (error.code === "23505" || error.cause?.code === "23505") {
+    } catch (error: unknown) {
+      const err = error as Record<string, unknown>;
+      if (err.code === "23505" || (err.cause as Record<string, unknown>)?.code === "23505") {
         throw status(400, {
           error: {
             code: "DUPLICATE_PRODUCT",
@@ -185,7 +190,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
    */
-  static async updateItem(itemId: number, quantity: number) {
+  static async updateItem(itemId: number, quantity: number, userId: number) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -207,6 +212,10 @@ export abstract class PurchaseRequestService {
       });
     }
 
+    if (pr.requestedBy !== userId) {
+      throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to modify this PR" } });
+    }
+
     const [updated] = await db
       .update(purchaseRequestItems)
       .set({ quantity })
@@ -223,7 +232,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
    */
-  static async removeItem(itemId: number) {
+  static async removeItem(itemId: number, userId: number) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -243,6 +252,10 @@ export abstract class PurchaseRequestService {
           message: "Can only remove items in DRAFT Purchase Request",
         },
       });
+    }
+
+    if (pr.requestedBy !== userId) {
+      throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to modify this PR" } });
     }
 
     await db
@@ -280,6 +293,10 @@ export abstract class PurchaseRequestService {
             message: "Purchase Request is not in DRAFT status",
           },
         });
+      }
+
+      if (pr.requestedBy !== userId) {
+        throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to submit this PR" } });
       }
 
       const items = await tx
