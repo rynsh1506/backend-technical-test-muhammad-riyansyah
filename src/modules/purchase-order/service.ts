@@ -1,17 +1,13 @@
 import { db } from "@/utils/db";
-import {
-  purchaseOrders,
-  purchaseOrderItems,
-} from "@/modules/purchase-order/model";
-import {
-  purchaseRequests,
-  purchaseRequestItems,
-} from "@/modules/purchase-request/model";
-import { suppliers } from "@/modules/supplier/model";
+import { purchaseOrders } from "@/modules/purchase-order/entities/purchase_orders.schema";
+import { purchaseOrderItems } from "@/modules/purchase-order/entities/purchase_order_items.schema";
+import { purchaseRequests } from "@/modules/purchase-request/entities/purchase_requests.schema";
+import { purchaseRequestItems } from "@/modules/purchase-request/entities/purchase_request_items.schema";
+import { suppliers } from "@/modules/supplier/entities/suppliers.schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { generateDocumentNumber } from "@/utils/generator";
 import { status } from "elysia";
-import { auditLogs } from "@/modules/audit/model";
+import { auditLogs } from "@/modules/audit/entities/audit_logs.schema";
 
 export abstract class PurchaseOrderService {
   /**

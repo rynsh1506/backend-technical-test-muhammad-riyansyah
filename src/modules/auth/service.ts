@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { users } from "@/modules/auth/model";
-import { loginBodyDto } from "@/modules/auth/model";
+import { users } from "@/modules/auth/entities/users.schema";
+import { loginBodyDto } from "@/modules/auth/dto";
 import type { Static } from "elysia";
 
 export abstract class AuthService {
