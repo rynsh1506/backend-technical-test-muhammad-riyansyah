@@ -22,5 +22,14 @@
   },
   "overrides": {
     "@sinclair/typebox": "^0.34.14"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/app.ts",
+    "start": "bun run src/app.ts",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:seed": "bun run src/utils/db/seed.ts",
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit"
   }
 }

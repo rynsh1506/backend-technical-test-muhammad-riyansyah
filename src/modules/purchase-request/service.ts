@@ -6,6 +6,8 @@ import {
 import { auditLogs } from "@/modules/audit/model";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { generateDocumentNumber } from "@/utils/generator";
+import { warehouses } from "@/modules/warehouse/model";
+import { products } from "@/modules/product/model";
 import { status } from "elysia";
 
 export abstract class PurchaseRequestService {
@@ -23,6 +25,11 @@ export abstract class PurchaseRequestService {
         purchaseRequests.requestNumber,
         "PR",
       );
+
+      const wh = await tx.select().from(warehouses).where(eq(warehouses.id, warehouseId));
+      if (wh.length === 0 || !wh[0]!.isActive) {
+        throw status(400, { error: { code: "INVALID_WAREHOUSE", message: "Warehouse is invalid or inactive" } });
+      }
       const [newPr] = await tx
         .insert(purchaseRequests)
         .values({
@@ -123,6 +130,15 @@ export abstract class PurchaseRequestService {
         },
       });
     }
+    if (pr.requestedBy !== userId) {
+      throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to modify this PR" } });
+    }
+
+    const wh = await db.select().from(warehouses).where(eq(warehouses.id, warehouseId));
+    if (wh.length === 0 || !wh[0]!.isActive) {
+      throw status(400, { error: { code: "INVALID_WAREHOUSE", message: "Warehouse is invalid or inactive" } });
+    }
+
 
     const [updated] = await db
       .update(purchaseRequests)
@@ -156,6 +172,11 @@ export abstract class PurchaseRequestService {
     if (pr.requestedBy !== userId) {
       throw status(403, { error: { code: "FORBIDDEN", message: "Not authorized to modify this PR" } });
     }
+    const prod = await db.select().from(products).where(eq(products.id, productId));
+    if (prod.length === 0 || !prod[0]!.isActive) {
+      throw status(400, { error: { code: "INVALID_PRODUCT", message: "Product is invalid or inactive" } });
+    }
+
 
     try {
       const [item] = await db
