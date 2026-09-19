@@ -10,6 +10,8 @@ import {
 import { warehouses } from "@/modules/warehouse/model";
 import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
+import { spread } from "@/utils/drizzle";
+import { createPaginatedDto } from "@/utils/dto";
 
 /**
  * ==========================================
@@ -67,16 +69,22 @@ export const insertInventoryMovementSchema =
 export const selectInventoryMovementSchema =
   createSelectSchema(inventoryMovements);
 
+const balanceSelect = spread(inventoryBalances, "select");
+
 /**
  * ==========================================
  * 3. API DTOs (Elysia TypeBox)
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const inventoryBalanceResponseDto = t.Intersect([
-  t.Pick(selectInventoryBalanceSchema, ["warehouseId", "productId", "stock"]),
-  t.Partial(t.Pick(selectInventoryBalanceSchema, ["id", "updatedAt"])),
-]);
+export const inventoryBalanceResponseDto = t.Object({
+  id: t.Optional(balanceSelect.id),
+  warehouseId: balanceSelect.warehouseId,
+  productId: balanceSelect.productId,
+  stock: balanceSelect.stock,
+  updatedAt: t.Optional(balanceSelect.updatedAt),
+});
+
 export const inventoryMovementResponseDto = selectInventoryMovementSchema;
 export const inventoryMovementListResponseDto = t.Array(
   selectInventoryMovementSchema,
