@@ -2,7 +2,7 @@ import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
 import { createPaginatedDto } from "@/utils/dto";
-import { products } from "./entities/products.schema";
+import { products } from "@/modules/product/entities/products.schema";
 
 /**
  * ==========================================

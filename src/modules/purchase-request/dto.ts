@@ -1,8 +1,8 @@
 import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
-import { purchaseRequests } from "./entities/purchase_requests.schema";
-import { purchaseRequestItems } from "./entities/purchase_request_items.schema";
+import { purchaseRequests } from "@/modules/purchase-request/entities/purchase_requests.schema";
+import { purchaseRequestItems } from "@/modules/purchase-request/entities/purchase_request_items.schema";
 
 /**
  * ==========================================
