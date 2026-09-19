@@ -391,3 +391,7 @@ bun test
 
 Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
 👉 **[http://localhost:3000/docs](http://localhost:3000/docs)**
+
+## License
+
+This project is restricted under an **Evaluation Only License** to prevent commercial code theft. See the [LICENSE](LICENSE) file for details.
