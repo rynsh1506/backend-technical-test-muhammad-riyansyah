@@ -6,8 +6,8 @@ import Elysia from "elysia";
 
 export class IdempotencyService {
   /**
-   * Cek apakah request dengan Idempotency Key ini sudah pernah berhasil diproses.
-   * Jika sudah, kembalikan response lama (mencegah proses ulang).
+   * Check if the request with this Idempotency Key has already been successfully processed.
+   * If yes, return the cached response (preventing duplicate processing).
    */
   static async check(userId: number, idempotencyKey: string | undefined) {
     if (!idempotencyKey) return;
@@ -28,8 +28,8 @@ export class IdempotencyService {
   }
 
   /**
-   * Simpan response dari request yang berhasil diproses agar bisa dipakai
-   * jika ada request duplikat di masa depan.
+   * Store the successful response so it can be returned
+   * if a duplicate request arrives in the future.
    */
   static async save(
     userId: number,
@@ -53,7 +53,7 @@ export class IdempotencyService {
   }
 }
 
-// Kita buat middleware super simpel agar controller bisa mengambil key dari header
+// A very simple middleware to extract the key from headers so controllers can access it.
 export const idempotencyPlugin = new Elysia({
   name: "IdempotencyPlugin",
 }).derive(({ headers }) => {

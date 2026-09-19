@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Run Unit Tests
+    name: Run Integration Tests
     runs-on: ubuntu-latest
 
     env:
@@ -53,5 +53,5 @@ jobs:
       - name: Run Database Seeder
         run: bun run src/utils/db/seed.ts
 
-      - name: Run Unit Tests
+      - name: Run Integration Tests
         run: bun test
