@@ -1,4 +1,16 @@
-import { pgTable, pgEnum, serial, varchar, timestamp, integer, boolean, unique, check, text, jsonb } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  pgEnum,
+  serial,
+  varchar,
+  timestamp,
+  integer,
+  boolean,
+  unique,
+  check,
+  text,
+  jsonb,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { users } from "@/modules/auth/entities/users.schema";
 
