@@ -8,6 +8,12 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
 
+/**
+ * ==========================================
+ * 1. DATABASE SCHEMA (Drizzle ORM)
+ * ==========================================
+ * Defines the PostgreSQL tables, columns, and relations.
+ */
 export const roleEnum = pgEnum("role", ["USER", "APPROVER"]);
 
 export const users = pgTable("users", {
@@ -19,9 +25,21 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
 export const loginBodyDto = t.Pick(insertUserSchema, ["username", "password"]);
 export const loginResponseDto = t.Object({
   message: t.String(),
