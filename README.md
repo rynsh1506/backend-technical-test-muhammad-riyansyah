@@ -73,104 +73,69 @@ flowchart TD
     style K fill:#28a745,color:#fff
 ```
 
-## 🗄️ Desain Database Saat Ini (Domain ERDs)
+## 🗄️ Desain Database (Conceptual Model / Chen-style ERD)
 
-Untuk menjaga diagram agar tetap rapi dan mudah dibaca (tidak saling tumpang tindih), ERD dipecah menjadi 2 domain bisnis utama:
-
-### 1. Domain Pengadaan (Procurement)
-Mencakup alur persetujuan, pemesanan, hingga penerimaan barang.
+Berikut adalah relasi konseptual antar entitas untuk memperjelas bagaimana satu tabel menyambung ke tabel lainnya secara logis. Kotak melambangkan **Entitas**, sedangkan belah ketupat melambangkan **Relasi (Kata Kerja)**.
 
 ```mermaid
-erDiagram
-    PURCHASE_REQUESTS ||--o{ PURCHASE_REQUEST_ITEMS : "contains"
-    PURCHASE_REQUESTS ||--o| PURCHASE_ORDERS : "converted_to"
-    PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_ITEMS : "contains"
-    PURCHASE_ORDERS ||--o{ GOODS_RECEIPTS : "fulfilled_by"
-    GOODS_RECEIPTS ||--o{ GOODS_RECEIPT_ITEMS : "contains"
+flowchart TD
+    %% Entities
+    U[USERS]
+    PR[PURCHASE_REQUESTS]
+    PRI[PURCHASE_REQUEST_ITEMS]
+    PO[PURCHASE_ORDERS]
+    POI[PURCHASE_ORDER_ITEMS]
+    GR[GOODS_RECEIPTS]
+    GRI[GOODS_RECEIPT_ITEMS]
+    PROD[PRODUCTS]
+    WH[WAREHOUSES]
+    INV[INVENTORY_BALANCES]
+    SUPP[SUPPLIERS]
 
-    PURCHASE_REQUESTS {
-        serial id PK
-        varchar pr_number UK
-        integer warehouse_id FK
-        enum status
-    }
-    PURCHASE_REQUEST_ITEMS {
-        serial id PK
-        integer pr_id FK
-        integer product_id FK
-        integer quantity
-    }
-    PURCHASE_ORDERS {
-        serial id PK
-        varchar po_number UK
-        integer pr_id FK
-        integer supplier_id FK
-        enum status
-    }
-    PURCHASE_ORDER_ITEMS {
-        serial id PK
-        integer po_id FK
-        integer product_id FK
-        integer quantity
-    }
-    GOODS_RECEIPTS {
-        serial id PK
-        varchar gr_number UK
-        integer po_id FK
-        integer received_by FK
-    }
-    GOODS_RECEIPT_ITEMS {
-        serial id PK
-        integer gr_id FK
-        integer product_id FK
-        integer quantity
-    }
+    %% Relationships (Diamonds)
+    req{Membuat}
+    conv{Dikonversi<br/>Menjadi}
+    store{Diterima<br/>Ke}
+    containPR{Memiliki}
+    containPO{Memiliki}
+    containGR{Memiliki}
+    refProd1{Merujuk}
+    refProd2{Merujuk}
+    refProd3{Merujuk}
+    refProd4{Mencatat}
+    sup{Menyuplai}
+    ful{Dipenuhi<br/>Oleh}
+    hasInv{Menyimpan}
+
+    %% Connections
+    U --- req --- PR
+    WH --- store --- PR
+    
+    PR --- containPR --- PRI
+    PRI --- refProd1 --- PROD
+    
+    PR --- conv --- PO
+    SUPP --- sup --- PO
+    
+    PO --- containPO --- POI
+    POI --- refProd2 --- PROD
+    
+    PO --- ful --- GR
+    GR --- containGR --- GRI
+    GRI --- refProd3 --- PROD
+    
+    WH --- hasInv --- INV
+    INV --- refProd4 --- PROD
+
+    %% Styling
+    classDef entity fill:#316192,color:#fff,stroke:#fff,stroke-width:2px;
+    classDef relation fill:#FF0420,color:#fff,shape:diamond;
+    
+    class U,PR,PRI,PO,POI,GR,GRI,PROD,WH,INV,SUPP entity;
+    class req,conv,store,containPR,containPO,containGR,refProd1,refProd2,refProd3,refProd4,sup,ful,hasInv relation;
 ```
 
-### 2. Domain Inventori & Master Data
-Mencakup catatan stok, histori mutasi, dan relasi data induk.
-
-```mermaid
-erDiagram
-    WAREHOUSES ||--o{ INVENTORY_BALANCES : "has"
-    WAREHOUSES ||--o{ INVENTORY_MOVEMENTS : "tracks"
-    PRODUCTS ||--o{ INVENTORY_BALANCES : "stocked_as"
-    PRODUCTS ||--o{ INVENTORY_MOVEMENTS : "moved_as"
-    SUPPLIERS ||--o{ PURCHASE_ORDERS : "supplies"
-
-    WAREHOUSES {
-        serial id PK
-        varchar code UK
-        varchar name
-        varchar location
-    }
-    PRODUCTS {
-        serial id PK
-        varchar sku UK
-        varchar name
-        varchar unit
-    }
-    SUPPLIERS {
-        serial id PK
-        varchar name
-        varchar email
-    }
-    INVENTORY_BALANCES {
-        serial id PK
-        integer warehouse_id FK
-        integer product_id FK
-        integer stock
-    }
-    INVENTORY_MOVEMENTS {
-        serial id PK
-        integer warehouse_id FK
-        integer product_id FK
-        integer quantity
-        varchar reference_type
-    }
-```
-
-*(Tabel `USERS` dan `AUDIT_LOGS` tidak digambarkan secara eksplisit untuk menjaga agar diagram tidak berantakan, namun terhubung ke hampir seluruh entitas sebagai pelacak aksi/aktor).*
+*(Catatan: Diagram di atas merupakan pemetaan konseptual. Relasi fisik di database Postgres dihubungkan secara ketat (Strict Foreign Keys) melalui kolom `id` utama milik masing-masing tabel).*
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
