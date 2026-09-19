@@ -13,6 +13,7 @@ import { suppliers } from "@/modules/supplier/model";
 import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
+import { spread } from "@/utils/drizzle";
 
 /**
  * ==========================================
@@ -75,13 +76,15 @@ export const insertPurchaseOrderItemSchema =
 export const selectPurchaseOrderItemSchema =
   createSelectSchema(purchaseOrderItems);
 
+const poInsert = spread(purchaseOrders, "insert");
+
 /**
  * ==========================================
  * 3. API DTOs (Elysia TypeBox)
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const purchaseOrderCreateDto = t.Pick(insertPurchaseOrderSchema, [
-  "purchaseRequestId",
-  "supplierId",
-]);
+export const purchaseOrderCreateDto = t.Object({
+  purchaseRequestId: poInsert.purchaseRequestId,
+  supplierId: poInsert.supplierId,
+});

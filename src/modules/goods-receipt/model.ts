@@ -11,6 +11,7 @@ import { purchaseOrders } from "@/modules/purchase-order/model";
 import { products } from "@/modules/product/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
+import { spread } from "@/utils/drizzle";
 
 /**
  * ==========================================
@@ -52,14 +53,16 @@ export const goodsReceiptItems = pgTable(
  */
 export const insertGoodsReceiptSchema = createInsertSchema(goodsReceipts);
 export const selectGoodsReceiptSchema = createSelectSchema(goodsReceipts);
+
 export const insertGoodsReceiptItemSchema = createInsertSchema(
   goodsReceiptItems,
-  {
-    quantity: t.Number({ minimum: 1 }),
-  },
+  { quantity: t.Number({ minimum: 1 }) },
 );
 export const selectGoodsReceiptItemSchema =
   createSelectSchema(goodsReceiptItems);
+
+const grInsert = spread(goodsReceipts, "insert");
+const grItemInsert = spread(insertGoodsReceiptItemSchema, "insert");
 
 /**
  * ==========================================
@@ -67,14 +70,12 @@ export const selectGoodsReceiptItemSchema =
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const goodsReceiptItemDto = t.Pick(insertGoodsReceiptItemSchema, [
-  "productId",
-  "quantity",
-]);
+export const goodsReceiptItemDto = t.Object({
+  productId: grItemInsert.productId,
+  quantity: grItemInsert.quantity,
+});
 
-export const goodsReceiptCreateDto = t.Intersect([
-  t.Pick(insertGoodsReceiptSchema, ["purchaseOrderId"]),
-  t.Object({
-    items: t.Array(goodsReceiptItemDto, { minItems: 1 }),
-  }),
-]);
+export const goodsReceiptCreateDto = t.Object({
+  purchaseOrderId: grInsert.purchaseOrderId,
+  items: t.Array(goodsReceiptItemDto, { minItems: 1 }),
+});
