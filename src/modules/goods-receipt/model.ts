@@ -52,8 +52,12 @@ export const goodsReceiptItems = pgTable(
  */
 export const insertGoodsReceiptSchema = createInsertSchema(goodsReceipts);
 export const selectGoodsReceiptSchema = createSelectSchema(goodsReceipts);
-export const insertGoodsReceiptItemSchema =
-  createInsertSchema(goodsReceiptItems);
+export const insertGoodsReceiptItemSchema = createInsertSchema(
+  goodsReceiptItems,
+  {
+    quantity: t.Number({ minimum: 1 }),
+  },
+);
 export const selectGoodsReceiptItemSchema =
   createSelectSchema(goodsReceiptItems);
 
@@ -68,7 +72,9 @@ export const goodsReceiptItemDto = t.Pick(insertGoodsReceiptItemSchema, [
   "quantity",
 ]);
 
-export const goodsReceiptCreateDto = t.Object({
-  purchaseOrderId: t.Number(),
-  items: t.Array(goodsReceiptItemDto, { minItems: 1 }),
-});
+export const goodsReceiptCreateDto = t.Intersect([
+  t.Pick(insertGoodsReceiptSchema, ["purchaseOrderId"]),
+  t.Object({
+    items: t.Array(goodsReceiptItemDto, { minItems: 1 }),
+  }),
+]);
