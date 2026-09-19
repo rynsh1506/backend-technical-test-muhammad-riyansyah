@@ -45,6 +45,7 @@ export const purchaseOrderController = new Elysia({
         "idempotency-key": t.Optional(t.String()),
         cookie: t.Optional(t.String()),
       }),
+      detail: { tags: ["Purchase Order"], summary: "Create Purchase Order" },
     },
   )
   .get(
@@ -60,11 +61,18 @@ export const purchaseOrderController = new Elysia({
         limit: t.Optional(t.Numeric()),
         status: t.Optional(t.String()),
       }),
+      detail: { tags: ["Purchase Order"], summary: "List Purchase Orders" },
     },
   )
-  .get("/:id", async ({ params: { id } }) => {
-    return await PurchaseOrderService.getDetail(Number(id));
-  })
+  .get(
+    "/:id",
+    async ({ params: { id } }) => {
+      return await PurchaseOrderService.getDetail(Number(id));
+    },
+    {
+      detail: { tags: ["Purchase Order"], summary: "Get PO Details" },
+    },
+  )
   .post(
     "/:id/order",
     async ({ params: { id }, user, request, headers }) => {
@@ -98,5 +106,6 @@ export const purchaseOrderController = new Elysia({
         "idempotency-key": t.Optional(t.String()),
         cookie: t.Optional(t.String()),
       }),
+      detail: { tags: ["Purchase Order"], summary: "Mark PO as Ordered" },
     },
   );
