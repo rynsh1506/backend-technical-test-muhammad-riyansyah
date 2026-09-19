@@ -115,7 +115,6 @@ describe("Purchase Request Module", () => {
       );
       const prId = (draftRes.data as { id: number }).id;
 
-      // PR is created by userCookie (staff_user)
       const { status, error } = await api["purchase-requests"]({
         id: prId,
       }).items.post(
