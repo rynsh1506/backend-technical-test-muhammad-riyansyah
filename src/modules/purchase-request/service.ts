@@ -2,7 +2,7 @@ import { db } from "@/utils/db";
 import { purchaseRequests } from "@/modules/purchase-request/entities/purchase_requests.schema";
 import { purchaseRequestItems } from "@/modules/purchase-request/entities/purchase_request_items.schema";
 import { auditLogs } from "@/modules/audit/entities/audit_logs.schema";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { generateDocumentNumber } from "@/utils/generator";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 import { products } from "@/modules/product/entities/products.schema";
