@@ -9,6 +9,12 @@ import {
 import { users } from "@/modules/auth/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
+/**
+ * ==========================================
+ * 1. DATABASE SCHEMA (Drizzle ORM)
+ * ==========================================
+ * Defines the PostgreSQL tables, columns, and relations.
+ */
 export const auditLogs = pgTable("audit_logs", {
   id: serial("id").primaryKey(),
   entityName: varchar("entity_name", { length: 50 }).notNull(),
@@ -30,6 +36,12 @@ export const idempotencyKeys = pgTable("idempotency_keys", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
 export const insertAuditLogSchema = createInsertSchema(auditLogs);
 export const selectAuditLogSchema = createSelectSchema(auditLogs);
 export const insertIdempotencyKeySchema = createInsertSchema(idempotencyKeys);
