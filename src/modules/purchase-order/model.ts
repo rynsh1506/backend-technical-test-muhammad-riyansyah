@@ -56,11 +56,14 @@ export const purchaseOrderItems = pgTable(
   (table) => [check("po_item_quantity_check", sql`${table.quantity} > 0`)],
 );
 
-/** TypeBox Schemas */
-export const purchaseOrderSelectSchema = createSelectSchema(purchaseOrders);
-export const purchaseOrderInsertSchema = createInsertSchema(purchaseOrders);
+export const insertPurchaseOrderSchema = createInsertSchema(purchaseOrders);
+export const selectPurchaseOrderSchema = createSelectSchema(purchaseOrders);
+export const insertPurchaseOrderItemSchema =
+  createInsertSchema(purchaseOrderItems);
+export const selectPurchaseOrderItemSchema =
+  createSelectSchema(purchaseOrderItems);
 
-export const purchaseOrderCreateDto = t.Object({
-  purchaseRequestId: t.Number(),
-  supplierId: t.Number(),
-});
+export const purchaseOrderCreateDto = t.Pick(insertPurchaseOrderSchema, [
+  "purchaseRequestId",
+  "supplierId",
+]);
