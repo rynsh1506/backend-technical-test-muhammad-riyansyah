@@ -67,7 +67,7 @@ describe("User Module (Eden Treaty E2E)", () => {
 
       expect(status).toBe(200);
       expect(data?.data?.length).toBeGreaterThan(0);
-      expect(data?.data[0].username.toLowerCase()).toContain("staff");
+      expect(data?.data?.[0]?.username.toLowerCase()).toContain("staff");
     });
   });
 
