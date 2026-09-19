@@ -1,16 +1,10 @@
 import { goodsReceipts } from "./goods_receipts.schema";
 import {
   pgTable,
-  pgEnum,
   serial,
-  varchar,
   timestamp,
   integer,
-  boolean,
-  unique,
   check,
-  text,
-  jsonb,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { products } from "@/modules/product/entities/products.schema";
