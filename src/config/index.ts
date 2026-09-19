@@ -34,7 +34,8 @@ export const APP_CONFIG = {
      * Full PostgreSQL connection string assembled from individual env vars.
      * Format: postgres://<user>:<password>@<host>:<port>/<database>
      */
-    URL: [
+    URL: process.env.DATABASE_URL || [
+      
       `postgres://`,
       `${process.env.DB_USER ?? "postgres"}`,
       `:${process.env.DB_PASSWORD ?? "postgres"}`,
