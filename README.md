@@ -300,24 +300,24 @@ _(Perhatikan parameter `-c cookies.txt` untuk menyimpan HttpOnly JWT Cookie)_
 curl -X POST http://localhost:3000/purchase-requests \
   -H "Content-Type: application/json" \
   -b cookies.txt \
-  -d '{"warehouseId": 1}'
+  -d '{"warehouseId": "<cuid2_warehouse>"}'
 ```
 
 ### 3. Tambah Item ke PR
 
 ```bash
-# Asumsikan ID PR yang baru dibuat adalah 1
-curl -X POST http://localhost:3000/purchase-requests/1/items \
+# Asumsikan ID PR yang baru dibuat adalah <cuid2_pr_id>
+curl -X POST http://localhost:3000/purchase-requests/<cuid2_pr_id>/items \
   -H "Content-Type: application/json" \
   -b cookies.txt \
-  -d '{"productId": 1, "quantity": 50}'
+  -d '{"productId": "<cuid2_product>", "quantity": 50}'
 ```
 
 ### 4. Submit PR & Tambahkan Idempotency Key
 
 ```bash
-curl -X POST http://localhost:3000/purchase-requests/1/submit \
-  -H "Idempotency-Key: submit-pr-1" \
+curl -X POST http://localhost:3000/purchase-requests/<cuid2_pr_id>/submit \
+  -H "Idempotency-Key: submit-pr-cuid-1" \
   -b cookies.txt
 ```
 
@@ -333,7 +333,7 @@ curl -X POST http://localhost:3000/auth/login \
 ### 6. Approve PR
 
 ```bash
-curl -X POST http://localhost:3000/purchase-requests/1/approve \
+curl -X POST http://localhost:3000/purchase-requests/<cuid2_pr_id>/approve \
   -b cookies_manager.txt
 ```
 
@@ -343,20 +343,20 @@ curl -X POST http://localhost:3000/purchase-requests/1/approve \
 curl -X POST http://localhost:3000/purchase-orders \
   -H "Content-Type: application/json" \
   -b cookies_manager.txt \
-  -d '{"purchaseRequestId": 1, "supplierId": 1}'
+  -d '{"purchaseRequestId": "<cuid2_pr_id>", "supplierId": "<cuid2_supplier>"}'
 ```
 
 ### 8. Terima Barang (Goods Receipt)
 
 ```bash
-# Asumsikan ID PO yang baru dibuat adalah 1
+# Asumsikan ID PO yang baru dibuat adalah <cuid2_po_id>
 curl -X POST http://localhost:3000/goods-receipts \
   -H "Content-Type: application/json" \
   -b cookies_manager.txt \
   -d '{
-    "purchaseOrderId": 1,
+    "purchaseOrderId": "<cuid2_po_id>",
     "items": [
-      { "productId": 1, "quantity": 50 }
+      { "productId": "<cuid2_product>", "quantity": 50 }
     ]
   }'
 ```
@@ -374,7 +374,7 @@ bun run db:seed
 - **USER:** username: `staff_user` | password: `password123`
 - **APPROVER:** username: `manager_approver` | password: `password123`
 
-_(Catatan: Jika menggunakan Docker, Anda bisa menjalankan seeder ke dalam container dengan `docker exec -it <container_name> bun run db:seed`)_
+_(Catatan: Jika menggunakan Docker, Anda bisa menjalankan seeder ke dalam container dengan `docker compose exec app bun run src/utils/db/seed.ts`)_
 
 ---
 
