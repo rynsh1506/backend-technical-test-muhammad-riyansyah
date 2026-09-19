@@ -62,7 +62,7 @@ export const purchaseOrderItems = pgTable(
 export const purchaseOrderSelectSchema = createSelectSchema(purchaseOrders);
 export const purchaseOrderInsertSchema = createInsertSchema(purchaseOrders);
 
-export const poCreateDto = t.Object({
+export const purchaseOrderCreateDto = t.Object({
   purchaseRequestId: t.Number(),
   supplierId: t.Number(),
 });
