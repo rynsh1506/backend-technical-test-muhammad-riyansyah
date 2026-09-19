@@ -39,25 +39,25 @@ describe("Purchase Order Module", () => {
       { code: `WH-PO-${randomSuffix}`, name: "PO Test WH", location: "PO Loc" },
       { headers: userCookie },
     );
-    warehouseId = (wh.data as {id: number}).id;
+    warehouseId = (wh.data as { id: number }).id;
 
     const supp = await api.suppliers.post(
       { name: "PO Test Supp", email: `po${randomSuffix}@supp.com` },
       { headers: userCookie },
     );
-    supplierId = (supp.data as {id: number}).id;
+    supplierId = (supp.data as { id: number }).id;
 
     const prod1 = await api.products.post(
       { sku: `PO-PROD-${randomSuffix}`, name: "PO Product 1", unit: "PCS" },
       { headers: userCookie },
     );
-    product1Id = (prod1.data as {id: number}).id;
+    product1Id = (prod1.data as { id: number }).id;
 
     const prDraft = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
     );
-    prId = (prDraft.data as {id: number}).id;
+    prId = (prDraft.data as { id: number }).id;
 
     await api["purchase-requests"]({ id: prId }).items.post(
       { productId: product1Id, quantity: 15 },
@@ -91,9 +91,9 @@ describe("Purchase Order Module", () => {
       );
 
       expect(status).toBe(200);
-      expect((data as {status: string}).status).toBe("PENDING");
-      expect((data as {poNumber: string}).poNumber).toContain("PO-");
-      poId = (data as {id: number}).id;
+      expect((data as { status: string }).status).toBe("PENDING");
+      expect((data as { poNumber: string }).poNumber).toContain("PO-");
+      poId = (data as { id: number }).id;
     });
 
     it("should prevent creating multiple POs for the same PR", async () => {
@@ -112,9 +112,18 @@ describe("Purchase Order Module", () => {
       });
 
       expect(status).toBe(200);
-      expect((data as {items: { quantity: number; productId: number }[]}).items.length).toBe(1);
-      expect((data as {items: { quantity: number; productId: number }[]}).items[0]!.quantity).toBe(15);
-      expect((data as {items: { quantity: number; productId: number }[]}).items[0]!.productId).toBe(product1Id);
+      expect(
+        (data as { items: { quantity: number; productId: number }[] }).items
+          .length,
+      ).toBe(1);
+      expect(
+        (data as { items: { quantity: number; productId: number }[] }).items[0]!
+          .quantity,
+      ).toBe(15);
+      expect(
+        (data as { items: { quantity: number; productId: number }[] }).items[0]!
+          .productId,
+      ).toBe(product1Id);
     });
 
     it("should mark the PO as ORDERED", async () => {
@@ -122,7 +131,7 @@ describe("Purchase Order Module", () => {
         id: poId,
       }).order.post({}, { headers: userCookie });
       expect(status).toBe(200);
-      expect((data as {status: string}).status).toBe("ORDERED");
+      expect((data as { status: string }).status).toBe("ORDERED");
     });
   });
 });

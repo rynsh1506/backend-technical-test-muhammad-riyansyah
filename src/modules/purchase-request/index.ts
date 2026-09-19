@@ -106,7 +106,7 @@ export const purchaseRequestController = new Elysia({
       return await PurchaseRequestService.updateDraft(
         Number(id),
         body.warehouseId!,
-        user.id
+        user.id,
       );
     },
     {
@@ -131,7 +131,7 @@ export const purchaseRequestController = new Elysia({
         Number(id),
         body.productId,
         body.quantity,
-        user.id
+        user.id,
       );
     },
     {
@@ -158,7 +158,7 @@ export const purchaseRequestController = new Elysia({
       return await PurchaseRequestService.updateItem(
         Number(itemId),
         body.quantity,
-        user.id
+        user.id,
       );
     },
     {

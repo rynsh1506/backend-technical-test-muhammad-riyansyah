@@ -22,11 +22,11 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 - [x] **Purchase Order (PO)**: Konversi PR yang disetujui menjadi PO ke Supplier.
 - [x] **Goods Receipt (GR) & Inventory**: Penerimaan barang (GR) yang otomatis menambah stok Inventory (Database Transaction).
 
-
 **Bonus Points Achieved:**
+
 - [x] **Audit Trail**: Melacak riwayat aksi penting di database.
-- [x] **Idempotency**: Mencegah klik-ganda (*double-submit*) pada API transaksional.
-- [x] **Docker & CI Pipeline**: Siap *deploy* dengan Docker Compose dan Github Actions.
+- [x] **Idempotency**: Mencegah klik-ganda (_double-submit_) pada API transaksional.
+- [x] **Docker & CI Pipeline**: Siap _deploy_ dengan Docker Compose dan Github Actions.
 - [x] **Clean Architecture (3-Tier)**: Pemisahan tegas antara Controller, Service, dan Model.
 
 ## 🛠️ Tech Stack
@@ -212,9 +212,10 @@ erDiagram
 ```
 
 ### Penjelasan Domain Data:
+
 1. **Master Data:** `users`, `products`, `suppliers`, `warehouses`. Menyimpan data induk yang menjadi referensi transaksi.
-2. **Procurement (Pengadaan):** `purchase_requests` & `purchase_orders`. Mencatat alur permintaan dari internal hingga pemesanan resmi ke pihak *Supplier*. Keduanya memiliki tabel *Items* masing-masing untuk mencatat detil produk.
-3. **Goods Receipt (Penerimaan):** `goods_receipts`. Mencatat bukti serah terima barang secara fisik dari *Supplier*.
+2. **Procurement (Pengadaan):** `purchase_requests` & `purchase_orders`. Mencatat alur permintaan dari internal hingga pemesanan resmi ke pihak _Supplier_. Keduanya memiliki tabel _Items_ masing-masing untuk mencatat detil produk.
+3. **Goods Receipt (Penerimaan):** `goods_receipts`. Mencatat bukti serah terima barang secara fisik dari _Supplier_.
 4. **Inventory (Persediaan):** `inventory_balances` (total stok saat ini) & `inventory_movements` (buku besar/histori keluar-masuk barang).
 5. **System:** `audit_logs` (rekaman jejak aktivitas) & `idempotency_keys` (mencegah duplikasi data API).
 
@@ -225,8 +226,8 @@ erDiagram
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
-- **Pemisahan Inventory**: Saldo saat ini (`inventory_balances`) dan histori mutasi (`inventory_movements`) dipisah. Hal ini memastikan setiap pergerakan terekam dengan jelas (Auditabilitas) dan mencegah *race condition* saat kalkulasi stok massal.
-- **Data Consistency via Transactions**: Seluruh transaksi kritikal (Submit PR, Goods Receipt) dibungkus dalam *Database Transactions* (`db.transaction`). Jika proses update stok gagal, seluruh data Goods Receipt akan di-*rollback* otomatis.
+- **Pemisahan Inventory**: Saldo saat ini (`inventory_balances`) dan histori mutasi (`inventory_movements`) dipisah. Hal ini memastikan setiap pergerakan terekam dengan jelas (Auditabilitas) dan mencegah _race condition_ saat kalkulasi stok massal.
+- **Data Consistency via Transactions**: Seluruh transaksi kritikal (Submit PR, Goods Receipt) dibungkus dalam _Database Transactions_ (`db.transaction`). Jika proses update stok gagal, seluruh data Goods Receipt akan di-_rollback_ otomatis.
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
@@ -259,23 +260,25 @@ Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
 
 ---
 
-
 ---
 
 ## ⚡ Contoh E2E Request (API Walkthrough)
 
-Untuk mempermudah pengujian manual via Terminal atau Postman, berikut adalah urutan *End-to-End* (*Happy Path*):
+Untuk mempermudah pengujian manual via Terminal atau Postman, berikut adalah urutan _End-to-End_ (_Happy Path_):
 
 ### 1. Login sebagai USER (Staff)
+
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "staff_user", "password": "password123"}' \
   -c cookies.txt
 ```
-*(Perhatikan parameter `-c cookies.txt` untuk menyimpan HttpOnly JWT Cookie)*
+
+_(Perhatikan parameter `-c cookies.txt` untuk menyimpan HttpOnly JWT Cookie)_
 
 ### 2. Buat Purchase Request (DRAFT)
+
 ```bash
 curl -X POST http://localhost:3000/purchase-requests \
   -H "Content-Type: application/json" \
@@ -284,6 +287,7 @@ curl -X POST http://localhost:3000/purchase-requests \
 ```
 
 ### 3. Tambah Item ke PR
+
 ```bash
 # Asumsikan ID PR yang baru dibuat adalah 1
 curl -X POST http://localhost:3000/purchase-requests/1/items \
@@ -293,6 +297,7 @@ curl -X POST http://localhost:3000/purchase-requests/1/items \
 ```
 
 ### 4. Submit PR & Tambahkan Idempotency Key
+
 ```bash
 curl -X POST http://localhost:3000/purchase-requests/1/submit \
   -H "Idempotency-Key: submit-pr-1" \
@@ -300,6 +305,7 @@ curl -X POST http://localhost:3000/purchase-requests/1/submit \
 ```
 
 ### 5. Login sebagai APPROVER (Manager)
+
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
@@ -308,12 +314,14 @@ curl -X POST http://localhost:3000/auth/login \
 ```
 
 ### 6. Approve PR
+
 ```bash
 curl -X POST http://localhost:3000/purchase-requests/1/approve \
   -b cookies_manager.txt
 ```
 
 ### 7. Buat Purchase Order (PO)
+
 ```bash
 curl -X POST http://localhost:3000/purchase-orders \
   -H "Content-Type: application/json" \
@@ -322,6 +330,7 @@ curl -X POST http://localhost:3000/purchase-orders \
 ```
 
 ### 8. Terima Barang (Goods Receipt)
+
 ```bash
 # Asumsikan ID PO yang baru dibuat adalah 1
 curl -X POST http://localhost:3000/goods-receipts \
