@@ -1,6 +1,11 @@
 import { Elysia, t } from "elysia";
 import { ProductService } from "@/modules/product/service";
-import { productCreateDto, productUpdateDto, productResponseDto, productListResponseDto } from "@/modules/product/dto";
+import {
+  productCreateDto,
+  productUpdateDto,
+  productResponseDto,
+  productListResponseDto,
+} from "@/modules/product/dto";
 import { isAuthenticated } from "@/utils/auth";
 
 export const productController = new Elysia({ prefix: "/products" })
