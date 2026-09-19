@@ -1,17 +1,6 @@
-import {
-  pgTable,
-  serial,
-  varchar,
-  timestamp,
-  pgEnum,
-} from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, serial, varchar, timestamp, integer, boolean, unique, check, text, jsonb } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
-/**
- * ==========================================
- * 1. DATABASE SCHEMA (Drizzle ORM)
- * ==========================================
- * Defines the PostgreSQL tables, columns, and relations.
- */
 export const roleEnum = pgEnum("role", ["USER", "APPROVER"]);
 
 export const users = pgTable("users", {

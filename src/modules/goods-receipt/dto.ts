@@ -1,10 +1,8 @@
 import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
-import {
-  goodsReceipts,
-  goodsReceiptItems,
-} from "@/entities/goods-receipt.schema";
+import { goodsReceipts } from "./entities/goods_receipts.schema";
+import { goodsReceiptItems } from "./entities/goods_receipt_items.schema";
 
 /**
  * ==========================================
