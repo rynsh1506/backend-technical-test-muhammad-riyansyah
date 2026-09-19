@@ -19,6 +19,10 @@ import { auditController } from "@/modules/audit";
 export const app = new Elysia()
   .use(logger)
   .use(cors())
+  .onRequest(({ set }) => {
+    set.headers["X-Developed-By"] = "Muhammad Riyansyah";
+    set.headers["X-License"] = "Evaluation Only";
+  })
 
   .use(
     swagger({
