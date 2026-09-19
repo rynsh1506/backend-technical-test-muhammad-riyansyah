@@ -86,10 +86,7 @@ export const purchaseOrderController = new Elysia({
       }
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
-      const result = await PurchaseOrderService.markAsOrdered(
-        id,
-        user.id,
-      );
+      const result = await PurchaseOrderService.markAsOrdered(id, user.id);
 
       await IdempotencyService.save(
         user.id,

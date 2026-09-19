@@ -2,7 +2,8 @@ import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
   timestamp,
-  varchar, integer,
+  varchar,
+  integer,
   check,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -12,7 +13,9 @@ import { purchaseOrders } from "@/modules/purchase-order/entities/purchase_order
 export const purchaseOrderItems = pgTable(
   "purchase_order_items",
   {
-    id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+    id: varchar("id", { length: 24 })
+      .$defaultFn(() => createId())
+      .primaryKey(),
     purchaseOrderId: varchar("purchase_order_id", { length: 24 })
       .notNull()
       .references(() => purchaseOrders.id, { onDelete: "cascade" }),

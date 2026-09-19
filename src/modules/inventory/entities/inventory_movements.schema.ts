@@ -1,15 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
-import {
-  pgTable,
-  varchar,
-  timestamp,
-  integer,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, integer } from "drizzle-orm/pg-core";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 import { products } from "@/modules/product/entities/products.schema";
 
 export const inventoryMovements = pgTable("inventory_movements", {
-  id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+  id: varchar("id", { length: 24 })
+    .$defaultFn(() => createId())
+    .primaryKey(),
   warehouseId: varchar("warehouse_id", { length: 24 })
     .notNull()
     .references(() => warehouses.id, { onDelete: "restrict" }),
