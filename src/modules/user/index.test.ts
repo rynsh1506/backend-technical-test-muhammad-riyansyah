@@ -6,17 +6,14 @@ import { APP_CONFIG } from "@/config";
 const api = treaty(app);
 
 /**
- * ==========================================
- * User Module Tests
- * ==========================================
- * Verifies fetching users by ID and listing users.
+ * End-to-end test suite for the User module.
+ * Verifies fetching users by ID, listing users, and checking unauthorized access.
  */
 describe("User Module (Eden Treaty E2E)", () => {
   let validCookie: string | null = null;
   let loggedInUserId: string = "";
 
   beforeAll(async () => {
-    // Login to get auth cookie and user ID
     const { status, response, data } = await api.auth.login.post({
       username: "staff_user",
       password: "password123",
@@ -54,7 +51,6 @@ describe("User Module (Eden Treaty E2E)", () => {
       expect(data).toBeDefined();
       expect(data?.data).toBeInstanceOf(Array);
       expect(data?.meta?.totalRecords).toBeGreaterThan(0);
-      // Ensure passwordHash is omitted
       expect(data?.data[0]).not.toHaveProperty("passwordHash");
     });
 
