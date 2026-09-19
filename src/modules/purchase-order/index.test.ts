@@ -109,6 +109,31 @@ describe("Purchase Order Module", () => {
       ).toBe("INVALID_SUPPLIER");
     });
 
+    it("should prevent creating PO from a non-approved Purchase Request", async () => {
+      const randomSuffix = Math.floor(Math.random() * 1000000);
+
+      const whRes = await api.warehouses.post(
+        { code: `WH-PO-NA-${randomSuffix}`, name: "PO NA WH", location: "Loc" },
+        { headers: userCookie },
+      );
+      const tempWarehouseId = (whRes.data as { id: string }).id;
+
+      const prDraftRes = await api["purchase-requests"].post(
+        { warehouseId: tempWarehouseId },
+        { headers: userCookie },
+      );
+      const draftPrId = (prDraftRes.data as { id: string }).id;
+
+      const { status, error } = await api["purchase-orders"].post(
+        { purchaseRequestId: draftPrId, supplierId },
+        { headers: approverCookie },
+      );
+      expect(status).toBe(400);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("INVALID_STATUS");
+    });
+
     it("should allow APPROVER to create PO from APPROVED PR", async () => {
       const { data, status } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
