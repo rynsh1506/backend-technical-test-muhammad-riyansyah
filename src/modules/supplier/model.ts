@@ -8,6 +8,12 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
 
+/**
+ * ==========================================
+ * 1. DATABASE SCHEMA (Drizzle ORM)
+ * ==========================================
+ * Defines the PostgreSQL tables, columns, and relations.
+ */
 export const suppliers = pgTable("suppliers", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -18,9 +24,21 @@ export const suppliers = pgTable("suppliers", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
 export const insertSupplierSchema = createInsertSchema(suppliers);
 export const selectSupplierSchema = createSelectSchema(suppliers);
 
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
 export const supplierCreateDto = t.Omit(insertSupplierSchema, [
   "id",
   "createdAt",
