@@ -1,19 +1,6 @@
 import { t } from "elysia";
-import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
-import { spread } from "@/utils/drizzle";
-import { users } from "@/modules/user/entities/users.schema";
 
-/**
- * ==========================================
- * BASE SCHEMAS (Drizzle TypeBox)
- * ==========================================
- * Auto-generated TypeBox schemas directly from the database tables.
- */
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-
-const userInsert = spread(users, "insert");
-const userSelect = spread(users, "select");
+import { userInsert, userSelect } from "@/modules/user/dto";
 
 /**
  * ==========================================
