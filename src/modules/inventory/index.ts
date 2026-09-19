@@ -33,6 +33,7 @@ export const inventoryController = new Elysia({ prefix: "/inventory" })
         warehouseId: t.Numeric(),
         productId: t.Numeric(),
       }),
+      response: { 200: inventoryMovementListResponseDto },
       detail: { tags: ["Inventory"], summary: "Get Inventory Movements" },
     },
   );
