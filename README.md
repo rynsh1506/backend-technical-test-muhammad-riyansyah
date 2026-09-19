@@ -37,7 +37,7 @@ Proyek ini adalah sistem _Backend_ untuk manajemen **Inventory dan Purchase Requ
 - **Database**: PostgreSQL 15
 - **ORM & Migrations**: Drizzle ORM
 - **Validation**: Elysia TypeBox (`t.Object`, `t.String`, dll) + Drizzle-Typebox
-- **Documentation**: Swagger/OpenAPI (Dirender menggunakan Scalar UI)
+- **Documentation**: OpenAPI (Dirender menggunakan Scalar UI)
 - **Infrastructure**: Docker & Docker Compose
 
 ## 📂 Struktur Proyek (Project Structure)
@@ -60,7 +60,7 @@ flowchart TD
     C -->|Reject| D[PR: REJECTED]
     C -->|Approve| E[PR: APPROVED]
     E --> F1[3. Create PO]
-    F1 --> F2[PO: PENDING]
+    F1 --> F2[PO: DRAFT]
     F2 --> F3[Place Order to Supplier]
     F3 --> F4[PO: ORDERED]
     F4 --> G[4. Receive Goods]
@@ -143,7 +143,7 @@ erDiagram
         varchar po_number UK
         integer purchase_request_id FK
         integer supplier_id FK
-        enum status "PENDING|ORDERED|PARTIALLY_RECEIVED|RECEIVED|CANCELLED"
+        enum status "DRAFT|ORDERED|PARTIALLY_RECEIVED|RECEIVED|CANCELLED"
         timestamp created_at
         timestamp updated_at
     }
@@ -222,7 +222,7 @@ erDiagram
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
 - **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
-- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Memanfaatkan standar Swagger/OpenAPI (`@elysiajs/swagger`) namun dirender menggunakan Scalar UI untuk tampilan yang lebih modern, lengkap dengan _code snippet_.
+- **Dokumentasi API Terpadu (@elysiajs/swagger)**: Menghasilkan spesifikasi OpenAPI otomatis yang dirender secara bawaan menggunakan **Scalar UI** untuk tampilan yang lebih interaktif dan lengkap dengan _code snippet_.
 - **E2E Type-Safe Testing (Eden Treaty)**: Menggunakan klien `@elysiajs/eden` (Treaty) untuk _integration testing_. Klien ini otomatis membaca tipe data dari _backend_ (Elysia App Instance) langsung ke file test tanpa harus menebak bentuk Response JSON.
 - **Validasi DRY (Drizzle-Typebox)**: Men-generate skema validasi request/response Elysia (TypeBox) secara otomatis dari skema tabel Drizzle ORM.
 - **Manajemen Peran (Role Enum)**: Diimplementasikan sebagai `pgEnum` ("USER", "APPROVER") native di PostgreSQL agar _type-safe_ di level database maupun aplikasi, menghindari tabel relasional yang _over-engineered_ untuk kasus sederhana ini.
@@ -238,6 +238,13 @@ Proyek ini dibangun menggunakan arsitektur **Vertical Slice** (berbasis fitur) a
 3. **Logika Bisnis (Core)**: Buka `service.ts` (misal: `src/modules/purchase-request/service.ts`). Ini adalah jantung dari aplikasi. Semua perhitungan, logika _approval_, dan operasi database (_transaction_) terjadi di sini. **Jangan menaruh logika bisnis di Controller!**
 4. **Jalur API (Controller)**: Buka `index.ts` di dalam modul (misal: `src/modules/purchase-request/index.ts`). Ini adalah pintu gerbang HTTP. File ini menerima _request_, memvalidasinya, memanggil `Service`, lalu mengembalikan respons JSON.
 5. **Cara Test Bekerja**: Buka `index.test.ts` (misal: `src/modules/purchase-request/index.test.ts`). Di sini Anda bisa melihat bagaimana seluruh fungsi _backend_ (Elysia) dipanggil dan diuji seolah-olah dari _browser_/_frontend_ menggunakan _Eden Treaty_.
+
+## 💡 Asumsi (Assumptions)
+
+- **1 PR = 1 PO**: Untuk kesederhanaan _flow_, diasumsikan satu _Purchase Request_ yang disetujui akan diubah menjadi tepat satu _Purchase Order_ ke satu _Supplier_.
+- **Penerimaan Barang (Goods Receipt)**: Barang yang diterima otomatis dialokasikan ke Gudang (_Warehouse_) yang awalnya dipilih saat membuat _Purchase Request_.
+- **Role Approval Global**: Siapapun yang memiliki _role_ `APPROVER` (Admin/Manager) berhak menyetujui _Purchase Request_. Tidak ada hierarki _approval_ bertingkat berdasarkan departemen.
+- **Soft-Delete Master Data**: _Products_, _Suppliers_, dan _Warehouses_ menggunakan flag `isActive` (bukan di-_delete_ permanen) agar riwayat transaksi masa lalu tidak rusak (_foreign key constraint_ terjaga), namun tidak bisa digunakan untuk transaksi baru.
 
 ## 🚀 Cara Menjalankan (Setup & Run)
 
@@ -379,7 +386,7 @@ Menjalankan _Integration & E2E Type-Safe Test_ (termasuk skenario validasi, peno
 bun test
 ```
 
-## 📚 Dokumentasi API (Swagger / Scalar UI)
+## 📚 Dokumentasi API (Scalar UI)
 
 Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
-👉 **[http://localhost:3000/swagger](http://localhost:3000/swagger)**
+👉 **[http://localhost:3000/docs](http://localhost:3000/docs)**
