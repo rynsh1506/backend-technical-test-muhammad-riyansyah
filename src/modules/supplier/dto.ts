@@ -6,7 +6,7 @@ import { suppliers } from "./entities/suppliers.schema";
 
 /**
  * ==========================================
- * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * BASE SCHEMAS (Drizzle TypeBox)
  * ==========================================
  * Auto-generated TypeBox schemas directly from the database tables.
  */

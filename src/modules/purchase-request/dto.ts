@@ -6,7 +6,7 @@ import { purchaseRequestItems } from "./entities/purchase_request_items.schema";
 
 /**
  * ==========================================
- * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * BASE SCHEMAS (Drizzle TypeBox)
  * ==========================================
  * Auto-generated TypeBox schemas directly from the database tables.
  */
