@@ -5,7 +5,6 @@ import {
   varchar,
   timestamp,
   integer,
-  unique,
 } from "drizzle-orm/pg-core";
 import { users } from "@/modules/auth/entities/users.schema";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
