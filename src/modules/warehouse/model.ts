@@ -6,7 +6,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
-import { t, type Static } from "elysia";
+import { t } from "elysia";
 
 export const warehouses = pgTable("warehouses", {
   id: serial("id").primaryKey(),
