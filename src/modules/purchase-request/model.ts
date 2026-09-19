@@ -70,19 +70,19 @@ export const insertPurchaseRequestItemSchema =
 export const selectPurchaseRequestItemSchema =
   createSelectSchema(purchaseRequestItems);
 
-export const prCreateDto = t.Object({
+export const purchaseRequestCreateDto = t.Object({
   warehouseId: t.Number(),
 });
 
-export const prUpdateDraftDto = t.Object({
+export const purchaseRequestUpdateDraftDto = t.Object({
   warehouseId: t.Optional(t.Number()),
 });
 
-export const prItemAddDto = t.Object({
+export const purchaseRequestItemAddDto = t.Object({
   productId: t.Number(),
   quantity: t.Number({ minimum: 1 }),
 });
 
-export const prItemUpdateDto = t.Object({
+export const purchaseRequestItemUpdateDto = t.Object({
   quantity: t.Number({ minimum: 1 }),
 });
