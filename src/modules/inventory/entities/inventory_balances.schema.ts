@@ -3,7 +3,8 @@ import {
   pgTable,
   uniqueIndex,
   timestamp,
-  varchar, integer,
+  varchar,
+  integer,
 } from "drizzle-orm/pg-core";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 import { products } from "@/modules/product/entities/products.schema";
@@ -11,7 +12,9 @@ import { products } from "@/modules/product/entities/products.schema";
 export const inventoryBalances = pgTable(
   "inventory_balances",
   {
-    id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+    id: varchar("id", { length: 24 })
+      .$defaultFn(() => createId())
+      .primaryKey(),
     warehouseId: varchar("warehouse_id", { length: 24 })
       .notNull()
       .references(() => warehouses.id, { onDelete: "restrict" }),

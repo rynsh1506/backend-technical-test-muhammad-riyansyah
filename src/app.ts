@@ -3,6 +3,7 @@ import { swagger } from "@elysiajs/swagger";
 import { cors } from "@elysiajs/cors";
 import { logger } from "@/utils/logger";
 import { authController } from "@/modules/auth";
+import { userController } from "@/modules/user";
 import { productController } from "@/modules/product";
 import { supplierController } from "@/modules/supplier";
 import { warehouseController } from "@/modules/warehouse";
@@ -38,6 +39,7 @@ export const app = new Elysia()
     }),
   )
   .use(authController)
+  .use(userController)
   .use(productController)
   .use(supplierController)
   .use(warehouseController)

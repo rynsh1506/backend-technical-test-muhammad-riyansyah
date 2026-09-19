@@ -34,14 +34,15 @@ export const APP_CONFIG = {
      * Full PostgreSQL connection string assembled from individual env vars.
      * Format: postgres://<user>:<password>@<host>:<port>/<database>
      */
-    URL: process.env.DATABASE_URL || [
-      
-      `postgres://`,
-      `${process.env.DB_USER ?? "postgres"}`,
-      `:${process.env.DB_PASSWORD ?? "postgres"}`,
-      `@${process.env.DB_HOST ?? "localhost"}`,
-      `:${process.env.DB_PORT ?? "5432"}`,
-      `/${process.env.DB_NAME ?? "inventory_db_test"}`,
-    ].join(""),
+    URL:
+      process.env.DATABASE_URL ||
+      [
+        `postgres://`,
+        `${process.env.DB_USER ?? "postgres"}`,
+        `:${process.env.DB_PASSWORD ?? "postgres"}`,
+        `@${process.env.DB_HOST ?? "localhost"}`,
+        `:${process.env.DB_PORT ?? "5432"}`,
+        `/${process.env.DB_NAME ?? "inventory_db_test"}`,
+      ].join(""),
   },
 };

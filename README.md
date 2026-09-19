@@ -221,7 +221,7 @@ erDiagram
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
-- **CUID2 instead of Serial (Enterprise Security)**: Seluruh Primary Key menggunakan tipe data string `cuid2` alih-alih `serial` (auto-increment integer). Keputusan arsitektural ini diambil untuk mencegah celah keamanan **ID Enumeration** (mengintip jumlah transaksi kompetitor dengan menebak `/api/orders/2`), natively mendukung *database sharding*, dan memungkinkan pembuatan ID dari sisi klien secara *offline*, sesuai dengan standar keamanan sistem terdistribusi modern.
+- **CUID2 instead of Serial (Enterprise Security)**: Seluruh Primary Key menggunakan tipe data string `cuid2` alih-alih `serial` (auto-increment integer). Keputusan arsitektural ini diambil untuk mencegah celah keamanan **ID Enumeration** (mengintip jumlah transaksi kompetitor dengan menebak `/api/orders/2`), natively mendukung _database sharding_, dan memungkinkan pembuatan ID dari sisi klien secara _offline_, sesuai dengan standar keamanan sistem terdistribusi modern.
 - **Arsitektur Ketat (Controller vs Service)**: Mengikuti struktur berbasis fitur dari ElysiaJS. _Controller_ (`index.ts`) khusus mengurus HTTP (Cookie, status code), sedangkan _Service_ (`service.ts`) menangani logika bisnis.
 - **Eksplisit DTO via Spread Utility (Developer Experience)**: Walaupun menggunakan `drizzle-typebox`, DTO API sengaja ditulis secara eksplisit (seperti `t.Object({ name: table.name })`) menggunakan utilitas `spread()` **resmi dari Elysia** (lihat [Dokumentasi Elysia Drizzle](https://elysiajs.com/recipe/drizzle.html#utility)). Keputusan ini diambil agar kode tetap mudah dibaca dan disalin (_copy-paste-able_ layaknya kelas DTO di NestJS/Prisma), tanpa kehilangan fitur sinkronisasi tipe data dengan _database_ (Single Source of Truth) dan tanpa terjebak _anti-pattern_ `t.Pick`/`t.Omit` berantai yang _over-engineered_.
 - **Dokumentasi API Terpadu (@elysiajs/swagger)**: Menghasilkan spesifikasi OpenAPI otomatis yang dirender secara bawaan menggunakan **Swagger UI** untuk tampilan yang lebih interaktif dan lengkap dengan _code snippet_.
@@ -385,11 +385,13 @@ _(Catatan: Jika menggunakan Docker, Anda bisa menjalankan seeder ke dalam contai
 Menjalankan _Integration & E2E Type-Safe Test_ (termasuk skenario validasi, penolakan auth, dan flow success):
 
 Jika menggunakan Docker (Direkomendasikan agar tidak perlu install Bun di lokal):
+
 ```bash
 docker compose exec app bun test
 ```
 
 Jika menjalankan secara lokal:
+
 ```bash
 bun test
 ```
