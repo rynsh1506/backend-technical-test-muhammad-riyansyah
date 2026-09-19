@@ -51,15 +51,10 @@ export const purchaseRequestItems = pgTable(
       .notNull(),
     quantity: integer("quantity").notNull(),
   },
-  (table) => {
-    return {
-      unqPrProduct: unique("unq_pr_product").on(
-        table.purchaseRequestId,
-        table.productId,
-      ),
-      chkQuantity: check("chk_quantity_gt_zero", sql`${table.quantity} > 0`),
-    };
-  },
+  (table) => [
+    unique("unq_pr_product").on(table.purchaseRequestId, table.productId),
+    check("chk_quantity_gt_zero", sql`${table.quantity} > 0`),
+  ],
 );
 
 export const insertPurchaseRequestSchema = createInsertSchema(purchaseRequests);
