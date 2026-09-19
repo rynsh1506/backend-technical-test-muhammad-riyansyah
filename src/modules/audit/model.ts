@@ -10,13 +10,13 @@ import { users } from "@/modules/auth/model";
 
 export const auditLogs = pgTable("audit_logs", {
   id: serial("id").primaryKey(),
-  entityName: varchar("entity_name", { length: 50 }).notNull(), // e.g., 'purchase_requests', 'purchase_orders'
+  entityName: varchar("entity_name", { length: 50 }).notNull(),
   entityId: integer("entity_id").notNull(),
-  action: varchar("action", { length: 50 }).notNull(), // e.g., 'SUBMIT', 'APPROVE', 'REJECT'
+  action: varchar("action", { length: 50 }).notNull(),
   performedBy: integer("performed_by")
     .references(() => users.id)
     .notNull(),
-  changes: jsonb("changes"), // Store what was changed, if any
+  changes: jsonb("changes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

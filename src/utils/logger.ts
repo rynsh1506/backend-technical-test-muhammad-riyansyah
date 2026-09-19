@@ -9,7 +9,6 @@ export const logger = new Elysia({ name: "logger" })
     const url = new URL(request.url).pathname;
     const status = set.status || 200;
 
-    // Convert status to number if it's a string somehow
     const statusCode = typeof status === "number" ? status : 200;
 
     let icon = "✅";
