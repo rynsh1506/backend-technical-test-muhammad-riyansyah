@@ -1,6 +1,10 @@
 import Elysia, { t } from "elysia";
 import { InventoryService } from "@/modules/inventory/service";
 import { isAuthenticated } from "@/utils/auth";
+import {
+  inventoryBalanceResponseDto,
+  inventoryMovementListResponseDto,
+} from "@/modules/inventory/model";
 
 export const inventoryController = new Elysia({ prefix: "/inventory" })
   .use(isAuthenticated)
@@ -17,6 +21,7 @@ export const inventoryController = new Elysia({ prefix: "/inventory" })
         warehouseId: t.Numeric(),
         productId: t.Numeric(),
       }),
+      response: { 200: inventoryBalanceResponseDto },
       detail: { tags: ["Inventory"], summary: "Get Inventory Level" },
     },
   )
