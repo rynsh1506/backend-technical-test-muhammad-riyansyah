@@ -25,12 +25,9 @@ export const inventoryBalances = pgTable(
       .notNull()
       .$onUpdate(() => new Date()),
   },
-  (table) => ({
-    warehouseProductIdx: uniqueIndex("warehouse_product_idx").on(
-      table.warehouseId,
-      table.productId,
-    ),
-  }),
+  (table) => [
+    uniqueIndex("warehouse_product_idx").on(table.warehouseId, table.productId),
+  ],
 );
 
 export const inventoryMovements = pgTable("inventory_movements", {
