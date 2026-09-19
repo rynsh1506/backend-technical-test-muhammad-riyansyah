@@ -59,15 +59,14 @@ export const purchaseRequestItems = pgTable(
 
 export const insertPurchaseRequestSchema = createInsertSchema(purchaseRequests);
 export const selectPurchaseRequestSchema = createSelectSchema(purchaseRequests);
-
 export const insertPurchaseRequestItemSchema =
   createInsertSchema(purchaseRequestItems);
 export const selectPurchaseRequestItemSchema =
   createSelectSchema(purchaseRequestItems);
 
-export const purchaseRequestCreateDto = t.Object({
-  warehouseId: t.Number(),
-});
+export const purchaseRequestCreateDto = t.Pick(insertPurchaseRequestSchema, [
+  "warehouseId",
+]);
 
 export const purchaseRequestUpdateDraftDto = t.Object({
   warehouseId: t.Optional(t.Number()),
