@@ -27,7 +27,15 @@ export const SupplierModel = {
     t.Omit(insertSupplierSchema, ["id", "createdAt", "updatedAt"]),
   ),
   response: selectSupplierSchema,
-  listResponse: t.Array(selectSupplierSchema),
+  listResponse: t.Object({
+    data: t.Array(selectSupplierSchema),
+    meta: t.Object({
+      page: t.Number(),
+      limit: t.Number(),
+      totalPages: t.Number(),
+      totalRecords: t.Number(),
+    }),
+  }),
 } as const;
 
 export type SupplierModelTypes = {

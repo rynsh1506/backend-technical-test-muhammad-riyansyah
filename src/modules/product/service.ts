@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
 import { products } from "@/modules/product/model";
@@ -23,12 +23,48 @@ export abstract class ProductService {
   }
 
   /**
-   * Retrieves all products ordered by ID (ascending).
+   * Retrieves a paginated list of products.
    *
-   * @returns An array of all product records.
+   * @param page - The page number to retrieve.
+   * @param limit - The maximum number of records per page.
+   * @param search - Optional search string for name or SKU.
+   * @returns Paginated product records.
    */
-  static async list() {
-    return await db.select().from(products).orderBy(products.id);
+  static async list(page = 1, limit = 10, search?: string) {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = undefined;
+    if (search) {
+      whereCondition = or(
+        ilike(products.name, `%${search}%`),
+        ilike(products.sku, `%${search}%`),
+      );
+    }
+
+    const data = await db
+      .select()
+      .from(products)
+      .where(whereCondition)
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(products.id));
+
+    const totalRes = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(products)
+      .where(whereCondition);
+
+    const total = Number(totalRes[0]!.count);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalRecords: total,
+      },
+    };
   }
 
   /**
