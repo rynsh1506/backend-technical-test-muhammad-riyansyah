@@ -133,7 +133,15 @@ export abstract class PurchaseOrderService {
 
     let whereCondition = undefined;
     if (filterStatus) {
-      whereCondition = eq(purchaseOrders.status, filterStatus as "PENDING" | "ORDERED" | "PARTIALLY_RECEIVED" | "RECEIVED" | "CANCELLED");
+      whereCondition = eq(
+        purchaseOrders.status,
+        filterStatus as
+          | "PENDING"
+          | "ORDERED"
+          | "PARTIALLY_RECEIVED"
+          | "RECEIVED"
+          | "CANCELLED",
+      );
     }
 
     const data = await db
