@@ -4,7 +4,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
 import { auditLogs } from "@/modules/audit/entities/audit_logs.schema";
 import { idempotencyKeys } from "@/modules/audit/entities/idempotency_keys.schema";
-import { selectUserSchema } from "@/modules/auth/dto";
+import { selectUserSchema } from "@/modules/user/dto";
 
 /**
  * ==========================================

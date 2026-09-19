@@ -1,5 +1,5 @@
 import { t } from "elysia";
-import { createSelectSchema } from "drizzle-typebox";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
 import { users } from "@/modules/user/entities/users.schema";
 import { createPaginatedDto } from "@/utils/dto";
@@ -8,9 +8,13 @@ import { createPaginatedDto } from "@/utils/dto";
  * ==========================================
  * BASE SCHEMAS (Drizzle TypeBox)
  * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
  */
+export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
-const userSelect = spread(users, "select");
+
+export const userInsert = spread(users, "insert");
+export const userSelect = spread(users, "select");
 
 /**
  * ==========================================
