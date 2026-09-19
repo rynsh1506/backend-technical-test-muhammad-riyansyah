@@ -27,7 +27,15 @@ export const ProductModel = {
     t.Omit(insertProductSchema, ["id", "sku", "createdAt", "updatedAt"]),
   ),
   response: selectProductSchema,
-  listResponse: t.Array(selectProductSchema),
+  listResponse: t.Object({
+    data: t.Array(selectProductSchema),
+    meta: t.Object({
+      page: t.Number(),
+      limit: t.Number(),
+      totalPages: t.Number(),
+      totalRecords: t.Number(),
+    }),
+  }),
 } as const;
 
 export type ProductModelTypes = {
