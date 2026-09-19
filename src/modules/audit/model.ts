@@ -7,8 +7,10 @@ import {
   integer,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { users } from "@/modules/auth/model";
+import { users, selectUserSchema } from "@/modules/auth/model";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
+import { spread } from "@/utils/drizzle";
+import { createPaginatedDto } from "@/utils/dto";
 
 /**
  * ==========================================
@@ -48,6 +50,9 @@ export const selectAuditLogSchema = createSelectSchema(auditLogs);
 export const insertIdempotencyKeySchema = createInsertSchema(idempotencyKeys);
 export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
 
+const auditSelect = spread(auditLogs, "select");
+const userSelect = spread(users, "select");
+
 /**
  * ==========================================
  * 3. API DTOs (Elysia TypeBox)
@@ -55,15 +60,15 @@ export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
  * Data Transfer Objects for API request/response validation.
  */
 export const auditLogResponseDto = t.Object({
-  id: t.Number(),
-  entityName: t.String(),
-  entityId: t.Number(),
-  action: t.String(),
+  id: auditSelect.id,
+  entityName: auditSelect.entityName,
+  entityId: auditSelect.entityId,
+  action: auditSelect.action,
   changes: t.Unknown(),
-  createdAt: t.Date(),
+  createdAt: auditSelect.createdAt,
   performedBy: t.Object({
-    id: t.Number(),
-    username: t.String(),
+    id: userSelect.id,
+    username: userSelect.username,
     role: t.String(),
   }),
 });

@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { t } from "elysia";
+import { spread } from "@/utils/drizzle";
 
 /**
  * ==========================================
@@ -34,19 +35,28 @@ export const products = pgTable("products", {
 export const insertProductSchema = createInsertSchema(products);
 export const selectProductSchema = createSelectSchema(products);
 
+const productInsert = spread(products, "insert");
+
 /**
  * ==========================================
  * 3. API DTOs (Elysia TypeBox)
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const productCreateDto = t.Omit(insertProductSchema, [
-  "id",
-  "createdAt",
-  "updatedAt",
-]);
+export const productCreateDto = t.Object({
+  sku: productInsert.sku,
+  name: productInsert.name,
+  unit: productInsert.unit,
+  isActive: productInsert.isActive,
+});
+
 export const productUpdateDto = t.Partial(
-  t.Omit(insertProductSchema, ["id", "sku", "createdAt", "updatedAt"]),
+  t.Object({
+    name: productInsert.name,
+    unit: productInsert.unit,
+    isActive: productInsert.isActive,
+  }),
 );
+
 export const productResponseDto = selectProductSchema;
 export const productListResponseDto = createPaginatedDto(selectProductSchema);
