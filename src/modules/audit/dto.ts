@@ -4,7 +4,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
 import { auditLogs } from "@/modules/audit/entities/audit_logs.schema";
 import { idempotencyKeys } from "@/modules/audit/entities/idempotency_keys.schema";
-import { selectUserSchema } from "@/modules/user/dto";
+import { createPaginatedDto } from "@/utils/dto";
 
 /**
  * ==========================================
@@ -39,4 +39,4 @@ export const auditLogResponseDto = t.Object({
     role: t.String(),
   }),
 });
-export const auditLogListResponseDto = t.Array(auditLogResponseDto);
+export const auditLogListResponseDto = createPaginatedDto(auditLogResponseDto);
