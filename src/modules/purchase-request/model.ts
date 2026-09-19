@@ -71,8 +71,12 @@ export const purchaseRequestItems = pgTable(
  */
 export const insertPurchaseRequestSchema = createInsertSchema(purchaseRequests);
 export const selectPurchaseRequestSchema = createSelectSchema(purchaseRequests);
-export const insertPurchaseRequestItemSchema =
-  createInsertSchema(purchaseRequestItems);
+export const insertPurchaseRequestItemSchema = createInsertSchema(
+  purchaseRequestItems,
+  {
+    quantity: t.Number({ minimum: 1 }),
+  },
+);
 export const selectPurchaseRequestItemSchema =
   createSelectSchema(purchaseRequestItems);
 
@@ -86,15 +90,16 @@ export const purchaseRequestCreateDto = t.Pick(insertPurchaseRequestSchema, [
   "warehouseId",
 ]);
 
-export const purchaseRequestUpdateDraftDto = t.Object({
-  warehouseId: t.Optional(t.Number()),
-});
+export const purchaseRequestUpdateDraftDto = t.Partial(
+  t.Pick(insertPurchaseRequestSchema, ["warehouseId"]),
+);
 
-export const purchaseRequestItemAddDto = t.Object({
-  productId: t.Number(),
-  quantity: t.Number({ minimum: 1 }),
-});
+export const purchaseRequestItemAddDto = t.Pick(
+  insertPurchaseRequestItemSchema,
+  ["productId", "quantity"],
+);
 
-export const purchaseRequestItemUpdateDto = t.Object({
-  quantity: t.Number({ minimum: 1 }),
-});
+export const purchaseRequestItemUpdateDto = t.Pick(
+  insertPurchaseRequestItemSchema,
+  ["quantity"],
+);
