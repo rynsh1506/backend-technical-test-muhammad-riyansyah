@@ -1,8 +1,9 @@
+import { users } from "@/modules/auth/entities/users.schema";
 import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
-import { auditLogs } from "./entities/audit_logs.schema";
-import { idempotencyKeys } from "./entities/idempotency_keys.schema";
+import { auditLogs } from "@/modules/audit/entities/audit_logs.schema";
+import { idempotencyKeys } from "@/modules/audit/entities/idempotency_keys.schema";
 import { selectUserSchema } from "@/modules/auth/dto";
 
 /**
@@ -39,4 +40,3 @@ export const auditLogResponseDto = t.Object({
   }),
 });
 export const auditLogListResponseDto = t.Array(auditLogResponseDto);
-import { users } from "@/modules/auth/entities/users.schema";
