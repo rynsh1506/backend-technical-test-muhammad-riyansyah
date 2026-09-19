@@ -27,6 +27,11 @@ async function main() {
           role: "USER",
         },
         {
+          username: "staff_user_2",
+          password: defaultPassword,
+          role: "USER",
+        },
+        {
           username: "manager_approver",
           password: defaultPassword,
           role: "APPROVER",
@@ -38,16 +43,8 @@ async function main() {
     await db
       .insert(products)
       .values([
-        {
-          sku: "IND-OIL-01",
-          name: "Industrial Oil",
-          unit: "PCS",
-        },
-        {
-          sku: "SFT-GLV-01",
-          name: "Safety Gloves",
-          unit: "BOX",
-        },
+        { sku: "IND-OIL-01", name: "Industrial Oil", unit: "PCS" },
+        { sku: "SFT-GLV-01", name: "Safety Gloves", unit: "BOX" },
       ])
       .onConflictDoNothing();
 
@@ -71,11 +68,6 @@ async function main() {
           code: "JKT-01",
           name: "Jakarta Main Warehouse",
           location: "Jakarta, Indonesia",
-        },
-        {
-          code: "SBY-01",
-          name: "Surabaya Hub",
-          location: "Surabaya, Indonesia",
         },
       ])
       .onConflictDoNothing();

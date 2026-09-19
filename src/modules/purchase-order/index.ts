@@ -2,6 +2,7 @@ import Elysia, { t } from "elysia";
 import { PurchaseOrderService } from "@/modules/purchase-order/service";
 import { poCreateDto } from "@/modules/purchase-order/model";
 import { isAuthenticated } from "@/utils/auth";
+import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
 
 export const purchaseOrderController = new Elysia({
@@ -12,6 +13,14 @@ export const purchaseOrderController = new Elysia({
   .post(
     "/",
     async ({ body, user, request, headers }) => {
+      if (user.role !== "APPROVER") {
+        throw status(403, {
+          error: {
+            code: "FORBIDDEN",
+            message: "Only APPROVER can perform this action",
+          },
+        });
+      }
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const result = await PurchaseOrderService.createFromPr(
@@ -59,6 +68,14 @@ export const purchaseOrderController = new Elysia({
   .post(
     "/:id/order",
     async ({ params: { id }, user, request, headers }) => {
+      if (user.role !== "APPROVER") {
+        throw status(403, {
+          error: {
+            code: "FORBIDDEN",
+            message: "Only APPROVER can perform this action",
+          },
+        });
+      }
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const result = await PurchaseOrderService.markAsOrdered(

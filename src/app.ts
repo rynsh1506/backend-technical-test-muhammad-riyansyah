@@ -9,6 +9,7 @@ import { warehouseController } from "@/modules/warehouse";
 import { purchaseRequestController } from "@/modules/purchase-request";
 import { purchaseOrderController } from "@/modules/purchase-order";
 import { goodsReceiptController } from "@/modules/goods-receipt";
+import { inventoryController } from "@/modules/inventory";
 
 /**
  * The main Elysia application instance.
@@ -36,4 +37,5 @@ export const app = new Elysia()
   .use(warehouseController)
   .use(purchaseRequestController)
   .use(purchaseOrderController)
-  .use(goodsReceiptController);
+  .use(goodsReceiptController)
+  .use(inventoryController);

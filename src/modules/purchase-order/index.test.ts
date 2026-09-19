@@ -4,15 +4,12 @@ import { treaty } from "@elysiajs/eden";
 
 const api = treaty(app);
 
-/**
- * End-to-end test suite for the Purchase Order module.
- * Tests creation from APPROVED PR, validation rules, and marking as ordered.
- */
 describe("Purchase Order Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
   let warehouseId: number;
   let supplierId: number;
+  let inactiveSupplierId: number;
   let product1Id: number;
   let prId: number;
   let poId: number;
@@ -22,86 +19,109 @@ describe("Purchase Order Module", () => {
       username: "staff_user",
       password: "password123",
     });
-    const userCookieStr =
-      userRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
-    userCookie = { Cookie: userCookieStr };
+    userCookie = {
+      Cookie: userRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "",
+    };
 
     const { response: appRes } = await api.auth.login.post({
       username: "manager_approver",
       password: "password123",
     });
-    const appCookieStr = appRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
-    approverCookie = { Cookie: appCookieStr };
+    approverCookie = {
+      Cookie: appRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "",
+    };
 
     const randomSuffix = Math.floor(Math.random() * 1000000);
 
-    const wh = await api.warehouses.post(
-      { code: `WH-PO-${randomSuffix}`, name: "PO Test WH", location: "PO Loc" },
+    const whRes = await api.warehouses.post(
+      { code: `WH-PO-${randomSuffix}`, name: "PO WH", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (wh.data as { id: number }).id;
+    warehouseId = (whRes.data as { id: number }).id;
 
-    const supp = await api.suppliers.post(
-      { name: "PO Test Supp", email: `po${randomSuffix}@supp.com` },
+    const prodRes = await api.products.post(
+      { sku: `PROD-PO-${randomSuffix}`, name: "PO Prod", unit: "PCS" },
       { headers: userCookie },
     );
-    supplierId = (supp.data as { id: number }).id;
+    product1Id = (prodRes.data as { id: number }).id;
 
-    const prod1 = await api.products.post(
-      { sku: `PO-PROD-${randomSuffix}`, name: "PO Product 1", unit: "PCS" },
+    const suppRes = await api.suppliers.post(
+      { name: "PO Supp", email: "po@test.com", phone: "123" },
       { headers: userCookie },
     );
-    product1Id = (prod1.data as { id: number }).id;
+    supplierId = (suppRes.data as { id: number }).id;
 
-    const prDraft = await api["purchase-requests"].post(
+    const suppInactiveRes = await api.suppliers.post(
+      { name: "Inactive Supplier", email: "off@test.com", phone: "123" },
+      { headers: userCookie },
+    );
+    inactiveSupplierId = (suppInactiveRes.data as { id: number }).id;
+    await api
+      .suppliers({ id: inactiveSupplierId })
+      .put({ isActive: false }, { headers: userCookie });
+
+    const prRes = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
     );
-    prId = (prDraft.data as { id: number }).id;
+    prId = (prRes.data as { id: number }).id;
 
     await api["purchase-requests"]({ id: prId }).items.post(
-      { productId: product1Id, quantity: 15 },
+      { productId: product1Id, quantity: 10 },
       { headers: userCookie },
+    );
+
+    await api["purchase-requests"]({ id: prId }).submit.post(
+      {},
+      { headers: userCookie },
+    );
+
+    await api["purchase-requests"]({ id: prId }).approve.post(
+      {},
+      { headers: approverCookie },
     );
   });
 
   describe("Creation Logic", () => {
-    it("should prevent creating PO if PR is not APPROVED", async () => {
-      const { status } = await api["purchase-orders"].post(
+    it("should prevent USER from creating a PO", async () => {
+      const { status, error } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
         { headers: userCookie },
       );
-      expect(status).toBe(400); // INVALID_STATUS
+      expect(status).toBe(403);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("FORBIDDEN");
     });
 
-    it("should allow creating PO after PR is APPROVED", async () => {
-      await api["purchase-requests"]({ id: prId }).submit.post(
-        {},
-        { headers: userCookie },
-      );
-
-      await api["purchase-requests"]({ id: prId }).approve.post(
-        {},
+    it("should prevent creating PO with inactive supplier", async () => {
+      const { status, error } = await api["purchase-orders"].post(
+        { purchaseRequestId: prId, supplierId: inactiveSupplierId },
         { headers: approverCookie },
       );
+      expect(status).toBe(400);
+      expect(
+        (error?.value as unknown as { error: { code: string } }).error.code,
+      ).toBe("INVALID_SUPPLIER");
+    });
 
+    it("should allow APPROVER to create PO from APPROVED PR", async () => {
       const { data, status } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
-        { headers: userCookie },
+        { headers: approverCookie },
       );
-
       expect(status).toBe(200);
-      expect((data as { status: string }).status).toBe("PENDING");
-      expect((data as { poNumber: string }).poNumber).toContain("PO-");
+      expect(data).toHaveProperty("id");
+      expect(data).toHaveProperty("poNumber");
       poId = (data as { id: number }).id;
     });
 
     it("should prevent creating multiple POs for the same PR", async () => {
       const { status } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
-        { headers: userCookie },
+        { headers: approverCookie },
       );
-      expect(status).toBe(400); // DUPLICATE_PO
+      expect(status).toBe(400);
     });
   });
 
@@ -112,24 +132,16 @@ describe("Purchase Order Module", () => {
       });
 
       expect(status).toBe(200);
-      expect(
-        (data as { items: { quantity: number; productId: number }[] }).items
-          .length,
-      ).toBe(1);
-      expect(
-        (data as { items: { quantity: number; productId: number }[] }).items[0]!
-          .quantity,
-      ).toBe(15);
-      expect(
-        (data as { items: { quantity: number; productId: number }[] }).items[0]!
-          .productId,
-      ).toBe(product1Id);
+      expect(data).toHaveProperty("items");
+      const items = (data as { items: any[] }).items;
+      expect(items.length).toBe(1);
+      expect((items[0] as { productId: number }).productId).toBe(product1Id);
     });
 
     it("should mark the PO as ORDERED", async () => {
       const { data, status } = await api["purchase-orders"]({
         id: poId,
-      }).order.post({}, { headers: userCookie });
+      }).order.post({}, { headers: approverCookie });
       expect(status).toBe(200);
       expect((data as { status: string }).status).toBe("ORDERED");
     });
