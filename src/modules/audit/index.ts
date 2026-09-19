@@ -7,7 +7,7 @@ export const auditController = new Elysia({ prefix: "/audit" })
   .use(isAuthenticated)
   .get(
     "/logs",
-    async ({ user, set }) => {
+    async ({ user, query, set }) => {
       if (user.role !== "APPROVER") {
         set.status = 403;
         return {
@@ -17,9 +17,26 @@ export const auditController = new Elysia({ prefix: "/audit" })
           },
         };
       }
-      return await AuditService.getLogs();
+
+      const limit = query.limit ? parseInt(query.limit) : 20;
+      const offset = query.offset ? parseInt(query.offset) : 0;
+
+      return await AuditService.getLogs(
+        limit,
+        offset,
+        query.entityName,
+        query.action,
+      );
     },
     {
+      query: t.Optional(
+        t.Object({
+          limit: t.Optional(t.String()),
+          offset: t.Optional(t.String()),
+          entityName: t.Optional(t.String()),
+          action: t.Optional(t.String()),
+        }),
+      ),
       response: {
         200: auditLogListResponseDto,
         403: t.Object({
@@ -28,9 +45,9 @@ export const auditController = new Elysia({ prefix: "/audit" })
       },
       detail: {
         tags: ["Audit Trail"],
-        summary: "Get all audit logs",
+        summary: "Get audit logs",
         description:
-          "Retrieves a history of critical actions performed in the system.",
+          "Retrieves a paginated history of critical actions. Filter by entity type (e.g. 'purchase_requests') or action (e.g. 'APPROVE', 'SUBMIT').",
       },
     },
   );
