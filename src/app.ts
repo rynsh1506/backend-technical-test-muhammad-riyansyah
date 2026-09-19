@@ -26,7 +26,7 @@ export const app = new Elysia()
       documentation: {
         info: {
           title: "Backend Technical Test API",
-          version: "1.0.0",
+          version: "1.0.3",
           description:
             "API Documentation for Master Data and Purchase Request System",
         },
