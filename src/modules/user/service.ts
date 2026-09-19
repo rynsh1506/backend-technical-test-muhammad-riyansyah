@@ -1,6 +1,6 @@
 import { eq, desc, ilike, or } from "drizzle-orm";
 import { db } from "@/utils/db";
-import { users } from "@/modules/auth/entities/users.schema";
+import { users } from "@/modules/user/entities/users.schema";
 import { status } from "@/utils/http";
 
 export class UserService {

@@ -1,4 +1,4 @@
-import { users } from "@/modules/auth/entities/users.schema";
+import { users } from "@/modules/user/entities/users.schema";
 import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
