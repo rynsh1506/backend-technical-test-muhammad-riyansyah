@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import { PurchaseOrderService } from "@/modules/purchase-order/service";
-import { purchaseOrderCreateDto } from "@/modules/purchase-order/dto";
+import { purchaseOrderCreateDto } from "@/modules/purchase-order/model";
 import { isAuthenticated } from "@/utils/auth";
 import { status } from "elysia";
 import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";

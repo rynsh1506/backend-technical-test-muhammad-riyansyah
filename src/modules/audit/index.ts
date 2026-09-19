@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { AuditService } from "@/modules/audit/service";
 import { isAuthenticated } from "@/utils/auth";
-import { auditLogListResponseDto } from "@/modules/audit/dto";
+import { auditLogListResponseDto } from "@/modules/audit/model";
 
 export const auditController = new Elysia({ prefix: "/audit" })
   .use(isAuthenticated)

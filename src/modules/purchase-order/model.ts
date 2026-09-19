@@ -8,9 +8,12 @@ import {
   check,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { purchaseRequests } from "@/entities/purchase-request.schema";
-import { suppliers } from "@/entities/supplier.schema";
-import { products } from "@/entities/product.schema";
+import { purchaseRequests } from "@/modules/purchase-request/model";
+import { suppliers } from "@/modules/supplier/model";
+import { products } from "@/modules/product/model";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
+import { t } from "elysia";
+import { spread } from "@/utils/drizzle";
 
 /**
  * ==========================================
@@ -59,3 +62,29 @@ export const purchaseOrderItems = pgTable(
   },
   (table) => [check("po_item_quantity_check", sql`${table.quantity} > 0`)],
 );
+
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
+export const insertPurchaseOrderSchema = createInsertSchema(purchaseOrders);
+export const selectPurchaseOrderSchema = createSelectSchema(purchaseOrders);
+export const insertPurchaseOrderItemSchema =
+  createInsertSchema(purchaseOrderItems);
+export const selectPurchaseOrderItemSchema =
+  createSelectSchema(purchaseOrderItems);
+
+const poInsert = spread(purchaseOrders, "insert");
+
+/**
+ * ==========================================
+ * 3. API DTOs (Elysia TypeBox)
+ * ==========================================
+ * Data Transfer Objects for API request/response validation.
+ */
+export const purchaseOrderCreateDto = t.Object({
+  purchaseRequestId: poInsert.purchaseRequestId,
+  supplierId: poInsert.supplierId,
+});

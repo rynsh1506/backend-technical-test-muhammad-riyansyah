@@ -1,12 +1,21 @@
 import { db } from "@/utils/db";
-import { goodsReceipts, goodsReceiptItems } from "@/entities/goods-receipt.schema";
-import { purchaseOrders, purchaseOrderItems } from "@/entities/purchase-order.schema";
-import { inventoryBalances, inventoryMovements } from "@/entities/inventory.schema";
-import { auditLogs } from "@/entities/audit.schema";
+import {
+  goodsReceipts,
+  goodsReceiptItems,
+} from "@/modules/goods-receipt/model";
+import {
+  purchaseOrders,
+  purchaseOrderItems,
+} from "@/modules/purchase-order/model";
+import {
+  inventoryBalances,
+  inventoryMovements,
+} from "@/modules/inventory/model";
+import { auditLogs } from "@/modules/audit/model";
 import { eq, sql } from "drizzle-orm";
 import { status as elysiaStatus } from "elysia";
 import { generateDocumentNumber } from "@/utils/generator";
-import { purchaseRequests } from "@/entities/purchase-request.schema";
+import { purchaseRequests } from "@/modules/purchase-request/model";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
