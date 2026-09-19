@@ -6,6 +6,7 @@ const api = treaty(app);
 
 /**
  * End-to-end test suite for the Product module.
+ * Verifies validation protections, unauthenticated access blocks, and CRUD operations.
  */
 describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
   let validCookie: string = "";
