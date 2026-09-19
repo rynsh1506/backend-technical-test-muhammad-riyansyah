@@ -1,17 +1,10 @@
 import {
   pgTable,
-  pgEnum,
   serial,
   varchar,
   timestamp,
-  integer,
   boolean,
-  unique,
-  check,
-  text,
-  jsonb,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const suppliers = pgTable("suppliers", {
   id: serial("id").primaryKey(),
