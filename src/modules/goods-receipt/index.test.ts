@@ -18,7 +18,6 @@ describe("Goods Receipt Module", () => {
   let poId: number;
 
   beforeAll(async () => {
-    // 1. Setup Auth
     const { response: userRes } = await api.auth.login.post({
       username: "staff_user",
       password: "password123",
@@ -36,7 +35,6 @@ describe("Goods Receipt Module", () => {
 
     const randomSuffix = Math.floor(Math.random() * 1000000);
 
-    // 2. Setup Master Data
     const wh = await api.warehouses.post(
       { code: `WH-GR-${randomSuffix}`, name: "GR Test WH", location: "Loc" },
       { headers: userCookie },
@@ -55,7 +53,6 @@ describe("Goods Receipt Module", () => {
     );
     product1Id = (prod1.data as any).id;
 
-    // 3. Create PR and PO
     const prDraft = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
@@ -82,7 +79,6 @@ describe("Goods Receipt Module", () => {
     );
     poId = (poRes.data as any).id;
 
-    // Mark PO as ORDERED
     await api["purchase-orders"]({ id: poId }).order.post(
       {},
       { headers: userCookie },
@@ -102,7 +98,6 @@ describe("Goods Receipt Module", () => {
       expect(status).toBe(200);
       expect((data as any).grNumber).toContain("GR-");
 
-      // Verify PO status is PARTIALLY_RECEIVED
       const poRes = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
@@ -110,7 +105,6 @@ describe("Goods Receipt Module", () => {
     });
 
     it("should prevent receiving more quantity than ordered", async () => {
-      // 60 already received, 40 remaining. Try to receive 50.
       const { status } = await api["goods-receipts"].post(
         {
           purchaseOrderId: poId,
@@ -123,7 +117,6 @@ describe("Goods Receipt Module", () => {
     });
 
     it("should allow completing the goods receipt and mark PO as RECEIVED", async () => {
-      // Receive the remaining 40
       const { status } = await api["goods-receipts"].post(
         {
           purchaseOrderId: poId,
@@ -134,7 +127,6 @@ describe("Goods Receipt Module", () => {
 
       expect(status).toBe(200);
 
-      // Verify PO status is RECEIVED
       const poRes = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
