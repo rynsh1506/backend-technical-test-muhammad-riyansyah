@@ -18,12 +18,12 @@ describe("Purchase Order Module", () => {
   let poId: number;
 
   beforeAll(async () => {
-    // 1. Setup Auth
     const { response: userRes } = await api.auth.login.post({
       username: "staff_user",
       password: "password123",
     });
-    const userCookieStr = userRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
+    const userCookieStr =
+      userRes?.headers.get("Set-Cookie")?.split(";")[0] ?? "";
     userCookie = { Cookie: userCookieStr };
 
     const { response: appRes } = await api.auth.login.post({
@@ -35,7 +35,6 @@ describe("Purchase Order Module", () => {
 
     const randomSuffix = Math.floor(Math.random() * 1000000);
 
-    // 2. Setup Master Data
     const wh = await api.warehouses.post(
       { code: `WH-PO-${randomSuffix}`, name: "PO Test WH", location: "PO Loc" },
       { headers: userCookie },
@@ -54,7 +53,6 @@ describe("Purchase Order Module", () => {
     );
     product1Id = (prod1.data as any).id;
 
-    // 3. Create a DRAFT PR and add items
     const prDraft = await api["purchase-requests"].post(
       { warehouseId },
       { headers: userCookie },
@@ -69,7 +67,6 @@ describe("Purchase Order Module", () => {
 
   describe("Creation Logic", () => {
     it("should prevent creating PO if PR is not APPROVED", async () => {
-      // PR is currently DRAFT
       const { status } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
         { headers: userCookie },
@@ -78,24 +75,21 @@ describe("Purchase Order Module", () => {
     });
 
     it("should allow creating PO after PR is APPROVED", async () => {
-      // Submit PR
       await api["purchase-requests"]({ id: prId }).submit.post(
         {},
         { headers: userCookie },
       );
 
-      // Approve PR
       await api["purchase-requests"]({ id: prId }).approve.post(
         {},
         { headers: approverCookie },
       );
 
-      // Create PO
       const { data, status } = await api["purchase-orders"].post(
         { purchaseRequestId: prId, supplierId },
         { headers: userCookie },
       );
-      
+
       expect(status).toBe(200);
       expect((data as any).status).toBe("PENDING");
       expect((data as any).poNumber).toContain("PO-");
@@ -116,7 +110,7 @@ describe("Purchase Order Module", () => {
       const { data, status } = await api["purchase-orders"]({ id: poId }).get({
         headers: userCookie,
       });
-      
+
       expect(status).toBe(200);
       expect((data as any).items.length).toBe(1);
       expect((data as any).items[0].quantity).toBe(15);
@@ -124,10 +118,9 @@ describe("Purchase Order Module", () => {
     });
 
     it("should mark the PO as ORDERED", async () => {
-      const { data, status } = await api["purchase-orders"]({ id: poId }).order.post(
-        {},
-        { headers: userCookie },
-      );
+      const { data, status } = await api["purchase-orders"]({
+        id: poId,
+      }).order.post({}, { headers: userCookie });
       expect(status).toBe(200);
       expect((data as any).status).toBe("ORDERED");
     });

@@ -25,7 +25,6 @@ export abstract class PurchaseOrderService {
    */
   static async createFromPr(prId: number, supplierId: number, userId: number) {
     return await db.transaction(async (tx) => {
-      // Check PR
       const prData = await tx
         .select()
         .from(purchaseRequests)
@@ -48,7 +47,6 @@ export abstract class PurchaseOrderService {
         });
       }
 
-      // Check Supplier
       const supplierData = await tx
         .select()
         .from(suppliers)
@@ -60,7 +58,6 @@ export abstract class PurchaseOrderService {
         });
       }
 
-      // Check existing PO for this PR
       const existingPo = await tx
         .select()
         .from(purchaseOrders)
@@ -75,7 +72,6 @@ export abstract class PurchaseOrderService {
         });
       }
 
-      // Fetch PR items
       const prItems = await tx
         .select()
         .from(purchaseRequestItems)
@@ -90,7 +86,6 @@ export abstract class PurchaseOrderService {
         });
       }
 
-      // Create PO
       const poNumber = await generateDocumentNumber(
         purchaseOrders,
         purchaseOrders.poNumber,
@@ -106,7 +101,6 @@ export abstract class PurchaseOrderService {
         })
         .returning();
 
-      // Insert PO Items matching PR Items
       const poItemsData = prItems.map((item) => ({
         purchaseOrderId: newPo!.id,
         productId: item.productId,
