@@ -1,3 +1,4 @@
+import { t } from "elysia";
 import {
   pgTable,
   serial,
@@ -72,4 +73,11 @@ export const selectInventoryMovementSchema =
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-// (No API DTOs defined yet for this module)
+export const inventoryBalanceResponseDto = t.Intersect([
+  t.Pick(selectInventoryBalanceSchema, ["warehouseId", "productId", "stock"]),
+  t.Partial(t.Pick(selectInventoryBalanceSchema, ["id", "updatedAt"])),
+]);
+export const inventoryMovementResponseDto = selectInventoryMovementSchema;
+export const inventoryMovementListResponseDto = t.Array(
+  selectInventoryMovementSchema,
+);
