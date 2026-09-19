@@ -54,5 +54,17 @@ export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
  * ==========================================
  * Data Transfer Objects for API request/response validation.
  */
-export const auditLogResponseDto = selectAuditLogSchema;
-export const auditLogListResponseDto = t.Array(selectAuditLogSchema);
+export const auditLogResponseDto = t.Object({
+  id: t.Number(),
+  entityName: t.String(),
+  entityId: t.Number(),
+  action: t.String(),
+  changes: t.Unknown(),
+  createdAt: t.Date(),
+  performedBy: t.Object({
+    id: t.Number(),
+    username: t.String(),
+    role: t.String(),
+  }),
+});
+export const auditLogListResponseDto = t.Array(auditLogResponseDto);

@@ -26,7 +26,7 @@ export abstract class InventoryService {
     if (level.length === 0) {
       return { warehouseId, productId, stock: 0 };
     }
-    return level[0];
+    return level[0]!;
   }
 
   /**

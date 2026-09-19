@@ -52,13 +52,13 @@ export const inventoryMovements = pgTable("inventory_movements", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+/**
+ * ==========================================
+ * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * ==========================================
+ * Auto-generated TypeBox schemas directly from the database tables.
+ */
 export const insertInventoryBalanceSchema =
-  /**
-   * ==========================================
-   * 2. BASE SCHEMAS (Drizzle TypeBox)
-   * ==========================================
-   * Auto-generated TypeBox schemas directly from the database tables.
-   */
   createInsertSchema(inventoryBalances);
 export const selectInventoryBalanceSchema =
   createSelectSchema(inventoryBalances);
