@@ -1,3 +1,4 @@
+import { createPaginatedDto } from "@/utils/dto";
 import {
   pgTable,
   serial,
@@ -48,12 +49,4 @@ export const supplierUpdateDto = t.Partial(
   t.Omit(insertSupplierSchema, ["id", "createdAt", "updatedAt"]),
 );
 export const supplierResponseDto = selectSupplierSchema;
-export const supplierListResponseDto = t.Object({
-  data: t.Array(selectSupplierSchema),
-  meta: t.Object({
-    page: t.Number(),
-    limit: t.Number(),
-    totalPages: t.Number(),
-    totalRecords: t.Number(),
-  }),
-});
+export const supplierListResponseDto = createPaginatedDto(selectSupplierSchema);
