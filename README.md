@@ -375,3 +375,29 @@ bun test
 
 Buka tautan berikut di _browser_ Anda untuk mengakses Dokumentasi API secara interaktif:
 👉 **[http://localhost:3000/openapi](http://localhost:3000/openapi)**
+
+### 📖 End-to-End API Flow Example
+
+To simulate a complete procurement lifecycle, follow these steps in your API Client (like Insomnia/Postman) or via the [Swagger UI](http://localhost:3000/swagger):
+
+1. **Login as USER**
+   - \`POST /auth/login\` with \`{ "username": "staff_user", "password": "password123" }\`
+   - _Extract the HTTP-only cookie._
+2. **Create a Purchase Request (Draft)**
+   - \`POST /purchase-requests\` (Returns PR ID, e.g., \`1\`)
+3. **Add Items to PR**
+   - \`POST /purchase-requests/1/items\` with \`{ "productId": 1, "quantity": 100 }\`
+4. **Submit PR for Approval**
+   - \`POST /purchase-requests/1/submit\`
+5. **Login as APPROVER**
+   - \`POST /auth/login\` with \`{ "username": "manager_user", "password": "password123" }\`
+6. **Approve PR**
+   - \`POST /purchase-requests/1/approve\`
+7. **Create Purchase Order**
+   - \`POST /purchase-orders\` with \`{ "purchaseRequestId": 1, "supplierId": 1 }\` (Returns PO ID, e.g., \`1\`)
+8. **Mark PO as Ordered**
+   - \`POST /purchase-orders/1/order\`
+9. **Receive Goods (Partial/Full)**
+   - \`POST /goods-receipts\` with \`{ "purchaseOrderId": 1, "items": [{ "productId": 1, "quantity": 100 }] }\`
+10. **Verify Inventory**
+    - \`GET /inventory/levels?warehouseId=1&productId=1\` -> Should now show stock increased by 100!

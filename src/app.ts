@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { openapi } from "@elysia/openapi";
+import { swagger } from "@elysiajs/swagger";
 import { cors } from "@elysiajs/cors";
 import { logger } from "@/utils/logger";
 import { authController } from "@/modules/auth";
@@ -20,7 +20,7 @@ export const app = new Elysia()
   .use(cors())
 
   .use(
-    openapi({
+    swagger({
       documentation: {
         info: {
           title: "Backend Technical Test API",

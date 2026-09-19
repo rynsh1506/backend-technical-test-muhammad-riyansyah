@@ -100,7 +100,7 @@ export abstract class PurchaseOrderService {
           poNumber,
           purchaseRequestId: prId,
           supplierId,
-          status: "PENDING",
+          status: "DRAFT",
         })
         .returning();
 
@@ -139,11 +139,7 @@ export abstract class PurchaseOrderService {
       whereCondition = eq(
         purchaseOrders.status,
         filterStatus as
-          | "PENDING"
-          | "ORDERED"
-          | "PARTIALLY_RECEIVED"
-          | "RECEIVED"
-          | "CANCELLED",
+          "DRAFT" | "ORDERED" | "PARTIALLY_RECEIVED" | "RECEIVED" | "CANCELLED",
       );
     }
 
@@ -206,7 +202,7 @@ export abstract class PurchaseOrderService {
    * @param poId - The purchase order ID.
    * @returns The updated purchase order.
    * @throws {404} If the purchase order is not found.
-   * @throws {400} If the request is not in PENDING status.
+   * @throws {400} If the request is not in DRAFT status.
    */
   static async markAsOrdered(poId: number, userId: number) {
     const poData = await db
@@ -221,11 +217,11 @@ export abstract class PurchaseOrderService {
     }
 
     const po = poData[0]!;
-    if (po.status !== "PENDING") {
+    if (po.status !== "DRAFT") {
       throw status(400, {
         error: {
           code: "INVALID_STATUS",
-          message: "Only PENDING Purchase Order can be marked as ORDERED",
+          message: "Only DRAFT Purchase Order can be marked as ORDERED",
         },
       });
     }
