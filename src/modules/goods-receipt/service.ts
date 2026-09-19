@@ -23,6 +23,13 @@ export abstract class GoodsReceiptService {
   /**
    * Creates a Goods Receipt (GR) for a Purchase Order.
    * Handles partial receipts, validates quantities, updates inventory, and updates PO status.
+   *
+   * @param poId - The ID of the purchase order being received.
+   * @param userId - The ID of the user performing the receipt.
+   * @param items - An array of incoming items with their product IDs and quantities.
+   * @returns The newly created goods receipt record.
+   * @throws {404} If the purchase order is not found.
+   * @throws {400} If the purchase order status is invalid or if there is an over-receipt attempt.
    */
   static async create(
     poId: number,
@@ -97,6 +104,10 @@ export abstract class GoodsReceiptService {
 
   /**
    * Retrieves the details of a specific Goods Receipt including its items.
+   *
+   * @param grId - The ID of the goods receipt to retrieve.
+   * @returns The goods receipt record populated with its items array.
+   * @throws {404} If the goods receipt is not found.
    */
   static async getDetail(grId: number) {
     const grList = await db
@@ -119,6 +130,15 @@ export abstract class GoodsReceiptService {
     return { ...grList[0]!, items };
   }
 
+  /**
+   * Retrieves a purchase order and validates if it can receive goods.
+   *
+   * @param tx - The database transaction context.
+   * @param poId - The ID of the purchase order.
+   * @returns The valid purchase order record.
+   * @throws {404} If the purchase order does not exist.
+   * @throws {400} If the purchase order status is not ORDERED or PARTIALLY_RECEIVED.
+   */
   private static async getValidPurchaseOrder(tx: Tx, poId: number) {
     const poList = await tx
       .select()
@@ -144,6 +164,13 @@ export abstract class GoodsReceiptService {
     return po;
   }
 
+  /**
+   * Retrieves all items belonging to a purchase order.
+   *
+   * @param tx - The database transaction context.
+   * @param poId - The ID of the purchase order.
+   * @returns An array of purchase order items.
+   */
   private static async getPurchaseOrderItems(tx: Tx, poId: number) {
     return await tx
       .select()
@@ -151,6 +178,13 @@ export abstract class GoodsReceiptService {
       .where(eq(purchaseOrderItems.purchaseOrderId, poId));
   }
 
+  /**
+   * Calculates the total quantities of items previously received for a purchase order.
+   *
+   * @param tx - The database transaction context.
+   * @param poId - The ID of the purchase order.
+   * @returns A map of product IDs to their total previously received quantities.
+   */
   private static async getPreviousReceiptQuantities(
     tx: Tx,
     poId: number,
@@ -173,6 +207,12 @@ export abstract class GoodsReceiptService {
     );
   }
 
+  /**
+   * Groups a list of incoming items by product ID and sums their quantities.
+   *
+   * @param items - An array of incoming item payloads.
+   * @returns A map of product IDs to their total incoming quantities.
+   */
   private static groupIncomingItems(
     items: { productId: number; quantity: number }[],
   ): Map<number, number> {
@@ -186,6 +226,16 @@ export abstract class GoodsReceiptService {
     return grouped;
   }
 
+  /**
+   * Validates that incoming quantities do not exceed the remaining requested quantities on the PO.
+   *
+   * @param groupedIncoming - A map of incoming product IDs to their total quantities.
+   * @param poItemsList - The original list of items on the purchase order.
+   * @param receivedMap - A map of previously received product quantities.
+   * @param poNumber - The purchase order string identifier for error messaging.
+   * @returns void
+   * @throws {400} If a product is not on the PO, or if the incoming quantity exceeds the remainder.
+   */
   private static validateIncomingQuantities(
     groupedIncoming: Map<number, number>,
     poItemsList: { productId: number; quantity: number }[],
@@ -221,6 +271,14 @@ export abstract class GoodsReceiptService {
     }
   }
 
+  /**
+   * Checks whether the current receipt fullfills the entire purchase order.
+   *
+   * @param poItemsList - The original list of items on the purchase order.
+   * @param receivedMap - A map of previously received product quantities.
+   * @param groupedIncoming - A map of current incoming product quantities.
+   * @returns True if all PO items have been completely received, false otherwise.
+   */
   private static checkIfFullyReceived(
     poItemsList: { productId: number; quantity: number }[],
     receivedMap: Map<number, number>,
@@ -238,6 +296,16 @@ export abstract class GoodsReceiptService {
     return true;
   }
 
+  /**
+   * Processes the insertion of goods receipt items and records inventory movements/balances.
+   *
+   * @param tx - The database transaction context.
+   * @param purchaseRequestId - The ID of the underlying purchase request to resolve the warehouse.
+   * @param grId - The ID of the newly created goods receipt.
+   * @param grNumber - The goods receipt string identifier for inventory movement reference.
+   * @param groupedIncoming - A map of incoming product IDs to their quantities.
+   * @returns void
+   */
   private static async processInventoryUpdates(
     tx: Tx,
     purchaseRequestId: number,
