@@ -1,7 +1,7 @@
 import { eq, ilike, or, sql, desc } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { products } from "@/entities/product.schema";
+import { products } from "@/modules/product/entities/products.schema";
 import { productCreateDto, productUpdateDto } from "@/modules/product/dto";
 import type { Static } from "elysia";
 

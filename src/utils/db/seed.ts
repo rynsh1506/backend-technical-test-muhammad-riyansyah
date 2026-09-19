@@ -1,8 +1,8 @@
 import { db, queryClient } from "@/utils/db";
-import { users } from "@/entities/auth.schema";
-import { products } from "@/entities/product.schema";
-import { suppliers } from "@/entities/supplier.schema";
-import { warehouses } from "@/entities/warehouse.schema";
+import { users } from "@/modules/auth/entities/users.schema";
+import { products } from "@/modules/product/entities/products.schema";
+import { suppliers } from "@/modules/supplier/entities/suppliers.schema";
+import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 
 /**
  * Executes the database seeding process.

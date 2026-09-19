@@ -1,10 +1,8 @@
 import { t } from "elysia";
 import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 import { spread } from "@/utils/drizzle";
-import {
-  inventoryBalances,
-  inventoryMovements,
-} from "@/entities/inventory.schema";
+import { inventoryBalances } from "./entities/inventory_balances.schema";
+import { inventoryMovements } from "./entities/inventory_movements.schema";
 
 /**
  * ==========================================

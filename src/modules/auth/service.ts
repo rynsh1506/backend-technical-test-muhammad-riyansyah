@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { status } from "elysia";
 import { db } from "@/utils/db";
-import { users } from "@/entities/auth.schema";
+import { users } from "@/modules/auth/entities/users.schema";
 import { loginBodyDto } from "@/modules/auth/dto";
 import type { Static } from "elysia";
 
