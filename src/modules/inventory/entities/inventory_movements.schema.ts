@@ -1,17 +1,10 @@
 import {
   pgTable,
-  pgEnum,
   serial,
   varchar,
   timestamp,
   integer,
-  boolean,
-  unique,
-  check,
-  text,
-  jsonb,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 import { products } from "@/modules/product/entities/products.schema";
 
