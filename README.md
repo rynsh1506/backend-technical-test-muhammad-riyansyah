@@ -213,7 +213,7 @@ erDiagram
 
 ### Penjelasan Domain Data:
 
-1. **Master Data:** `users`, `products`, `suppliers`, `warehouses`. Menyimpan data induk yang menjadi referensi transaksi.
+1. **Master Data:** `users`, `products`, `suppliers`, `warehouses`. Menyimpan data induk yang menjadi referensi transaksi. (Terdapat API khusus untuk mencari ID `users` yang terdaftar).
 2. **Procurement (Pengadaan):** `purchase_requests` & `purchase_orders`. Mencatat alur permintaan dari internal hingga pemesanan resmi ke pihak _Supplier_. Keduanya memiliki tabel _Items_ masing-masing untuk mencatat detil produk.
 3. **Goods Receipt (Penerimaan):** `goods_receipts`. Mencatat bukti serah terima barang secara fisik dari _Supplier_.
 4. **Inventory (Persediaan):** `inventory_balances` (total stok saat ini) & `inventory_movements` (buku besar/histori keluar-masuk barang).
