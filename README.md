@@ -384,6 +384,12 @@ _(Catatan: Jika menggunakan Docker, Anda bisa menjalankan seeder ke dalam contai
 
 Menjalankan _Integration & E2E Type-Safe Test_ (termasuk skenario validasi, penolakan auth, dan flow success):
 
+Jika menggunakan Docker (Direkomendasikan agar tidak perlu install Bun di lokal):
+```bash
+docker compose exec app bun test
+```
+
+Jika menjalankan secara lokal:
 ```bash
 bun test
 ```
