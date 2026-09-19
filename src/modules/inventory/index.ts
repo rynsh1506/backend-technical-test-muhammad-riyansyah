@@ -12,14 +12,14 @@ export const inventoryController = new Elysia({ prefix: "/inventory" })
     "/levels",
     async ({ query }) => {
       return await InventoryService.getLevel(
-        Number(query.warehouseId),
-        Number(query.productId),
+        query.warehouseId,
+        query.productId,
       );
     },
     {
       query: t.Object({
-        warehouseId: t.Numeric(),
-        productId: t.Numeric(),
+        warehouseId: t.String(),
+        productId: t.String(),
       }),
       response: { 200: inventoryBalanceResponseDto },
       detail: { tags: ["Inventory"], summary: "Get Inventory Level" },
@@ -29,14 +29,14 @@ export const inventoryController = new Elysia({ prefix: "/inventory" })
     "/movements",
     async ({ query }) => {
       return await InventoryService.getMovements(
-        Number(query.warehouseId),
-        Number(query.productId),
+        query.warehouseId,
+        query.productId,
       );
     },
     {
       query: t.Object({
-        warehouseId: t.Numeric(),
-        productId: t.Numeric(),
+        warehouseId: t.String(),
+        productId: t.String(),
       }),
       response: { 200: inventoryMovementListResponseDto },
       detail: { tags: ["Inventory"], summary: "Get Inventory Movements" },

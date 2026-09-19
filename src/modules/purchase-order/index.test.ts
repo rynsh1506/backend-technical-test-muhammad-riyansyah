@@ -11,12 +11,12 @@ const api = treaty(app);
 describe("Purchase Order Module", () => {
   let userCookie: Record<string, string> = {};
   let approverCookie: Record<string, string> = {};
-  let warehouseId: number;
-  let supplierId: number;
-  let inactiveSupplierId: number;
-  let product1Id: number;
-  let prId: number;
-  let poId: number;
+  let warehouseId: string;
+  let supplierId: string;
+  let inactiveSupplierId: string;
+  let product1Id: string;
+  let prId: string;
+  let poId: string;
 
   beforeAll(async () => {
     const { response: userRes } = await api.auth.login.post({
@@ -41,25 +41,25 @@ describe("Purchase Order Module", () => {
       { code: `WH-PO-${randomSuffix}`, name: "PO WH", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (whRes.data as { id: number }).id;
+    warehouseId = (whRes.data as { id: string }).id;
 
     const prodRes = await api.products.post(
       { sku: `PROD-PO-${randomSuffix}`, name: "PO Prod", unit: "PCS" },
       { headers: userCookie },
     );
-    product1Id = (prodRes.data as { id: number }).id;
+    product1Id = (prodRes.data as { id: string }).id;
 
     const suppRes = await api.suppliers.post(
       { name: "PO Supp", email: "po@test.com", phone: "123" },
       { headers: userCookie },
     );
-    supplierId = (suppRes.data as { id: number }).id;
+    supplierId = (suppRes.data as { id: string }).id;
 
     const suppInactiveRes = await api.suppliers.post(
       { name: "Inactive Supplier", email: "off@test.com", phone: "123" },
       { headers: userCookie },
     );
-    inactiveSupplierId = (suppInactiveRes.data as { id: number }).id;
+    inactiveSupplierId = (suppInactiveRes.data as { id: string }).id;
     await api
       .suppliers({ id: inactiveSupplierId })
       .put({ isActive: false }, { headers: userCookie });
@@ -68,7 +68,7 @@ describe("Purchase Order Module", () => {
       { warehouseId },
       { headers: userCookie },
     );
-    prId = (prRes.data as { id: number }).id;
+    prId = (prRes.data as { id: string }).id;
 
     await api["purchase-requests"]({ id: prId }).items.post(
       { productId: product1Id, quantity: 10 },
@@ -117,7 +117,7 @@ describe("Purchase Order Module", () => {
       expect(status).toBe(200);
       expect(data).toHaveProperty("id");
       expect(data).toHaveProperty("poNumber");
-      poId = (data as { id: number }).id;
+      poId = (data as { id: string }).id;
     });
 
     it("should prevent creating multiple POs for the same PR", async () => {
@@ -139,7 +139,7 @@ describe("Purchase Order Module", () => {
       expect(data).toHaveProperty("items");
       const items = (data as { items: unknown[] }).items;
       expect(items.length).toBe(1);
-      expect((items[0] as { productId: number }).productId).toBe(product1Id);
+      expect((items[0] as { productId: string }).productId).toBe(product1Id);
     });
 
     it("should mark the PO as ORDERED", async () => {

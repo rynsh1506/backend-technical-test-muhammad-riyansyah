@@ -30,7 +30,7 @@ export const isAuthenticated = (app: Elysia) =>
       !("id" in payload) ||
       !("role" in payload) ||
       !("username" in payload) ||
-      typeof payload.id !== "number" ||
+      typeof payload.id !== "string" ||
       typeof payload.role !== "string" ||
       typeof payload.username !== "string"
     ) {

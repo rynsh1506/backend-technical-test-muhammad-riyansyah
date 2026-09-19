@@ -1,13 +1,13 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
-  serial,
   varchar,
   timestamp,
   boolean,
 } from "drizzle-orm/pg-core";
 
 export const warehouses = pgTable("warehouses", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   location: varchar("location", { length: 255 }),

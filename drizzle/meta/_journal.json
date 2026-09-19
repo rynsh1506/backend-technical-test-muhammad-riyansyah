@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1789563820399,
-      "tag": "0000_sharp_micromax",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1789573091113,
-      "tag": "0001_friendly_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1789666982823,
-      "tag": "0002_fix_user_role_default",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1789667033415,
-      "tag": "0003_use_native_pg_enum_for_roles",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1789672475512,
-      "tag": "0004_mysterious_nehzno",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1789672508197,
-      "tag": "0005_steady_maginty",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1789741898653,
-      "tag": "0006_add_purchase_orders",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1789742994529,
-      "tag": "0007_add_inventory_and_goods_receipt",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1789786589024,
-      "tag": "0008_fast_captain_flint",
+      "when": 1789825167922,
+      "tag": "0000_normal_omega_red",
       "breakpoints": true
     }
   ]

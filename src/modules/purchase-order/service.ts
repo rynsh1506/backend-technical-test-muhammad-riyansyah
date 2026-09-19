@@ -19,7 +19,7 @@ export abstract class PurchaseOrderService {
    * @throws {400} If PR is not APPROVED or PO already exists.
    * @throws {404} If PR or Supplier is not found.
    */
-  static async createFromPr(prId: number, supplierId: number, userId: number) {
+  static async createFromPr(prId: string, supplierId: string, userId: string) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -172,7 +172,7 @@ export abstract class PurchaseOrderService {
    * @returns The purchase order and its items.
    * @throws {404} If the purchase order is not found.
    */
-  static async getDetail(poId: number) {
+  static async getDetail(poId: string) {
     const poData = await db
       .select()
       .from(purchaseOrders)
@@ -200,7 +200,7 @@ export abstract class PurchaseOrderService {
    * @throws {404} If the purchase order is not found.
    * @throws {400} If the request is not in DRAFT status.
    */
-  static async markAsOrdered(poId: number, userId: number) {
+  static async markAsOrdered(poId: string, userId: string) {
     const poData = await db
       .select()
       .from(purchaseOrders)

@@ -67,7 +67,7 @@ export const purchaseOrderController = new Elysia({
   .get(
     "/:id",
     async ({ params: { id } }) => {
-      return await PurchaseOrderService.getDetail(Number(id));
+      return await PurchaseOrderService.getDetail(id);
     },
     {
       detail: { tags: ["Purchase Order"], summary: "Get PO Details" },
@@ -87,7 +87,7 @@ export const purchaseOrderController = new Elysia({
       await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const result = await PurchaseOrderService.markAsOrdered(
-        Number(id),
+        id,
         user.id,
       );
 

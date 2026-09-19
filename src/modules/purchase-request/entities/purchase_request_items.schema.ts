@@ -1,4 +1,5 @@
-import { pgTable, serial, integer, unique, check } from "drizzle-orm/pg-core";
+import { createId } from "@paralleldrive/cuid2";
+import { pgTable, integer, unique, check , varchar} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { products } from "@/modules/product/entities/products.schema";
 import { purchaseRequests } from "@/modules/purchase-request/entities/purchase_requests.schema";
@@ -6,11 +7,11 @@ import { purchaseRequests } from "@/modules/purchase-request/entities/purchase_r
 export const purchaseRequestItems = pgTable(
   "purchase_request_items",
   {
-    id: serial("id").primaryKey(),
-    purchaseRequestId: integer("purchase_request_id")
+    id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
+    purchaseRequestId: varchar("purchase_request_id", { length: 24 })
       .references(() => purchaseRequests.id, { onDelete: "cascade" })
       .notNull(),
-    productId: integer("product_id")
+    productId: varchar("product_id", { length: 24 })
       .references(() => products.id)
       .notNull(),
     quantity: integer("quantity").notNull(),

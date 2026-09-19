@@ -26,9 +26,9 @@ export abstract class GoodsReceiptService {
    * @throws {400} If the purchase order status is invalid or if there is an over-receipt attempt.
    */
   static async create(
-    poId: number,
-    userId: number,
-    items: { productId: number; quantity: number }[],
+    poId: string,
+    userId: string,
+    items: { productId: string; quantity: number }[],
   ) {
     return await db.transaction(async (tx) => {
       const po = await this.getValidPurchaseOrder(tx, poId);
@@ -103,7 +103,7 @@ export abstract class GoodsReceiptService {
    * @returns The goods receipt record populated with its items array.
    * @throws {404} If the goods receipt is not found.
    */
-  static async getDetail(grId: number) {
+  static async getDetail(grId: string) {
     const grList = await db
       .select()
       .from(goodsReceipts)
@@ -133,7 +133,7 @@ export abstract class GoodsReceiptService {
    * @throws {404} If the purchase order does not exist.
    * @throws {400} If the purchase order status is not ORDERED or PARTIALLY_RECEIVED.
    */
-  private static async getValidPurchaseOrder(tx: Tx, poId: number) {
+  private static async getValidPurchaseOrder(tx: Tx, poId: string) {
     const poList = await tx
       .select()
       .from(purchaseOrders)
@@ -165,7 +165,7 @@ export abstract class GoodsReceiptService {
    * @param poId - The ID of the purchase order.
    * @returns An array of purchase order items.
    */
-  private static async getPurchaseOrderItems(tx: Tx, poId: number) {
+  private static async getPurchaseOrderItems(tx: Tx, poId: string) {
     return await tx
       .select()
       .from(purchaseOrderItems)
@@ -181,8 +181,8 @@ export abstract class GoodsReceiptService {
    */
   private static async getPreviousReceiptQuantities(
     tx: Tx,
-    poId: number,
-  ): Promise<Map<number, number>> {
+    poId: string,
+  ): Promise<Map<string, number>> {
     const previousReceipts = await tx
       .select({
         productId: goodsReceiptItems.productId,
@@ -208,9 +208,9 @@ export abstract class GoodsReceiptService {
    * @returns A map of product IDs to their total incoming quantities.
    */
   private static groupIncomingItems(
-    items: { productId: number; quantity: number }[],
-  ): Map<number, number> {
-    const grouped = new Map<number, number>();
+    items: { productId: string; quantity: number }[],
+  ): Map<string, number> {
+    const grouped = new Map<string, number>();
     for (const item of items) {
       grouped.set(
         item.productId,
@@ -231,9 +231,9 @@ export abstract class GoodsReceiptService {
    * @throws {400} If a product is not on the PO, or if the incoming quantity exceeds the remainder.
    */
   private static validateIncomingQuantities(
-    groupedIncoming: Map<number, number>,
-    poItemsList: { productId: number; quantity: number }[],
-    receivedMap: Map<number, number>,
+    groupedIncoming: Map<string, number>,
+    poItemsList: { productId: string; quantity: number }[],
+    receivedMap: Map<string, number>,
     poNumber: string,
   ) {
     const poItemsMap = new Map(
@@ -274,9 +274,9 @@ export abstract class GoodsReceiptService {
    * @returns True if all PO items have been completely received, false otherwise.
    */
   private static checkIfFullyReceived(
-    poItemsList: { productId: number; quantity: number }[],
-    receivedMap: Map<number, number>,
-    groupedIncoming: Map<number, number>,
+    poItemsList: { productId: string; quantity: number }[],
+    receivedMap: Map<string, number>,
+    groupedIncoming: Map<string, number>,
   ): boolean {
     for (const poItem of poItemsList) {
       const previouslyReceived = receivedMap.get(poItem.productId) || 0;
@@ -302,10 +302,10 @@ export abstract class GoodsReceiptService {
    */
   private static async processInventoryUpdates(
     tx: Tx,
-    purchaseRequestId: number,
-    grId: number,
+    purchaseRequestId: string,
+    grId: string,
     grNumber: string,
-    groupedIncoming: Map<number, number>,
+    groupedIncoming: Map<string, number>,
   ) {
     const prList = await tx
       .select({ warehouseId: purchaseRequests.warehouseId })

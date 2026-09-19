@@ -1,11 +1,10 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
   pgEnum,
-  serial,
   varchar,
   timestamp,
-  integer,
-} from "drizzle-orm/pg-core";
+  } from "drizzle-orm/pg-core";
 import { users } from "@/modules/auth/entities/users.schema";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 
@@ -17,12 +16,12 @@ export const purchaseRequestStatusEnum = pgEnum("purchase_request_status", [
 ]);
 
 export const purchaseRequests = pgTable("purchase_requests", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
   requestNumber: varchar("request_number", { length: 50 }).notNull().unique(),
-  warehouseId: integer("warehouse_id")
+  warehouseId: varchar("warehouse_id", { length: 24 })
     .references(() => warehouses.id)
     .notNull(),
-  requestedBy: integer("requested_by")
+  requestedBy: varchar("requested_by", { length: 24 })
     .references(() => users.id)
     .notNull(),
   status: purchaseRequestStatusEnum("status").default("DRAFT").notNull(),

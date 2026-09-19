@@ -51,7 +51,7 @@ export const goodsReceiptController = new Elysia({
   .get(
     "/:id",
     async ({ params: { id } }) => {
-      return await GoodsReceiptService.getDetail(Number(id));
+      return await GoodsReceiptService.getDetail(id);
     },
     {
       detail: { tags: ["Goods Receipt"], summary: "Get GR Details" },

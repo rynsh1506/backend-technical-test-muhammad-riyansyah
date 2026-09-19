@@ -81,7 +81,7 @@ export abstract class WarehouseService {
    * @returns The matching warehouse record.
    * @throws {404} If no warehouse with the given ID exists.
    */
-  static async getById(id: number) {
+  static async getById(id: string) {
     const result = await db
       .select()
       .from(warehouses)
@@ -104,7 +104,7 @@ export abstract class WarehouseService {
    * @throws {404} If no warehouse with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: Static<typeof warehouseUpdateDto>) {
+  static async update(id: string, data: Static<typeof warehouseUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(warehouses)
