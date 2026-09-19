@@ -9,7 +9,7 @@ export class IdempotencyService {
    * Check if the request with this Idempotency Key has already been successfully processed.
    * If yes, return the cached response (preventing duplicate processing).
    */
-  static async check(userId: number, idempotencyKey: string | undefined) {
+  static async check(userId: string, idempotencyKey: string | undefined) {
     if (!idempotencyKey) return;
 
     const existing = await db
@@ -32,7 +32,7 @@ export class IdempotencyService {
    * if a duplicate request arrives in the future.
    */
   static async save(
-    userId: number,
+    userId: string,
     idempotencyKey: string | undefined,
     requestPath: string,
     method: string,

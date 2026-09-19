@@ -16,7 +16,7 @@ export abstract class PurchaseRequestService {
    * @param warehouseId - The warehouse ID for this purchase request.
    * @returns The newly created purchase request.
    */
-  static async createDraft(userId: number, warehouseId: number) {
+  static async createDraft(userId: string, warehouseId: string) {
     return await db.transaction(async (tx) => {
       const requestNumber = await generateDocumentNumber(
         purchaseRequests,
@@ -101,7 +101,7 @@ export abstract class PurchaseRequestService {
    * @returns The purchase request and its items.
    * @throws {404} If the purchase request is not found.
    */
-  static async getDetail(prId: number) {
+  static async getDetail(prId: string) {
     const pr = await db
       .select()
       .from(purchaseRequests)
@@ -129,7 +129,7 @@ export abstract class PurchaseRequestService {
    * @returns The updated purchase request.
    * @throws {400} If the request is not in DRAFT status.
    */
-  static async updateDraft(prId: number, warehouseId: number, userId: number) {
+  static async updateDraft(prId: string, warehouseId: string, userId: string) {
     const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
       throw status(400, {
@@ -180,10 +180,10 @@ export abstract class PurchaseRequestService {
    * @throws {400} If the request is not in DRAFT status or product is duplicate.
    */
   static async addItem(
-    prId: number,
-    productId: number,
+    prId: string,
+    productId: string,
     quantity: number,
-    userId: number,
+    userId: string,
   ) {
     const pr = await this.getDetail(prId);
     if (pr.status !== "DRAFT") {
@@ -252,7 +252,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
    */
-  static async updateItem(itemId: number, quantity: number, userId: number) {
+  static async updateItem(itemId: string, quantity: number, userId: string) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -299,7 +299,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the item is not found.
    * @throws {400} If the purchase request is not in DRAFT status.
    */
-  static async removeItem(itemId: number, userId: number) {
+  static async removeItem(itemId: string, userId: string) {
     const items = await db
       .select()
       .from(purchaseRequestItems)
@@ -345,7 +345,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the purchase request is not found.
    * @throws {400} If the request is not in DRAFT status or has no items.
    */
-  static async submit(prId: number, userId: number) {
+  static async submit(prId: string, userId: string) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -415,7 +415,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the purchase request is not found.
    * @throws {400} If the request is not in SUBMITTED status.
    */
-  static async approve(prId: number, approverId: number) {
+  static async approve(prId: string, approverId: string) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()
@@ -463,7 +463,7 @@ export abstract class PurchaseRequestService {
    * @throws {404} If the purchase request is not found.
    * @throws {400} If the request is not in SUBMITTED status.
    */
-  static async reject(prId: number, approverId: number) {
+  static async reject(prId: string, approverId: string) {
     return await db.transaction(async (tx) => {
       const prData = await tx
         .select()

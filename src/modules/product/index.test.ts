@@ -9,7 +9,7 @@ const api = treaty(app);
  */
 describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
   let validCookie: string = "";
-  let createdProductId: number;
+  let createdProductId: string;
 
   beforeAll(async () => {
     const { response } = await api.auth.login.post({
@@ -97,7 +97,7 @@ describe("Product Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should return 404 for non-existent product", async () => {
-      const { status } = await api.products({ id: 999999 }).get({
+      const { status } = await api.products({ id: "999999" }).get({
         headers: { cookie: validCookie },
       });
       expect(status).toBe(404);

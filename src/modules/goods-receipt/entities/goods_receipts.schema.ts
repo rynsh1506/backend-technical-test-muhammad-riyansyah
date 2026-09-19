@@ -1,18 +1,17 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
-  serial,
   varchar,
   timestamp,
-  integer,
-} from "drizzle-orm/pg-core";
+  } from "drizzle-orm/pg-core";
 import { purchaseOrders } from "@/modules/purchase-order/entities/purchase_orders.schema";
 
 export const goodsReceipts = pgTable("goods_receipts", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 24 }).$defaultFn(() => createId()).primaryKey(),
   grNumber: varchar("gr_number", { length: 50 }).notNull().unique(),
-  purchaseOrderId: integer("purchase_order_id")
+  purchaseOrderId: varchar("purchase_order_id", { length: 24 })
     .notNull()
     .references(() => purchaseOrders.id, { onDelete: "restrict" }),
-  receivedBy: integer("received_by").notNull(),
+  receivedBy: varchar("received_by", { length: 24 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

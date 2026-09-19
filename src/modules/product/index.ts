@@ -54,7 +54,7 @@ export const productController = new Elysia({ prefix: "/products" })
       return await ProductService.getById(id);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       response: productResponseDto,
       detail: {
         tags: ["Master Data: Product"],
@@ -68,7 +68,7 @@ export const productController = new Elysia({ prefix: "/products" })
       return await ProductService.update(id, body);
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: productUpdateDto,
       response: productResponseDto,
       detail: {

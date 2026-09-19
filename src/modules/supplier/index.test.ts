@@ -9,7 +9,7 @@ const api = treaty(app);
  */
 describe("Supplier Module (Eden Treaty E2E Type-Safe)", () => {
   let validCookie: string = "";
-  let createdSupplierId: number;
+  let createdSupplierId: string;
 
   beforeAll(async () => {
     const { response } = await api.auth.login.post({
@@ -99,7 +99,7 @@ describe("Supplier Module (Eden Treaty E2E Type-Safe)", () => {
     });
 
     it("should return 404 for non-existent supplier", async () => {
-      const { status } = await api.suppliers({ id: 999999 }).get({
+      const { status } = await api.suppliers({ id: "999999" }).get({
         headers: { cookie: validCookie },
       });
       expect(status).toBe(404);

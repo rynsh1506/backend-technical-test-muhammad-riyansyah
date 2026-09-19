@@ -75,7 +75,7 @@ export abstract class ProductService {
    * @returns The matching product record.
    * @throws {404} If no product with the given ID exists.
    */
-  static async getById(id: number) {
+  static async getById(id: string) {
     const result = await db
       .select()
       .from(products)
@@ -98,7 +98,7 @@ export abstract class ProductService {
    * @throws {404} If no product with the given ID exists.
    * @throws {500} If the database update unexpectedly returns no data.
    */
-  static async update(id: number, data: Static<typeof productUpdateDto>) {
+  static async update(id: string, data: Static<typeof productUpdateDto>) {
     await this.getById(id);
     const result = await db
       .update(products)
