@@ -53,9 +53,7 @@ export const purchaseOrderItems = pgTable(
     quantity: integer("quantity").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => ({
-    quantityCheck: check("po_item_quantity_check", sql`${table.quantity} > 0`),
-  }),
+  (table) => [check("po_item_quantity_check", sql`${table.quantity} > 0`)],
 );
 
 /** TypeBox Schemas */
