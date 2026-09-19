@@ -6,7 +6,7 @@ import { products } from "./entities/products.schema";
 
 /**
  * ==========================================
- * 2. BASE SCHEMAS (Drizzle TypeBox)
+ * BASE SCHEMAS (Drizzle TypeBox)
  * ==========================================
  * Auto-generated TypeBox schemas directly from the database tables.
  */
