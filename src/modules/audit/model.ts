@@ -7,6 +7,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { users } from "@/modules/auth/model";
+import { createInsertSchema, createSelectSchema } from "drizzle-typebox";
 
 export const auditLogs = pgTable("audit_logs", {
   id: serial("id").primaryKey(),
@@ -28,3 +29,8 @@ export const idempotencyKeys = pgTable("idempotency_keys", {
   response: jsonb("response"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs);
+export const selectAuditLogSchema = createSelectSchema(auditLogs);
+export const insertIdempotencyKeySchema = createInsertSchema(idempotencyKeys);
+export const selectIdempotencyKeySchema = createSelectSchema(idempotencyKeys);
