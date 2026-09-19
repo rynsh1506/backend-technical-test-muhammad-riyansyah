@@ -12,10 +12,12 @@ import {
   inventoryMovements,
 } from "@/modules/inventory/model";
 import { auditLogs } from "@/modules/audit/model";
-import { eq, inArray, and, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { status as elysiaStatus } from "elysia";
 import { generateDocumentNumber } from "@/utils/generator";
 import { purchaseRequests } from "@/modules/purchase-request/model";
+
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export abstract class GoodsReceiptService {
   /**
@@ -28,98 +30,24 @@ export abstract class GoodsReceiptService {
     items: { productId: number; quantity: number }[],
   ) {
     return await db.transaction(async (tx) => {
-      const poList = await tx
-        .select()
-        .from(purchaseOrders)
-        .where(eq(purchaseOrders.id, poId))
-        .limit(1);
+      const po = await this.getValidPurchaseOrder(tx, poId);
+      const poItemsList = await this.getPurchaseOrderItems(tx, poId);
+      const receivedMap = await this.getPreviousReceiptQuantities(tx, poId);
 
-      if (poList.length === 0) {
-        throw elysiaStatus(404, {
-          error: { code: "NOT_FOUND", message: "Purchase Order not found" },
-        });
-      }
-      const po = poList[0]!;
+      const groupedIncoming = this.groupIncomingItems(items);
 
-      if (po.status !== "ORDERED" && po.status !== "PARTIALLY_RECEIVED") {
-        throw elysiaStatus(400, {
-          error: {
-            code: "INVALID_STATUS",
-            message: `Cannot receive goods for PO with status ${po.status}`,
-          },
-        });
-      }
-
-      const poItemsList = await tx
-        .select()
-        .from(purchaseOrderItems)
-        .where(eq(purchaseOrderItems.purchaseOrderId, poId));
-
-      const poItemsMap = new Map(
-        poItemsList.map((item) => [item.productId, item]),
+      this.validateIncomingQuantities(
+        groupedIncoming,
+        poItemsList,
+        receivedMap,
+        po.poNumber,
       );
 
-      const previousReceipts = await tx
-        .select({
-          productId: goodsReceiptItems.productId,
-          totalReceived: sql<number>`CAST(SUM(${goodsReceiptItems.quantity}) AS INTEGER)`,
-        })
-        .from(goodsReceiptItems)
-        .innerJoin(
-          goodsReceipts,
-          eq(goodsReceipts.id, goodsReceiptItems.goodsReceiptId),
-        )
-        .where(eq(goodsReceipts.purchaseOrderId, poId))
-        .groupBy(goodsReceiptItems.productId);
-
-      const receivedMap = new Map(
-        previousReceipts.map((pr) => [pr.productId, pr.totalReceived]),
+      const isFullyReceived = this.checkIfFullyReceived(
+        poItemsList,
+        receivedMap,
+        groupedIncoming,
       );
-
-      let totalItemsOrdered = 0;
-      let totalItemsReceivedAfterThis = 0;
-
-      const groupedIncoming = new Map<number, number>();
-      for (const item of items) {
-        groupedIncoming.set(
-          item.productId,
-          (groupedIncoming.get(item.productId) || 0) + item.quantity,
-        );
-      }
-
-      for (const [productId, incomingQty] of groupedIncoming.entries()) {
-        const poItem = poItemsMap.get(productId);
-        if (!poItem) {
-          throw elysiaStatus(400, {
-            error: {
-              code: "INVALID_PRODUCT",
-              message: `Product ID ${productId} is not part of Purchase Order ${po.poNumber}`,
-            },
-          });
-        }
-
-        const previouslyReceived = receivedMap.get(productId) || 0;
-        const remaining = poItem.quantity - previouslyReceived;
-
-        if (incomingQty > remaining) {
-          throw elysiaStatus(400, {
-            error: {
-              code: "OVER_RECEIPT",
-              message: `Cannot receive ${incomingQty} for product ${productId}. Only ${remaining} remaining.`,
-            },
-          });
-        }
-      }
-
-      let isFullyReceived = true;
-      for (const poItem of poItemsList) {
-        const previouslyReceived = receivedMap.get(poItem.productId) || 0;
-        const incomingQty = groupedIncoming.get(poItem.productId) || 0;
-        const finalQty = previouslyReceived + incomingQty;
-        if (finalQty < poItem.quantity) {
-          isFullyReceived = false;
-        }
-      }
 
       const grNumber = await generateDocumentNumber(
         goodsReceipts,
@@ -136,50 +64,13 @@ export abstract class GoodsReceiptService {
         })
         .returning();
 
-      const prList = await tx
-        .select({ warehouseId: purchaseRequests.warehouseId })
-        .from(purchaseRequests)
-        .where(eq(purchaseRequests.id, po.purchaseRequestId))
-        .limit(1);
-
-      const warehouseId = prList[0]!.warehouseId;
-
-      const grItemsToInsert = [];
-      const inventoryMovementsToInsert = [];
-
-      for (const [productId, incomingQty] of groupedIncoming.entries()) {
-        grItemsToInsert.push({
-          goodsReceiptId: newGr!.id,
-          productId,
-          quantity: incomingQty,
-        });
-
-        inventoryMovementsToInsert.push({
-          warehouseId,
-          productId,
-          quantity: incomingQty,
-          referenceType: "GOODS_RECEIPT",
-          referenceId: grNumber,
-        });
-
-        await tx
-          .insert(inventoryBalances)
-          .values({
-            warehouseId,
-            productId,
-            stock: incomingQty,
-          })
-          .onConflictDoUpdate({
-            target: [
-              inventoryBalances.warehouseId,
-              inventoryBalances.productId,
-            ],
-            set: { stock: sql`${inventoryBalances.stock} + ${incomingQty}` },
-          });
-      }
-
-      await tx.insert(goodsReceiptItems).values(grItemsToInsert);
-      await tx.insert(inventoryMovements).values(inventoryMovementsToInsert);
+      await this.processInventoryUpdates(
+        tx,
+        po.purchaseRequestId,
+        newGr!.id,
+        grNumber,
+        groupedIncoming,
+      );
 
       const newStatus = isFullyReceived ? "RECEIVED" : "PARTIALLY_RECEIVED";
       if (po.status !== newStatus) {
@@ -226,5 +117,174 @@ export abstract class GoodsReceiptService {
       .where(eq(goodsReceiptItems.goodsReceiptId, grId));
 
     return { ...grList[0]!, items };
+  }
+
+  private static async getValidPurchaseOrder(tx: Tx, poId: number) {
+    const poList = await tx
+      .select()
+      .from(purchaseOrders)
+      .where(eq(purchaseOrders.id, poId))
+      .limit(1);
+
+    if (poList.length === 0) {
+      throw elysiaStatus(404, {
+        error: { code: "NOT_FOUND", message: "Purchase Order not found" },
+      });
+    }
+
+    const po = poList[0]!;
+    if (po.status !== "ORDERED" && po.status !== "PARTIALLY_RECEIVED") {
+      throw elysiaStatus(400, {
+        error: {
+          code: "INVALID_STATUS",
+          message: `Cannot receive goods for PO with status ${po.status}`,
+        },
+      });
+    }
+    return po;
+  }
+
+  private static async getPurchaseOrderItems(tx: Tx, poId: number) {
+    return await tx
+      .select()
+      .from(purchaseOrderItems)
+      .where(eq(purchaseOrderItems.purchaseOrderId, poId));
+  }
+
+  private static async getPreviousReceiptQuantities(
+    tx: Tx,
+    poId: number,
+  ): Promise<Map<number, number>> {
+    const previousReceipts = await tx
+      .select({
+        productId: goodsReceiptItems.productId,
+        totalReceived: sql<number>`CAST(SUM(${goodsReceiptItems.quantity}) AS INTEGER)`,
+      })
+      .from(goodsReceiptItems)
+      .innerJoin(
+        goodsReceipts,
+        eq(goodsReceipts.id, goodsReceiptItems.goodsReceiptId),
+      )
+      .where(eq(goodsReceipts.purchaseOrderId, poId))
+      .groupBy(goodsReceiptItems.productId);
+
+    return new Map(
+      previousReceipts.map((pr) => [pr.productId, pr.totalReceived]),
+    );
+  }
+
+  private static groupIncomingItems(
+    items: { productId: number; quantity: number }[],
+  ): Map<number, number> {
+    const grouped = new Map<number, number>();
+    for (const item of items) {
+      grouped.set(
+        item.productId,
+        (grouped.get(item.productId) || 0) + item.quantity,
+      );
+    }
+    return grouped;
+  }
+
+  private static validateIncomingQuantities(
+    groupedIncoming: Map<number, number>,
+    poItemsList: { productId: number; quantity: number }[],
+    receivedMap: Map<number, number>,
+    poNumber: string,
+  ) {
+    const poItemsMap = new Map(
+      poItemsList.map((item) => [item.productId, item]),
+    );
+
+    for (const [productId, incomingQty] of groupedIncoming.entries()) {
+      const poItem = poItemsMap.get(productId);
+      if (!poItem) {
+        throw elysiaStatus(400, {
+          error: {
+            code: "INVALID_PRODUCT",
+            message: `Product ID ${productId} is not part of Purchase Order ${poNumber}`,
+          },
+        });
+      }
+
+      const previouslyReceived = receivedMap.get(productId) || 0;
+      const remaining = poItem.quantity - previouslyReceived;
+
+      if (incomingQty > remaining) {
+        throw elysiaStatus(400, {
+          error: {
+            code: "OVER_RECEIPT",
+            message: `Cannot receive ${incomingQty} for product ${productId}. Only ${remaining} remaining.`,
+          },
+        });
+      }
+    }
+  }
+
+  private static checkIfFullyReceived(
+    poItemsList: { productId: number; quantity: number }[],
+    receivedMap: Map<number, number>,
+    groupedIncoming: Map<number, number>,
+  ): boolean {
+    for (const poItem of poItemsList) {
+      const previouslyReceived = receivedMap.get(poItem.productId) || 0;
+      const incomingQty = groupedIncoming.get(poItem.productId) || 0;
+      const finalQty = previouslyReceived + incomingQty;
+
+      if (finalQty < poItem.quantity) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static async processInventoryUpdates(
+    tx: Tx,
+    purchaseRequestId: number,
+    grId: number,
+    grNumber: string,
+    groupedIncoming: Map<number, number>,
+  ) {
+    const prList = await tx
+      .select({ warehouseId: purchaseRequests.warehouseId })
+      .from(purchaseRequests)
+      .where(eq(purchaseRequests.id, purchaseRequestId))
+      .limit(1);
+
+    const warehouseId = prList[0]!.warehouseId;
+
+    const grItemsToInsert = [];
+    const inventoryMovementsToInsert = [];
+
+    for (const [productId, incomingQty] of groupedIncoming.entries()) {
+      grItemsToInsert.push({
+        goodsReceiptId: grId,
+        productId,
+        quantity: incomingQty,
+      });
+
+      inventoryMovementsToInsert.push({
+        warehouseId,
+        productId,
+        quantity: incomingQty,
+        referenceType: "GOODS_RECEIPT",
+        referenceId: grNumber,
+      });
+
+      await tx
+        .insert(inventoryBalances)
+        .values({
+          warehouseId,
+          productId,
+          stock: incomingQty,
+        })
+        .onConflictDoUpdate({
+          target: [inventoryBalances.warehouseId, inventoryBalances.productId],
+          set: { stock: sql`${inventoryBalances.stock} + ${incomingQty}` },
+        });
+    }
+
+    await tx.insert(goodsReceiptItems).values(grItemsToInsert);
+    await tx.insert(inventoryMovements).values(inventoryMovementsToInsert);
   }
 }
