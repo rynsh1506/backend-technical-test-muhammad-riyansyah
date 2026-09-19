@@ -53,7 +53,7 @@ export class IdempotencyService {
   }
 }
 
-// A very simple middleware to extract the key from headers so controllers can access it.
+/** A very simple middleware to extract the key from headers so controllers can access it. */
 export const idempotencyPlugin = new Elysia({
   name: "IdempotencyPlugin",
 }).derive(({ headers }) => {
