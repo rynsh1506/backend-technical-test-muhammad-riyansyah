@@ -259,6 +259,82 @@ Jika Anda ingin menjalankannya secara lokal menggunakan Bun:
 
 ---
 
+
+---
+
+## ⚡ Contoh E2E Request (API Walkthrough)
+
+Untuk mempermudah pengujian manual via Terminal atau Postman, berikut adalah urutan *End-to-End* (*Happy Path*):
+
+### 1. Login sebagai USER (Staff)
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "staff_user", "password": "password123"}' \
+  -c cookies.txt
+```
+*(Perhatikan parameter `-c cookies.txt` untuk menyimpan HttpOnly JWT Cookie)*
+
+### 2. Buat Purchase Request (DRAFT)
+```bash
+curl -X POST http://localhost:3000/purchase-requests \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{"warehouseId": 1}'
+```
+
+### 3. Tambah Item ke PR
+```bash
+# Asumsikan ID PR yang baru dibuat adalah 1
+curl -X POST http://localhost:3000/purchase-requests/1/items \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{"productId": 1, "quantity": 50}'
+```
+
+### 4. Submit PR & Tambahkan Idempotency Key
+```bash
+curl -X POST http://localhost:3000/purchase-requests/1/submit \
+  -H "Idempotency-Key: submit-pr-1" \
+  -b cookies.txt
+```
+
+### 5. Login sebagai APPROVER (Manager)
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "manager_approver", "password": "password123"}' \
+  -c cookies_manager.txt
+```
+
+### 6. Approve PR
+```bash
+curl -X POST http://localhost:3000/purchase-requests/1/approve \
+  -b cookies_manager.txt
+```
+
+### 7. Buat Purchase Order (PO)
+```bash
+curl -X POST http://localhost:3000/purchase-orders \
+  -H "Content-Type: application/json" \
+  -b cookies_manager.txt \
+  -d '{"purchaseRequestId": 1, "supplierId": 1}'
+```
+
+### 8. Terima Barang (Goods Receipt)
+```bash
+# Asumsikan ID PO yang baru dibuat adalah 1
+curl -X POST http://localhost:3000/goods-receipts \
+  -H "Content-Type: application/json" \
+  -b cookies_manager.txt \
+  -d '{
+    "purchaseOrderId": 1,
+    "items": [
+      { "productId": 1, "quantity": 50 }
+    ]
+  }'
+```
+
 ## 🌱 Seeding Database (Penting untuk Penguji)
 
 Untuk memudahkan pengujian (baik via Scalar UI maupun Postman), jalankan _Seeder_ untuk mengisi _Master Data_ dan 2 Akun Utama secara otomatis:
