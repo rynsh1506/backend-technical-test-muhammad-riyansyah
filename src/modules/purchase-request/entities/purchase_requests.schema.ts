@@ -5,13 +5,8 @@ import {
   varchar,
   timestamp,
   integer,
-  boolean,
   unique,
-  check,
-  text,
-  jsonb,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { users } from "@/modules/auth/entities/users.schema";
 import { warehouses } from "@/modules/warehouse/entities/warehouses.schema";
 
