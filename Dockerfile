@@ -8,8 +8,12 @@ RUN bun install --frozen-lockfile
 # Copy application code
 COPY . .
 
+# Add execution permission to entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Expose the Elysia port
 EXPOSE 3000
 
-# Start the application
-CMD ["bun", "run", "index.ts"]
+# Start the application via entrypoint script
+ENTRYPOINT ["docker-entrypoint.sh"]
