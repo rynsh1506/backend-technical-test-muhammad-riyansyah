@@ -37,19 +37,19 @@ describe("Purchase Request Module", () => {
       { code: `WH-PR-${randomSuffix}`, name: "PR Warehouse", location: "Loc" },
       { headers: userCookie },
     );
-    warehouseId = (whRes.data as any).id;
+    warehouseId = (whRes.data as {id: number}).id;
 
     const p1Res = await api.products.post(
       { sku: `SKU-PR-1-${randomSuffix}`, name: "PR Prod 1", unit: "PCS" },
       { headers: userCookie },
     );
-    productId1 = (p1Res.data as any).id;
+    productId1 = (p1Res.data as {id: number}).id;
 
     const p2Res = await api.products.post(
       { sku: `SKU-PR-2-${randomSuffix}`, name: "PR Prod 2", unit: "PCS" },
       { headers: userCookie },
     );
-    productId2 = (p2Res.data as any).id;
+    productId2 = (p2Res.data as {id: number}).id;
   });
 
   describe("Draft Creation and Updates", () => {
@@ -59,8 +59,8 @@ describe("Purchase Request Module", () => {
         { headers: userCookie },
       );
       expect(res.status).toBe(200);
-      expect((res.data as any).status).toBe("DRAFT");
-      expect((res.data as any).requestNumber).toStartWith("PR-");
+      expect((res.data as {status: string}).status).toBe("DRAFT");
+      expect((res.data as {requestNumber: string}).requestNumber).toStartWith("PR-");
     });
 
     it("should allow USER to add items to DRAFT PR", async () => {
@@ -68,14 +68,14 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
 
       const itemRes = await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
       );
       expect(itemRes.status).toBe(200);
-      expect((itemRes.data as any).quantity).toBe(10);
+      expect((itemRes.data as {quantity: number}).quantity).toBe(10);
     });
 
     it("should prevent duplicate products in the same PR", async () => {
@@ -83,7 +83,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
 
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
@@ -95,7 +95,7 @@ describe("Purchase Request Module", () => {
         { headers: userCookie },
       );
       expect(dupRes.status).toBe(400);
-      expect((dupRes.error as any).value.error.code).toBe("DUPLICATE_PRODUCT");
+      expect((dupRes.error?.value as unknown as {error: {code: string}}).error.code).toBe("DUPLICATE_PRODUCT");
     });
   });
 
@@ -105,12 +105,12 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       const submitRes = await api["purchase-requests"]({
         id: prId,
       }).submit.post({}, { headers: userCookie });
       expect(submitRes.status).toBe(400);
-      expect((submitRes.error as any).value.error.code).toBe("EMPTY_REQUEST");
+      expect((submitRes.error?.value as unknown as {error: {code: string}}).error.code).toBe("EMPTY_REQUEST");
     });
 
     it("should successfully SUBMIT a PR with items", async () => {
@@ -118,7 +118,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -127,7 +127,7 @@ describe("Purchase Request Module", () => {
         id: prId,
       }).submit.post({}, { headers: userCookie });
       expect(submitRes.status).toBe(200);
-      expect((submitRes.data as any).status).toBe("SUBMITTED");
+      expect((submitRes.data as {status: string}).status).toBe("SUBMITTED");
     });
 
     it("should reject APPROVE if PR is not SUBMITTED", async () => {
@@ -135,12 +135,12 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       const approveRes = await api["purchase-requests"]({
         id: prId,
       }).approve.post({}, { headers: approverCookie });
       expect(approveRes.status).toBe(400);
-      expect((approveRes.error as any).value.error.code).toBe("INVALID_STATUS");
+      expect((approveRes.error?.value as unknown as {error: {code: string}}).error.code).toBe("INVALID_STATUS");
     });
 
     it("should reject APPROVE if user is not APPROVER role", async () => {
@@ -148,7 +148,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -162,7 +162,7 @@ describe("Purchase Request Module", () => {
         id: prId,
       }).approve.post({}, { headers: userCookie });
       expect(approveRes.status).toBe(403);
-      expect((approveRes.error as any).value.error.code).toBe("FORBIDDEN");
+      expect((approveRes.error?.value as unknown as {error: {code: string}}).error.code).toBe("FORBIDDEN");
     });
 
     it("should allow APPROVER to APPROVE a SUBMITTED PR", async () => {
@@ -170,7 +170,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 10 },
         { headers: userCookie },
@@ -184,7 +184,7 @@ describe("Purchase Request Module", () => {
         id: prId,
       }).approve.post({}, { headers: approverCookie });
       expect(approveRes.status).toBe(200);
-      expect((approveRes.data as any).status).toBe("APPROVED");
+      expect((approveRes.data as {status: string}).status).toBe("APPROVED");
     });
   });
 
@@ -194,7 +194,7 @@ describe("Purchase Request Module", () => {
         { warehouseId },
         { headers: userCookie },
       );
-      const prId = (draftRes.data as any).id;
+      const prId = (draftRes.data as {id: number}).id;
       await api["purchase-requests"]({ id: prId }).items.post(
         { productId: productId1, quantity: 5 },
         { headers: userCookie },
@@ -216,8 +216,8 @@ describe("Purchase Request Module", () => {
       );
       expect(submit2.status).toBe(200);
       expect(
-        new Date((submit2.data as any).updatedAt as string).toISOString(),
-      ).toBe(new Date((submit1.data as any).updatedAt as string).toISOString());
+        new Date((submit2.data as {updatedAt: string}).updatedAt as string).toISOString(),
+      ).toBe(new Date((submit1.data as {updatedAt: string}).updatedAt as string).toISOString());
     });
   });
 });

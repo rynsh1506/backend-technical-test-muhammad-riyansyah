@@ -7,7 +7,7 @@ import {
   prItemUpdateDto,
 } from "@/modules/purchase-request/model";
 import { isAuthenticated } from "@/utils/auth";
-import { idempotencyPlugin } from "@/utils/idempotency";
+import { idempotencyPlugin, IdempotencyService } from "@/utils/idempotency";
 import { status } from "elysia";
 
 export const purchaseRequestController = new Elysia({
@@ -22,41 +22,27 @@ export const purchaseRequestController = new Elysia({
    */
   .post(
     "/",
-    async ({
-      body,
-      user,
-      request,
-      idempotencyKey,
-      checkIdempotency,
-      saveIdempotency,
-    }) => {
+    async ({ body, user, request, headers }) => {
       if (user.role !== "USER") {
         throw status(403, {
           error: { code: "FORBIDDEN", message: "Only USER can create PR" },
         });
       }
 
-      if (checkIdempotency) {
-        await checkIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-        );
-      }
+      await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const pr = await PurchaseRequestService.createDraft(
         user.id,
         body.warehouseId,
       );
 
-      if (saveIdempotency) {
-        await saveIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-          pr,
-        );
-      }
+      await IdempotencyService.save(
+        user.id,
+        "idempotency-key" in headers ? headers["idempotency-key"] : undefined,
+        new URL(request.url).pathname,
+        request.method,
+        pr,
+      );
       return pr;
     },
     {
@@ -120,6 +106,7 @@ export const purchaseRequestController = new Elysia({
       return await PurchaseRequestService.updateDraft(
         Number(id),
         body.warehouseId!,
+        user.id
       );
     },
     {
@@ -144,6 +131,7 @@ export const purchaseRequestController = new Elysia({
         Number(id),
         body.productId,
         body.quantity,
+        user.id
       );
     },
     {
@@ -170,6 +158,7 @@ export const purchaseRequestController = new Elysia({
       return await PurchaseRequestService.updateItem(
         Number(itemId),
         body.quantity,
+        user.id
       );
     },
     {
@@ -193,7 +182,7 @@ export const purchaseRequestController = new Elysia({
           },
         });
       }
-      return await PurchaseRequestService.removeItem(Number(itemId));
+      return await PurchaseRequestService.removeItem(Number(itemId), user.id);
     },
     {
       detail: { tags: ["Purchase Request"], summary: "Remove Item from PR" },
@@ -206,37 +195,24 @@ export const purchaseRequestController = new Elysia({
    */
   .post(
     "/:id/submit",
-    async ({
-      params: { id },
-      user,
-      request,
-      checkIdempotency,
-      saveIdempotency,
-    }) => {
+    async ({ params: { id }, user, request, headers }) => {
       if (user.role !== "USER") {
         throw status(403, {
           error: { code: "FORBIDDEN", message: "Only USER can submit PR" },
         });
       }
 
-      if (checkIdempotency) {
-        await checkIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-        );
-      }
+      await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const pr = await PurchaseRequestService.submit(Number(id), user.id);
 
-      if (saveIdempotency) {
-        await saveIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-          pr,
-        );
-      }
+      await IdempotencyService.save(
+        user.id,
+        "idempotency-key" in headers ? headers["idempotency-key"] : undefined,
+        new URL(request.url).pathname,
+        request.method,
+        pr,
+      );
       return pr;
     },
     {
@@ -250,37 +226,24 @@ export const purchaseRequestController = new Elysia({
    */
   .post(
     "/:id/approve",
-    async ({
-      params: { id },
-      user,
-      request,
-      checkIdempotency,
-      saveIdempotency,
-    }) => {
+    async ({ params: { id }, user, request, headers }) => {
       if (user.role !== "APPROVER") {
         throw status(403, {
           error: { code: "FORBIDDEN", message: "Only APPROVER can approve PR" },
         });
       }
 
-      if (checkIdempotency) {
-        await checkIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-        );
-      }
+      await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const pr = await PurchaseRequestService.approve(Number(id), user.id);
 
-      if (saveIdempotency) {
-        await saveIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-          pr,
-        );
-      }
+      await IdempotencyService.save(
+        user.id,
+        "idempotency-key" in headers ? headers["idempotency-key"] : undefined,
+        new URL(request.url).pathname,
+        request.method,
+        pr,
+      );
       return pr;
     },
     {
@@ -294,37 +257,24 @@ export const purchaseRequestController = new Elysia({
    */
   .post(
     "/:id/reject",
-    async ({
-      params: { id },
-      user,
-      request,
-      checkIdempotency,
-      saveIdempotency,
-    }) => {
+    async ({ params: { id }, user, request, headers }) => {
       if (user.role !== "APPROVER") {
         throw status(403, {
           error: { code: "FORBIDDEN", message: "Only APPROVER can reject PR" },
         });
       }
 
-      if (checkIdempotency) {
-        await checkIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-        );
-      }
+      await IdempotencyService.check(user.id, headers["idempotency-key"]);
 
       const pr = await PurchaseRequestService.reject(Number(id), user.id);
 
-      if (saveIdempotency) {
-        await saveIdempotency(
-          user.id,
-          new URL(request.url).pathname,
-          request.method,
-          pr,
-        );
-      }
+      await IdempotencyService.save(
+        user.id,
+        "idempotency-key" in headers ? headers["idempotency-key"] : undefined,
+        new URL(request.url).pathname,
+        request.method,
+        pr,
+      );
       return pr;
     },
     {
