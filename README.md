@@ -73,57 +73,33 @@ flowchart TD
     style K fill:#28a745,color:#fff
 ```
 
-## 🗄️ Desain Database Saat Ini (Current ERD)
+## 🗄️ Desain Database Saat Ini (Domain ERDs)
+
+Untuk menjaga diagram agar tetap rapi dan mudah dibaca (tidak saling tumpang tindih), ERD dipecah menjadi 2 domain bisnis utama:
+
+### 1. Domain Pengadaan (Procurement)
+Mencakup alur persetujuan, pemesanan, hingga penerimaan barang.
 
 ```mermaid
 erDiagram
-    USERS {
-        serial id PK
-        varchar username UK
-        varchar password
-        enum role "USER | APPROVER"
-        timestamp created_at
-    }
-
-    PRODUCTS {
-        serial id PK
-        varchar sku UK
-        varchar name
-        varchar unit
-        boolean is_active
-    }
-
-    SUPPLIERS {
-        serial id PK
-        varchar name
-        varchar email
-        varchar phone
-        boolean is_active
-    }
-
-    WAREHOUSES {
-        serial id PK
-        varchar code UK
-        varchar name
-        varchar location
-        boolean is_active
-    }
+    PURCHASE_REQUESTS ||--o{ PURCHASE_REQUEST_ITEMS : "contains"
+    PURCHASE_REQUESTS ||--o| PURCHASE_ORDERS : "converted_to"
+    PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_ITEMS : "contains"
+    PURCHASE_ORDERS ||--o{ GOODS_RECEIPTS : "fulfilled_by"
+    GOODS_RECEIPTS ||--o{ GOODS_RECEIPT_ITEMS : "contains"
 
     PURCHASE_REQUESTS {
         serial id PK
         varchar pr_number UK
         integer warehouse_id FK
-        integer requested_by FK
         enum status
     }
-
     PURCHASE_REQUEST_ITEMS {
         serial id PK
         integer pr_id FK
         integer product_id FK
         integer quantity
     }
-
     PURCHASE_ORDERS {
         serial id PK
         varchar po_number UK
@@ -131,35 +107,60 @@ erDiagram
         integer supplier_id FK
         enum status
     }
-
     PURCHASE_ORDER_ITEMS {
         serial id PK
         integer po_id FK
         integer product_id FK
         integer quantity
     }
-
     GOODS_RECEIPTS {
         serial id PK
         varchar gr_number UK
         integer po_id FK
         integer received_by FK
     }
-
     GOODS_RECEIPT_ITEMS {
         serial id PK
         integer gr_id FK
         integer product_id FK
         integer quantity
     }
+```
 
+### 2. Domain Inventori & Master Data
+Mencakup catatan stok, histori mutasi, dan relasi data induk.
+
+```mermaid
+erDiagram
+    WAREHOUSES ||--o{ INVENTORY_BALANCES : "has"
+    WAREHOUSES ||--o{ INVENTORY_MOVEMENTS : "tracks"
+    PRODUCTS ||--o{ INVENTORY_BALANCES : "stocked_as"
+    PRODUCTS ||--o{ INVENTORY_MOVEMENTS : "moved_as"
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : "supplies"
+
+    WAREHOUSES {
+        serial id PK
+        varchar code UK
+        varchar name
+        varchar location
+    }
+    PRODUCTS {
+        serial id PK
+        varchar sku UK
+        varchar name
+        varchar unit
+    }
+    SUPPLIERS {
+        serial id PK
+        varchar name
+        varchar email
+    }
     INVENTORY_BALANCES {
         serial id PK
         integer warehouse_id FK
         integer product_id FK
         integer stock
     }
-
     INVENTORY_MOVEMENTS {
         serial id PK
         integer warehouse_id FK
@@ -167,38 +168,9 @@ erDiagram
         integer quantity
         varchar reference_type
     }
-
-    AUDIT_LOGS {
-        serial id PK
-        varchar entity_name
-        integer entity_id
-        varchar action
-        integer performed_by FK
-    }
-
-    %% Core Relationships (Tali Relasi Utama)
-    %% (Relasi ke USERS & AUDIT disembunyikan agar visual diagram tidak berantakan/spaghetti)
-    
-    WAREHOUSES ||--o{ INVENTORY_BALANCES : "has"
-    WAREHOUSES ||--o{ INVENTORY_MOVEMENTS : "tracks"
-    
-    SUPPLIERS ||--o{ PURCHASE_ORDERS : "supplies"
-    
-    PRODUCTS ||--o{ PURCHASE_REQUEST_ITEMS : "has"
-    PRODUCTS ||--o{ PURCHASE_ORDER_ITEMS : "has"
-    PRODUCTS ||--o{ GOODS_RECEIPT_ITEMS : "has"
-    PRODUCTS ||--o{ INVENTORY_BALANCES : "stocked_as"
-
-    PURCHASE_REQUESTS ||--o{ PURCHASE_REQUEST_ITEMS : "contains"
-    PURCHASE_REQUESTS ||--o| PURCHASE_ORDERS : "converted_to"
-
-    PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_ITEMS : "contains"
-    PURCHASE_ORDERS ||--o{ GOODS_RECEIPTS : "fulfilled_by"
-
-    GOODS_RECEIPTS ||--o{ GOODS_RECEIPT_ITEMS : "contains"
 ```
 
-_(Catatan: Diagram di atas merupakan ERD lengkap dari keseluruhan domain proyek ini)._
+*(Tabel `USERS` dan `AUDIT_LOGS` tidak digambarkan secara eksplisit untuk menjaga agar diagram tidak berantakan, namun terhubung ke hampir seluruh entitas sebagai pelacak aksi/aktor).*
 
 ## 🧠 Keputusan Teknis (Engineering Decisions)
 
