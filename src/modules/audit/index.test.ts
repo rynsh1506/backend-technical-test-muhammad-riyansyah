@@ -37,6 +37,8 @@ describe("Audit Module (Eden Treaty E2E Type-Safe)", () => {
       headers: approverCookie,
     });
     expect(status).toBe(200);
-    expect(Array.isArray(data)).toBe(true);
+    expect(data).toHaveProperty("data");
+    expect(Array.isArray((data as { data: unknown[] }).data)).toBe(true);
+    expect(data).toHaveProperty("meta");
   });
 });
