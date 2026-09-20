@@ -37,8 +37,10 @@ describe("Audit Module (Eden Treaty E2E Type-Safe)", () => {
       headers: approverCookie,
     });
     expect(status).toBe(200);
-    expect(data).toHaveProperty("data");
-    expect(Array.isArray((data as { data: unknown[] }).data)).toBe(true);
+    if (!data || typeof data !== "object" || !("data" in data)) {
+      throw new Error("Invalid response format");
+    }
+    expect(Array.isArray(data.data)).toBe(true);
     expect(data).toHaveProperty("meta");
   });
 });
